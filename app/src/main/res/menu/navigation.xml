@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/translator"
+        android:icon="@drawable/ic_school"
+        android:title="@string/title_translator"/>
+
+    <item
+        android:id="@+id/favourite"
+        android:icon="@drawable/ic_dashboard_black_24dp"
+        android:title="@string/title_favourite"/>
+
+    <item
+        android:id="@+id/history"
+        android:icon="@drawable/ic_notifications_black_24dp"
+        android:title="@string/title_history"/>
+
+</menu>
