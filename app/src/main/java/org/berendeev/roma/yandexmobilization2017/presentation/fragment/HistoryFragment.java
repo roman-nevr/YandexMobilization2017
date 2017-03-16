@@ -10,10 +10,10 @@ import android.view.ViewGroup;
 import org.berendeev.roma.yandexmobilization2017.R;
 
 
-public class TranslatorFragment extends Fragment {
+public class HistoryFragment extends Fragment {
+
     @Nullable @Override public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-//        return super.onCreateView(inflater, container, savedInstanceState);
-        View view = inflater.inflate(R.layout.translator, container, false);
+        View view = inflater.inflate(R.layout.history_layout, container, false);
         return view;
     }
 }
