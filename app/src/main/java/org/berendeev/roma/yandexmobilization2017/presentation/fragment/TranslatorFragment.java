@@ -19,18 +19,19 @@ public class TranslatorFragment extends Fragment {
     @Nullable @Override public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 //        return super.onCreateView(inflater, container, savedInstanceState);
         View view = inflater.inflate(R.layout.translator, container, false);
+
         toolbar = (Toolbar) view.findViewById(R.id.toolbar);
+        View actionView = inflater.inflate(R.layout.translator_action_bar, container, false);
 
-
+        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
+        ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
+        actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM
+                | ActionBar.DISPLAY_SHOW_HOME);
+        actionBar.setCustomView(actionView);
         return view;
     }
 
-    @Override public void onResume() {
-        super.onResume();
-        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
-        ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
-        actionBar.setCustomView(R.layout.translator_action_bar);
-        actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM
-                | ActionBar.DISPLAY_SHOW_HOME);
+    @Override public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
     }
 }

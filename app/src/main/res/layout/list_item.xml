@@ -8,10 +8,8 @@
 
     <ImageButton
         android:id="@+id/imageButton2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:paddingBottom="8dp"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
         app:srcCompat="@drawable/ic_bookmark_black"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"

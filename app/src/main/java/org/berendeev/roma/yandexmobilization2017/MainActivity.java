@@ -9,34 +9,35 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.TextView;
 
+import org.berendeev.roma.yandexmobilization2017.presentation.fragment.FavouriteFragment;
 import org.berendeev.roma.yandexmobilization2017.presentation.fragment.HistoryFragment;
 import org.berendeev.roma.yandexmobilization2017.presentation.fragment.TranslatorFragment;
-
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
     public static final String TRANSLATOR = "translator";
     public static final String HISTORY = "history";
-    private TextView mTextMessage;
+    public static final String FAVOURITE = "favourite";
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+            int id = navigation.getSelectedItemId();
+            int from = navigation.getMenu().findItem(id).getOrder();
+
             switch (item.getItemId()) {
                 case R.id.translator:
-                    showTranslatorFragment();
+                    showFragment(TRANSLATOR, from, 1);
                     return true;
                 case R.id.favourite:
-                    showHistoryFragment();
+                    showFragment(FAVOURITE, from, 2);
                     return true;
                 case R.id.history:
-                    showHistoryFragment();
+                    showFragment(HISTORY, from, 3);
                     return true;
             }
             return false;
@@ -44,46 +45,75 @@ public class MainActivity extends AppCompatActivity {
 
     };
     private FragmentManager fragmentManager;
+    private FragmentTransaction transaction;
+    private BottomNavigationView navigation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
+        navigation = (BottomNavigationView) findViewById(R.id.navigation);
 
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
         fragmentManager = getSupportFragmentManager();
 
-//        View actionBarView = getLayoutInflater().inflate(R.layout.translator_action_bar, null);
-
-        ActionBar actionBar = getSupportActionBar();
-
+        if (savedInstanceState == null){
+            beginTransaction();
+            showEnterFragment(TRANSLATOR);
+            commitTransaction();
+        }
 
     }
 
-    private void showTranslatorFragment(){
-        FragmentTransaction transaction = fragmentManager.beginTransaction();
-        hideFragment(transaction, HISTORY);
+    private void showFragment(String tag, int from, int to){
+        if(from == to){
+            return;
+        }
+        beginTransaction();
+        setAnimation(from, to);
+        hidePreviousFragment();
+        showEnterFragment(tag);
+        commitTransaction();
+    }
 
-        Fragment fragment = fragmentManager.findFragmentByTag(TRANSLATOR);
-        if(fragment == null){
-            transaction.add(R.id.container, new TranslatorFragment(), TRANSLATOR).commit();
+    private void beginTransaction(){
+        transaction = fragmentManager.beginTransaction();
+    }
+
+    private void commitTransaction(){
+        transaction.commit();
+    }
+
+    private void setAnimation(int from, int to){
+        if(from > to){
+            transaction.setCustomAnimations(R.anim.to_left_in, R.anim.to_right_out);
         }else {
-            transaction.show(fragment).commit();
+            transaction.setCustomAnimations(R.anim.to_right_in, R.anim.to_left_out);
         }
     }
 
-    private void showHistoryFragment(){
-        FragmentTransaction transaction = fragmentManager.beginTransaction();
-        hideFragment(transaction, TRANSLATOR);
-
-        Fragment fragment = fragmentManager.findFragmentByTag(HISTORY);
-        if(fragment == null){
-            transaction.add(R.id.container, new HistoryFragment(), HISTORY).commit();
+    private void showEnterFragment(String tag) {
+        Fragment fragment = fragmentManager.findFragmentByTag(tag);
+        if (fragment != null){
+            transaction.show(fragment);
         }else {
-            transaction.show(fragment).commit();
+            fragment = getFragment(tag);
+            transaction.add(R.id.container, fragment, tag);
+        }
+    }
+
+    @NonNull private Fragment getFragment(String tag) {
+        switch (tag){
+            case TRANSLATOR:
+                return new TranslatorFragment();
+            case HISTORY:
+                return new HistoryFragment();
+            case FAVOURITE:
+                return new FavouriteFragment();
+            default:
+                throw new IllegalArgumentException();
         }
     }
 
@@ -94,4 +124,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void hidePreviousFragment(){
+        hideFragment(transaction, HISTORY);
+        hideFragment(transaction, TRANSLATOR);
+        hideFragment(transaction, FAVOURITE);
+    }
 }
