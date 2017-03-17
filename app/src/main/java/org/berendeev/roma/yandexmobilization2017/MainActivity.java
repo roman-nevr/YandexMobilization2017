@@ -6,8 +6,10 @@ import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 
 import org.berendeev.roma.yandexmobilization2017.presentation.fragment.HistoryFragment;
@@ -53,6 +55,12 @@ public class MainActivity extends AppCompatActivity {
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
         fragmentManager = getSupportFragmentManager();
+
+//        View actionBarView = getLayoutInflater().inflate(R.layout.translator_action_bar, null);
+
+        ActionBar actionBar = getSupportActionBar();
+
+
     }
 
     private void showTranslatorFragment(){
