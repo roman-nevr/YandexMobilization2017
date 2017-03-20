@@ -11,6 +11,8 @@ import android.widget.TextView;
 
 import org.berendeev.roma.yandexmobilization2017.R;
 
+import java.util.Locale;
+
 
 public class FavouriteFragment extends Fragment {
     private Toolbar toolbar;

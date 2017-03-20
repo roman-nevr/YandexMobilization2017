@@ -6,13 +6,13 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
-import org.berendeev.roma.yandexmobilization2017.data.RepositoryImpl;
-import org.berendeev.roma.yandexmobilization2017.data.datasource.TranslateAPI;
+import org.berendeev.roma.yandexmobilization2017.data.TranslationRepositoryImpl;
+import org.berendeev.roma.yandexmobilization2017.data.http.TranslateAPI;
 import org.berendeev.roma.yandexmobilization2017.data.deserializer.LanguageMapDeserializer;
 import org.berendeev.roma.yandexmobilization2017.data.deserializer.TranslateDirectionsDeserializer;
-import org.berendeev.roma.yandexmobilization2017.data.entity.LanguageMap;
+import org.berendeev.roma.yandexmobilization2017.domain.entity.LanguageMap;
 import org.berendeev.roma.yandexmobilization2017.data.entity.TranslateDirection;
-import org.berendeev.roma.yandexmobilization2017.domain.Repository;
+import org.berendeev.roma.yandexmobilization2017.domain.TranslationRepository;
 
 import java.lang.reflect.Type;
 import java.util.List;
@@ -22,6 +22,7 @@ import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;
 import okhttp3.OkHttpClient;
+import okhttp3.ResponseBody;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -47,7 +48,6 @@ public class MainModule {
         return new Retrofit.Builder()
                 .client(httpClient)
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
-                .addConverterFactory(GsonConverterFactory.create())
                 .baseUrl(TranslateAPI.BASE_URL)
                 .build();
     }
@@ -71,8 +71,8 @@ public class MainModule {
 
     @Provides
     @Singleton
-    public Repository provideRepository(){
-        return new RepositoryImpl();
+    public TranslationRepository provideRepository(){
+        return new TranslationRepositoryImpl();
     }
 
 }

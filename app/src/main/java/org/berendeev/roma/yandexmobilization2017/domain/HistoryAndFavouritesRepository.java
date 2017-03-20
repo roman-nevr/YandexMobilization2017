@@ -4,9 +4,10 @@ import org.berendeev.roma.yandexmobilization2017.domain.entity.Word;
 
 import java.util.List;
 
+import io.reactivex.Completable;
 import io.reactivex.Observable;
 
-public interface Repository {
-    Observable<Word> translate(Word word);
-    Observable<List<String>> getLanguages();
+public interface HistoryAndFavouritesRepository {
+    Observable<List<Word>> getHistory();
+    Observable<List<Word>> getFavourites();
 }

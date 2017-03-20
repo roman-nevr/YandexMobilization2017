@@ -1,4 +1,4 @@
-package org.berendeev.roma.yandexmobilization2017.data.datasource;
+package org.berendeev.roma.yandexmobilization2017.data.sqlite;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;

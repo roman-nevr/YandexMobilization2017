@@ -5,6 +5,8 @@ import java.util.List;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import org.berendeev.roma.yandexmobilization2017.domain.entity.LanguageMap;
+
 public class Languages {
 
     @SerializedName("dirs")

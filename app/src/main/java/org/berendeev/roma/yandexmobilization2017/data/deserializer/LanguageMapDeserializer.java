@@ -6,7 +6,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 
-import org.berendeev.roma.yandexmobilization2017.data.entity.LanguageMap;
+import org.berendeev.roma.yandexmobilization2017.domain.entity.LanguageMap;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -20,7 +20,7 @@ public class LanguageMapDeserializer implements JsonDeserializer<List<LanguageMa
         JsonObject jsonObject = json.getAsJsonObject();
         Set<Map.Entry<String, JsonElement>> entries = jsonObject.entrySet();
         for (Map.Entry<String, JsonElement> entry : entries) {
-            languageMapList.add(new LanguageMap(entry.getKey(), context.deserialize(entry.getValue(), String.class)));
+            languageMapList.add(LanguageMap.create(entry.getKey(), context.deserialize(entry.getValue(), String.class)));
         }
         return languageMapList;
     }

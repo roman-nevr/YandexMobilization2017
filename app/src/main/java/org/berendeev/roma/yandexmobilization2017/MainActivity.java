@@ -6,14 +6,14 @@ import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
-import android.widget.TextView;
 
 import org.berendeev.roma.yandexmobilization2017.presentation.fragment.FavouriteFragment;
 import org.berendeev.roma.yandexmobilization2017.presentation.fragment.HistoryFragment;
 import org.berendeev.roma.yandexmobilization2017.presentation.fragment.TranslatorFragment;
+
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -52,6 +52,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Locale.getDefault().getCountry();
+
 
         navigation = (BottomNavigationView) findViewById(R.id.navigation);
 

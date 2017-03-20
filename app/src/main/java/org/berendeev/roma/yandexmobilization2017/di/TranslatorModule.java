@@ -1,6 +1,6 @@
 package org.berendeev.roma.yandexmobilization2017.di;
 
-import org.berendeev.roma.yandexmobilization2017.data.datasource.TranslateAPI;
+import org.berendeev.roma.yandexmobilization2017.data.http.TranslateAPI;
 
 import dagger.Module;
 import dagger.Provides;
