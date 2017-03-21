@@ -2,6 +2,7 @@ package org.berendeev.roma.yandexmobilization2017.di;
 
 import android.content.Context;
 
+import com.facebook.stetho.okhttp3.StethoInterceptor;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -11,23 +12,24 @@ import org.berendeev.roma.yandexmobilization2017.data.TranslationRepositoryImpl;
 import org.berendeev.roma.yandexmobilization2017.data.deserializer.LanguageMapDeserializer;
 import org.berendeev.roma.yandexmobilization2017.data.deserializer.TranslateDirectionsDeserializer;
 import org.berendeev.roma.yandexmobilization2017.data.entity.TranslateDirection;
+import org.berendeev.roma.yandexmobilization2017.data.http.CacheInterceptor;
 import org.berendeev.roma.yandexmobilization2017.data.http.TranslateAPI;
 import org.berendeev.roma.yandexmobilization2017.domain.TranslationRepository;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.LanguageMap;
-import org.berendeev.roma.yandexmobilization2017.domain.entity.Word;
 
 import java.io.File;
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
 import okhttp3.Cache;
+import okhttp3.CacheControl;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 import static org.berendeev.roma.yandexmobilization2017.Consts.HTTP_CACHE_SIZE;
@@ -43,11 +45,13 @@ public class MainModule {
 
     @Provides
     @Singleton
-    public OkHttpClient provideOkHttpClient() {
-        File cacheDir = context.getCacheDir();
+    public OkHttpClient provideOkHttpClient(CacheInterceptor cacheInterceptor) {
+        File cacheDir = new File(context.getCacheDir(), "http");
         Cache cache = new Cache(cacheDir, HTTP_CACHE_SIZE);
         return new OkHttpClient.Builder()
                 .cache(cache)
+                .addInterceptor(cacheInterceptor)
+                .addNetworkInterceptor(new StethoInterceptor())
                 .build();
     }
 
@@ -87,8 +91,22 @@ public class MainModule {
 
     @Provides
     @Singleton
-    public TranslationRepository provideRepository(){
-        return new TranslationRepositoryImpl();
+    public TranslationRepository provideRepository(TranslateAPI translateAPI, Context context){
+        return new TranslationRepositoryImpl(translateAPI, context);
+    }
+
+    @Provides
+    @Singleton
+    public CacheInterceptor provideCacheInterceptor(CacheControl cacheControl){
+        return new CacheInterceptor(cacheControl);
+    }
+
+    @Provides
+    @Singleton
+    public CacheControl provideCacheControl(){
+        return new CacheControl.Builder()
+                .maxStale(365, TimeUnit.DAYS)
+                .build();
     }
 
 }

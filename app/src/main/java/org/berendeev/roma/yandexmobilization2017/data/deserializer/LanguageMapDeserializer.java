@@ -10,18 +10,19 @@ import org.berendeev.roma.yandexmobilization2017.domain.entity.LanguageMap;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class LanguageMapDeserializer implements JsonDeserializer<List<LanguageMap>> {
-    @Override public List<LanguageMap> deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-        List<LanguageMap> languageMapList = new ArrayList<>();
+public class LanguageMapDeserializer implements JsonDeserializer<Map<String, String>> {
+    @Override public Map<String, String> deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+        Map<String, String> languageMap = new HashMap<>();
         JsonObject jsonObject = json.getAsJsonObject();
         Set<Map.Entry<String, JsonElement>> entries = jsonObject.entrySet();
         for (Map.Entry<String, JsonElement> entry : entries) {
-            languageMapList.add(LanguageMap.create(entry.getKey(), context.deserialize(entry.getValue(), String.class)));
+            languageMap.put(entry.getKey(), entry.getValue().getAsString());
         }
-        return languageMapList;
+        return languageMap;
     }
 }

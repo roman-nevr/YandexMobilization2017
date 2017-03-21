@@ -1,6 +1,15 @@
 package org.berendeev.roma.yandexmobilization2017;
 
+import android.app.Application;
+
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.Robolectric;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.RuntimeEnvironment;
+import org.robolectric.annotation.Config;
+
+import java.util.UUID;
 
 import static org.junit.Assert.*;
 
@@ -12,6 +21,7 @@ import static org.junit.Assert.*;
 public class ExampleUnitTest {
     @Test
     public void addition_isCorrect() throws Exception {
-        assertEquals(4, 2 + 2);
+        UUID uuid = UUID.randomUUID();
+        System.out.println(UUID.randomUUID());
     }
 }

@@ -15,7 +15,11 @@ import org.junit.Test;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import io.reactivex.Maybe;
 
 public class DeserializatorTest {
     private static final String langsJson ="{\"dirs\":[\"uk-sr\",\"uk-tr\"],\"langs\":{\"ja\":\"Japanese\",\"ru\":\"Russian\"}}";
@@ -27,7 +31,7 @@ public class DeserializatorTest {
     @Before
     public void before() {
         dirType = new TypeToken<List<TranslateDirection>>() {}.getType();
-        mapType = new TypeToken<List<LanguageMap>>() {}.getType();
+        mapType = new TypeToken<Map<String, String>>() {}.getType();
 
         gson = new GsonBuilder()
                 .registerTypeAdapter(mapType, new LanguageMapDeserializer())
