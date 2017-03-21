@@ -42,7 +42,7 @@
     </android.support.v7.widget.Toolbar>
 
     <EditText
-        android:id="@+id/editText"
+        android:id="@+id/word_to_translate"
         android:layout_width="0dp"
         android:layout_height="100dp"
         android:ems="10"
@@ -60,17 +60,19 @@
         app:layout_constraintTop_toBottomOf="@+id/toolbar"/>
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/translation"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:text="TextView"
-        android:layout_below="@+id/editText"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_below="@+id/word_to_translate"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_marginLeft="8dp"
         app:layout_constraintLeft_toLeftOf="parent"
         android:layout_marginTop="8dp"
-        app:layout_constraintTop_toBottomOf="@+id/editText"
+        app:layout_constraintTop_toBottomOf="@+id/word_to_translate"
         app:layout_constraintRight_toLeftOf="@+id/imageButton"
         android:layout_marginRight="8dp"
         app:layout_constraintBottom_toBottomOf="@+id/imageButton"
@@ -84,7 +86,7 @@
         app:srcCompat="@drawable/ic_bookmark_black"
         android:background="@android:color/transparent"
         android:layout_marginTop="8dp"
-        app:layout_constraintTop_toBottomOf="@+id/editText"
+        app:layout_constraintTop_toBottomOf="@+id/word_to_translate"
         android:layout_marginRight="8dp"
         app:layout_constraintRight_toRightOf="parent"
         android:layout_marginEnd="8dp"/>
@@ -93,7 +95,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="8dp"
-        app:layout_constraintTop_toBottomOf="@+id/textView"
+        app:layout_constraintTop_toBottomOf="@+id/translation"
         android:layout_marginLeft="8dp"
         app:layout_constraintLeft_toLeftOf="parent"
         android:layout_marginRight="8dp"

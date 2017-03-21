@@ -1,6 +1,8 @@
 package org.berendeev.roma.yandexmobilization2017.domain.entity;
 
 import com.google.auto.value.AutoValue;
+import com.google.gson.Gson;
+import com.google.gson.TypeAdapter;
 
 @AutoValue
 public abstract class Word {
@@ -55,5 +57,9 @@ public abstract class Word {
         public abstract Builder isFavourite(boolean isFavourite);
 
         public abstract Word build();
+    }
+
+    public static TypeAdapter<Word> typeAdapter(Gson gson) {
+        return new AutoValue_Word.GsonTypeAdapter(gson);
     }
 }

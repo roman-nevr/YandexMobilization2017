@@ -34,4 +34,8 @@ public class DiscCacheDataSource implements DataSource, Cache {
     @Override public Observable<String> getLanguages(Locale locale) {
         return null;
     }
+
+    @Override public Observable<Word> getLastWord() {
+        return null;
+    }
 }

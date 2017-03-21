@@ -1,5 +1,7 @@
 package org.berendeev.roma.yandexmobilization2017.di;
 
+import org.berendeev.roma.yandexmobilization2017.data.http.TranslateAPI;
+
 import javax.inject.Singleton;
 
 import dagger.Component;
@@ -9,4 +11,6 @@ import retrofit2.Retrofit;
 @Singleton
 public interface MainComponent {
     Retrofit provideRetrofit();
+
+    TranslateAPI provideTranslateAPI();
 }

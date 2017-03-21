@@ -1,6 +1,7 @@
 package org.berendeev.roma.yandexmobilization2017.data.http;
 
 import org.berendeev.roma.yandexmobilization2017.data.entity.Languages;
+import org.berendeev.roma.yandexmobilization2017.data.entity.Translation;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.Word;
 
 import io.reactivex.Observable;
@@ -12,9 +13,9 @@ public interface TranslateAPI {
     public final String BASE_URL = "https://translate.yandex.net/api/v1.5/tr.json/";
 
     @GET("translate")
-    Observable<ResponseBody> translate(@Query("key") String key,
-                               @Query("text") String text,
-                               @Query("lang") String langDirections);
+    Observable<Translation> translate(@Query("key") String key,
+                                      @Query("text") String text,
+                                      @Query("lang") String langDirections);
 
     @GET("getLangs")
     Observable<ResponseBody> getLanguages(@Query("key") String key,

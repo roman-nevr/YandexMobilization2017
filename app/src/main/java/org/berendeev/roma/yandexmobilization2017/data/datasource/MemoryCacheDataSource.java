@@ -35,7 +35,7 @@ public class MemoryCacheDataSource implements DataSource, Cache {
             queries.add(query);
             cache.add(json);
         }
-        lastWord = query.toBuilder().translation()
+//        lastWord = query.toBuilder().translation();
     }
 
     @Override public void persist(Locale locale, String json) {
