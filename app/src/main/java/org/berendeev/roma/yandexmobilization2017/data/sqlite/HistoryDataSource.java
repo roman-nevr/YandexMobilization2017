@@ -1,4 +1,4 @@
-package org.berendeev.roma.yandexmobilization2017.domain;
+package org.berendeev.roma.yandexmobilization2017.data.sqlite;
 
 import org.berendeev.roma.yandexmobilization2017.domain.entity.Word;
 
@@ -6,10 +6,10 @@ import java.util.List;
 
 import io.reactivex.Observable;
 
-public interface HistoryAndFavouritesRepository {
+public interface HistoryDataSource {
     Observable<List<Word>> getHistory();
 
     Observable<List<Word>> getFavourites();
 
-    Observable<Word> checkIfInFavourites(Word word);
+    boolean checkIfInFavourites(Word word);
 }

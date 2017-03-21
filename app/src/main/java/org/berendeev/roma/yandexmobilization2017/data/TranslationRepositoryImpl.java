@@ -15,7 +15,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
-import javax.inject.Inject;
 
 import io.reactivex.Observable;
 import timber.log.Timber;
