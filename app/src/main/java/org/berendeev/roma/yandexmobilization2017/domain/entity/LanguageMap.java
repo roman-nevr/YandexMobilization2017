@@ -5,7 +5,6 @@ import com.google.auto.value.AutoValue;
 import java.util.Locale;
 import java.util.Map;
 
-import io.reactivex.Maybe;
 
 @AutoValue
 public abstract class LanguageMap{

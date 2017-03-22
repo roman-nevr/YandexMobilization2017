@@ -28,15 +28,31 @@
 
             <Button
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                style="?android:attr/borderlessButtonStyle"
+                android:textAllCaps="false"
+                android:textSize="18sp"
+                tools:text="Russian"
+                />
+
+            <ImageButton
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                app:srcCompat="@drawable/ic_arrows"
+                android:background="@android:color/transparent"
+                android:paddingRight="8dp"
+                android:paddingLeft="8dp"
+                />
 
             <Button
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                style="?android:attr/borderlessButtonStyle"
+                android:textAllCaps="false"
+                android:textSize="18sp"
+                tools:text="English"
+                />
         </LinearLayout>
 
     </android.support.v7.widget.Toolbar>

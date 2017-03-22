@@ -8,12 +8,17 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
+import org.berendeev.roma.yandexmobilization2017.data.HistoryAndFavouritesRepositoryImpl;
 import org.berendeev.roma.yandexmobilization2017.data.TranslationRepositoryImpl;
 import org.berendeev.roma.yandexmobilization2017.data.deserializer.LanguageMapDeserializer;
 import org.berendeev.roma.yandexmobilization2017.data.deserializer.TranslateDirectionsDeserializer;
 import org.berendeev.roma.yandexmobilization2017.data.entity.TranslateDirection;
 import org.berendeev.roma.yandexmobilization2017.data.http.CacheInterceptor;
 import org.berendeev.roma.yandexmobilization2017.data.http.TranslateAPI;
+import org.berendeev.roma.yandexmobilization2017.data.sqlite.DatabaseHistoryDataSource;
+import org.berendeev.roma.yandexmobilization2017.data.sqlite.DatabaseOpenHelper;
+import org.berendeev.roma.yandexmobilization2017.data.sqlite.HistoryDataSource;
+import org.berendeev.roma.yandexmobilization2017.domain.HistoryAndFavouritesRepository;
 import org.berendeev.roma.yandexmobilization2017.domain.TranslationRepository;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.LanguageMap;
 
@@ -91,8 +96,26 @@ public class MainModule {
 
     @Provides
     @Singleton
-    public TranslationRepository provideRepository(TranslateAPI translateAPI, Context context){
+    public TranslationRepository provideTranslationRepository(TranslateAPI translateAPI, Context context){
         return new TranslationRepositoryImpl(translateAPI, context);
+    }
+
+    @Provides
+    @Singleton
+    public HistoryAndFavouritesRepository provideHistoryAndFavouritesRepository(HistoryDataSource dataSource){
+        return new HistoryAndFavouritesRepositoryImpl(dataSource);
+    }
+
+    @Provides
+    @Singleton
+    public HistoryDataSource provideHistoryDataSource(DatabaseOpenHelper openHelper){
+        return new DatabaseHistoryDataSource(openHelper);
+    }
+
+    @Provides
+    @Singleton
+    public DatabaseOpenHelper provideDatabaseOpenHelper(Context context){
+        return new DatabaseOpenHelper(context);
     }
 
     @Provides

@@ -23,13 +23,13 @@ import retrofit2.Retrofit;
 @RunWith(RobolectricTestRunner.class)
 public class RepositoryTest {
 
-    private Context application;
+    private Context context;
     private TranslationRepository repository;
 
     @Before
     public void before() {
-        application = RuntimeEnvironment.application.getApplicationContext();
-        MainModule mainModule = new MainModule(application.getApplicationContext());
+        context = RuntimeEnvironment.application.getApplicationContext();
+        MainModule mainModule = new MainModule(context.getApplicationContext());
         CacheControl cacheControl = mainModule.provideCacheControl();
         CacheInterceptor interceptor = mainModule.provideCacheInterceptor(cacheControl);
         OkHttpClient httpClient = mainModule.provideOkHttpClient(interceptor);
