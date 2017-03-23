@@ -8,7 +8,7 @@ import java.util.Map;
 
 @AutoValue
 public abstract class LanguageMap{
-    public abstract Locale local();
+    public abstract Locale locale();
     public abstract Map<String, String> map();
 
     public static Builder builder() {
@@ -16,7 +16,7 @@ public abstract class LanguageMap{
     }
 
     @AutoValue.Builder public abstract static class Builder {
-        public abstract Builder local(Locale local);
+        public abstract Builder locale(Locale locale);
 
         public abstract Builder map(Map<String, String> map);
 

@@ -14,7 +14,7 @@
         android:name=".presentation.App"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MainActivity"
+            android:name=".presentation.activity.MainActivity"
             android:theme="@style/NoActionBar"
             android:label="@string/app_name"
             android:windowSoftInputMode="stateAlwaysHidden"
@@ -25,12 +25,17 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".TestActivity">
+        <activity android:name=".presentation.activity.TestActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <activity
+            android:name=".presentation.activity.LanguageSelectorActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:parentActivityName=".presentation.activity.MainActivity"
+            />
     </application>
 
 </manifest>

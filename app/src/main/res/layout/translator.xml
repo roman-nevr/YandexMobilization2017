@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity"
+    tools:context=".presentation.activity.MainActivity"
     >
 
     <android.support.v7.widget.Toolbar
@@ -21,35 +21,37 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="?attr/actionBarSize"
             android:gravity="center_horizontal"
             android:orientation="horizontal"
             >
 
             <Button
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                style="?android:attr/borderlessButtonStyle"
+                android:layout_height="?attr/actionBarSize"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:textAllCaps="false"
                 android:textSize="18sp"
                 tools:text="Russian"
+                android:id="@+id/language_from"
                 />
 
             <ImageButton
                 android:layout_gravity="center"
-                android:layout_width="56dp"
+                android:layout_width="?attr/actionBarSize"
                 android:layout_height="match_parent"
                 app:srcCompat="@drawable/ic_arrows"
-                style="?android:attr/borderlessButtonStyle"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 />
 
             <Button
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                style="?android:attr/borderlessButtonStyle"
+                android:layout_height="?attr/actionBarSize"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:textAllCaps="false"
                 android:textSize="18sp"
                 tools:text="English"
+                android:id="@+id/language_to"
                 />
         </LinearLayout>
 
@@ -80,6 +82,7 @@
         android:text="TextView"
         android:textSize="18sp"
         android:textStyle="bold"
+        android:gravity="center_vertical"
         android:layout_below="@+id/word_to_translate"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"

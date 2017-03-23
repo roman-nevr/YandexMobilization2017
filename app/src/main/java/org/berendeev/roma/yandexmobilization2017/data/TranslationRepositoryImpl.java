@@ -1,7 +1,6 @@
 package org.berendeev.roma.yandexmobilization2017.data;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 
 import org.berendeev.roma.yandexmobilization2017.data.entity.Languages;
 import org.berendeev.roma.yandexmobilization2017.data.entity.Translation;
@@ -24,19 +23,11 @@ import static org.berendeev.roma.yandexmobilization2017.data.http.TranslateAPI.O
 
 public class TranslationRepositoryImpl implements TranslationRepository {
 
-    public static final String WORD = "word";
-    public static final String TEXT = "text";
-    public static final String TRANSLATION = "translation";
-    public static final String TO = "to";
-    public static final String FROM = "from";
+
     TranslateAPI translateAPI;
-    Context context;
-    private final SharedPreferences preferences;
 
     public TranslationRepositoryImpl(TranslateAPI translateAPI, Context context) {
         this.translateAPI = translateAPI;
-        this.context = context;
-        preferences = context.getSharedPreferences(WORD, Context.MODE_PRIVATE);
     }
 
     @Override public Observable<Word> translate(TranslationQuery query) {
@@ -46,7 +37,6 @@ public class TranslationRepositoryImpl implements TranslationRepository {
                     if (translation.code == OK_CODE) {
                         Word word = buildWord(query, translation);
                         emitter.onNext(word);
-                        saveLastWord(word);
                     }
                     emitter.onComplete();
                 }, throwable -> Timber.d(throwable)));
@@ -64,28 +54,9 @@ public class TranslationRepositoryImpl implements TranslationRepository {
 
     private LanguageMap buildLanguageMap(Languages languages, Locale locale) {
         return LanguageMap.builder()
-                .local(locale)
+                .locale(locale)
                 .map(languages.languageMapList)
                 .build();
-    }
-
-    @Override public Observable<Word> getLastWord() {
-        return Observable.just(Word.builder()
-                .word(preferences.getString(TEXT, ""))
-                .translation(preferences.getString(TRANSLATION, ""))
-                .languageFrom(preferences.getString(FROM, ""))
-                .languageTo(preferences.getString(TO, ""))
-                .isFavourite(false)
-                .build());
-    }
-
-    private void saveLastWord(Word word) {
-        preferences.edit()
-                .putString(TEXT, word.word())
-                .putString(TRANSLATION, word.translation())
-                .putString(FROM, word.languageFrom())
-                .putString(TO, word.languageTo())
-                .apply();
     }
 
     private Word buildWord(TranslationQuery query, Translation translation) {

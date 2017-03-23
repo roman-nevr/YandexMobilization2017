@@ -9,6 +9,7 @@ import com.google.gson.reflect.TypeToken;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
 import org.berendeev.roma.yandexmobilization2017.data.HistoryAndFavouritesRepositoryImpl;
+import org.berendeev.roma.yandexmobilization2017.data.PreferencesRepositoryImpl;
 import org.berendeev.roma.yandexmobilization2017.data.TranslationRepositoryImpl;
 import org.berendeev.roma.yandexmobilization2017.data.deserializer.LanguageMapDeserializer;
 import org.berendeev.roma.yandexmobilization2017.data.deserializer.TranslateDirectionsDeserializer;
@@ -19,18 +20,23 @@ import org.berendeev.roma.yandexmobilization2017.data.sqlite.DatabaseHistoryData
 import org.berendeev.roma.yandexmobilization2017.data.sqlite.DatabaseOpenHelper;
 import org.berendeev.roma.yandexmobilization2017.data.sqlite.HistoryDataSource;
 import org.berendeev.roma.yandexmobilization2017.domain.HistoryAndFavouritesRepository;
+import org.berendeev.roma.yandexmobilization2017.domain.PreferencesRepository;
 import org.berendeev.roma.yandexmobilization2017.domain.TranslationRepository;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.LanguageMap;
 
 import java.io.File;
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import io.reactivex.Scheduler;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import okhttp3.Cache;
 import okhttp3.CacheControl;
 import okhttp3.OkHttpClient;
@@ -50,7 +56,42 @@ public class MainModule {
 
     @Provides
     @Singleton
-    public OkHttpClient provideOkHttpClient(CacheInterceptor cacheInterceptor) {
+    public Context provideContext(){
+        return context;
+    }
+
+
+
+    @Singleton
+    @Provides
+    ThreadPoolExecutor provideThreadPoolExecutor(){
+        int poolSize = 2;
+        int maxPoolSize = 4;
+        int timeout = 30;
+        return new ThreadPoolExecutor(poolSize, maxPoolSize, timeout,
+                TimeUnit.SECONDS, new ArrayBlockingQueue<>(poolSize));
+    }
+
+    @Singleton
+    @Provides Scheduler provideScheduler(){
+        return AndroidSchedulers.mainThread();
+    }
+
+    @Provides
+    @Singleton
+    public PreferencesRepository providePreferencesRepository(Context context){
+        return new PreferencesRepositoryImpl(context);
+    }
+
+    @Provides
+    @Singleton
+    public TranslationRepository provideTranslationRepository(TranslateAPI translateAPI, Context context){
+        return new TranslationRepositoryImpl(translateAPI, context);
+    }
+
+    @Provides
+    @Singleton
+    public OkHttpClient provideOkHttpClient(CacheInterceptor cacheInterceptor, Context context) {
         File cacheDir = new File(context.getCacheDir(), "http");
         Cache cache = new Cache(cacheDir, HTTP_CACHE_SIZE);
         return new OkHttpClient.Builder()
@@ -88,35 +129,7 @@ public class MainModule {
         return retrofit.create(TranslateAPI.class);
     }
 
-    @Provides
-    @Singleton
-    public Context provideContext(){
-        return context;
-    }
 
-    @Provides
-    @Singleton
-    public TranslationRepository provideTranslationRepository(TranslateAPI translateAPI, Context context){
-        return new TranslationRepositoryImpl(translateAPI, context);
-    }
-
-    @Provides
-    @Singleton
-    public HistoryAndFavouritesRepository provideHistoryAndFavouritesRepository(HistoryDataSource dataSource){
-        return new HistoryAndFavouritesRepositoryImpl(dataSource);
-    }
-
-    @Provides
-    @Singleton
-    public HistoryDataSource provideHistoryDataSource(DatabaseOpenHelper openHelper){
-        return new DatabaseHistoryDataSource(openHelper);
-    }
-
-    @Provides
-    @Singleton
-    public DatabaseOpenHelper provideDatabaseOpenHelper(Context context){
-        return new DatabaseOpenHelper(context);
-    }
 
     @Provides
     @Singleton

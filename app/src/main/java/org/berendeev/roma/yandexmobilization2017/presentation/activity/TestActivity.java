@@ -1,4 +1,4 @@
-package org.berendeev.roma.yandexmobilization2017;
+package org.berendeev.roma.yandexmobilization2017.presentation.activity;
 
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
@@ -17,11 +17,14 @@ import android.widget.TextView;
 
 import com.jakewharton.rxbinding2.widget.RxTextView;
 
+import org.berendeev.roma.yandexmobilization2017.R;
 import org.berendeev.roma.yandexmobilization2017.data.http.TranslateAPI;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.Word;
 import org.berendeev.roma.yandexmobilization2017.presentation.App;
 
 import java.util.concurrent.TimeUnit;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -36,7 +39,7 @@ import static org.berendeev.roma.yandexmobilization2017.Consts.API_KEY;
 
 public class TestActivity extends AppCompatActivity {
 
-    private TranslateAPI api;
+    @Inject TranslateAPI api;
 
     @BindView(R.id.word_to_translate) EditText etText;
     @BindView(R.id.translation) TextView tvTranslation;
@@ -76,7 +79,7 @@ public class TestActivity extends AppCompatActivity {
     }
 
     private void intiDI() {
-        api = App.getApplication().getMainComponent().provideTranslateAPI();
+        App.getApplication().getMainComponent().inject(this);
     }
 
     private void subscribe(){

@@ -3,4 +3,6 @@
     <string name="title_translator">Translator</string>
     <string name="title_favourite">Favourite</string>
     <string name="title_history">History</string>
+    <string name="title_language_selector_source">Select source language</string>
+    <string name="title_language_selector_target">Select target language</string>
 </resources>

@@ -11,9 +11,11 @@ import java.util.List;
 import java.util.Locale;
 
 import io.reactivex.Observable;
+import io.reactivex.Single;
 
 public interface TranslationRepository {
     Observable<Word> translate(TranslationQuery word);
     Observable<LanguageMap> getLanguages(Locale locale);
-    Observable<Word> getLastWord();
+
+
 }

@@ -1,4 +1,4 @@
-package org.berendeev.roma.yandexmobilization2017;
+package org.berendeev.roma.yandexmobilization2017.presentation.activity;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -9,6 +9,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
+import org.berendeev.roma.yandexmobilization2017.R;
 import org.berendeev.roma.yandexmobilization2017.presentation.fragment.FavouriteFragment;
 import org.berendeev.roma.yandexmobilization2017.presentation.fragment.HistoryFragment;
 import org.berendeev.roma.yandexmobilization2017.presentation.fragment.TranslatorFragment;
@@ -52,9 +53,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        Locale.getDefault().getCountry();
-
 
         navigation = (BottomNavigationView) findViewById(R.id.navigation);
 

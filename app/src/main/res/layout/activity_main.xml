@@ -7,7 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="org.berendeev.roma.yandexmobilization2017.MainActivity">
+    tools:context="org.berendeev.roma.yandexmobilization2017.presentation.activity.MainActivity">
 
     <FrameLayout
         android:id="@+id/container"

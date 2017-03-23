@@ -32,7 +32,7 @@ public class RepositoryTest {
         MainModule mainModule = new MainModule(context.getApplicationContext());
         CacheControl cacheControl = mainModule.provideCacheControl();
         CacheInterceptor interceptor = mainModule.provideCacheInterceptor(cacheControl);
-        OkHttpClient httpClient = mainModule.provideOkHttpClient(interceptor);
+        OkHttpClient httpClient = mainModule.provideOkHttpClient(interceptor, mainModule.provideContext());
         Retrofit retrofit = mainModule.provideRetrofit(httpClient, mainModule.provideGson());
         TranslateAPI translateAPI = mainModule.provideTranslateAPI(retrofit);
         repository = new TranslationRepositoryImpl(translateAPI, mainModule.provideContext());
@@ -53,16 +53,6 @@ public class RepositoryTest {
         repository
                 .translate(query)
                 .subscribe(word ->{
-                    System.out.println(word);
-                });
-    }
-
-    @Test
-    public void lastWord(){
-        translateTest();
-        repository
-                .getLastWord()
-                .subscribe(word -> {
                     System.out.println(word);
                 });
     }
