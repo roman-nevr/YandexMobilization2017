@@ -45,9 +45,11 @@ public class PreferencesRepositoryImpl implements PreferencesRepository {
             wordPreferences.edit()
                     .putString(TEXT, word.word())
                     .putString(TRANSLATION, word.translation())
-                    .putString(DIRECTION_FROM, word.languageFrom())
-                    .putString(DIRECTION_TO, word.languageTo())
                     .apply();
+//            dirsPreferences.edit()
+//                    .putString(DIRECTION_FROM, word.languageFrom())
+//                    .putString(DIRECTION_TO, word.languageTo())
+//                    .apply();
         });
     }
 
@@ -55,8 +57,8 @@ public class PreferencesRepositoryImpl implements PreferencesRepository {
         return Single.just(Word.builder()
                 .word(wordPreferences.getString(TEXT, ""))
                 .translation(wordPreferences.getString(TRANSLATION, ""))
-                .languageFrom(wordPreferences.getString(DIRECTION_FROM, ""))
-                .languageTo(wordPreferences.getString(DIRECTION_TO, ""))
+                .languageFrom(dirsPreferences.getString(DIRECTION_FROM, ""))
+                .languageTo(dirsPreferences.getString(DIRECTION_TO, ""))
                 .isFavourite(false)
                 .build());
     }

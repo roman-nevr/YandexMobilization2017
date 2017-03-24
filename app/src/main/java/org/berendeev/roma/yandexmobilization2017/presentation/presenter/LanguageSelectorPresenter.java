@@ -8,8 +8,6 @@ import org.berendeev.roma.yandexmobilization2017.domain.interactor.Interactor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.SetDirectionFromInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.SetDirectionToInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.VoidObserver;
-import org.berendeev.roma.yandexmobilization2017.presentation.activity.LanguageSelectorActivity;
-import org.berendeev.roma.yandexmobilization2017.presentation.view.DummyView;
 import org.berendeev.roma.yandexmobilization2017.presentation.view.LanguageSelectorView;
 import org.berendeev.roma.yandexmobilization2017.presentation.view.LanguageSelectorView.Router;
 
@@ -17,6 +15,7 @@ import java.util.Locale;
 
 import javax.inject.Inject;
 
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.observers.DisposableObserver;
 
 import static org.berendeev.roma.yandexmobilization2017.presentation.view.DummyView.DUMMY_VIEW;
@@ -31,23 +30,25 @@ public class LanguageSelectorPresenter {
     @Inject GetLanguagesInteractor getLanguagesInteractor;
     private Interactor<Void, String> interactor;
     private Router router;
+    private final CompositeDisposable disposable;
 
     @Inject
-    public LanguageSelectorPresenter() {}
+    public LanguageSelectorPresenter() {
+        disposable = new CompositeDisposable();
+    }
 
     public void start(){
-        getLanguagesInteractor.execute(new LanguageObserver(), Locale.getDefault());
+        disposable.add(getLanguagesInteractor.execute(new LanguageObserver(), Locale.getDefault()));
         view.setTitleById(titleId);
     }
 
     public void stop(){
-        getLanguagesInteractor.dispose();
-        interactor.dispose();
+        disposable.clear();
         view = DUMMY_VIEW;
     }
 
     public void onLanguageSelected(String key) {
-        interactor.execute(new VoidObserver(), key);
+        disposable.add(interactor.execute(new VoidObserver(), key));
         router.moveToTranslator();
     }
 
@@ -56,11 +57,11 @@ public class LanguageSelectorPresenter {
             throw new IllegalArgumentException("wrong type");
         }
 
-        if (type == R.id.languageFromType){
+        if (type == R.id.language_from_type){
             titleId = R.string.title_language_selector_source;
             interactor = setDirectionFromInteractor;
         }
-        if (type == R.id.languageToType){
+        if (type == R.id.language_to_type){
             titleId = R.string.title_language_selector_target;
             interactor = setDirectionToInteractor;
         }

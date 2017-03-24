@@ -5,9 +5,8 @@ import android.animation.ObjectAnimator;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +15,6 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import com.jakewharton.rxbinding2.view.RxView;
 import com.jakewharton.rxbinding2.widget.RxTextView;
 
 import org.berendeev.roma.yandexmobilization2017.R;
@@ -33,8 +31,11 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.Observable;
 
+import static android.view.inputmethod.EditorInfo.IME_ACTION_DONE;
+
 
 public class TranslatorFragment extends Fragment implements TranslatorView, TranslatorView.Router{
+    public static final int MIN_KEYBOARD_HEIGHT = 200;
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.word_to_translate) EditText wordToTranslate;
     @BindView(R.id.translation) TextView translation;
@@ -46,16 +47,35 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
     private boolean flag;
 
     @Inject TranslatorPresenter presenter;
+    private int colorFavourite;
+    private int colorNotFavourite;
+    private View mainView;
 
     @Nullable @Override public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.translator, container, false);
         ButterKnife.bind(this, view);
         initUI();
+
+        wordToTranslate.setOnEditorActionListener((v, actionId, event) -> {
+            System.out.println("action " + actionId);
+            System.out.println("event " + event);
+            return true;
+
+        });
+
+        mainView = view.findViewById(R.id.main_layout);
+
+
         return view;
     }
 
     private void initUI() {
-        flag = true;
+        initHeaderView();
+        initFavouritesMarker();
+        presenter.init();
+    }
+
+    private void initHeaderView(){
         btnLanguageTo.setOnClickListener(v -> {
             presenter.onTargetButtonClick();
         });
@@ -65,19 +85,23 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
         swapButton.setOnClickListener(v -> {
             presenter.onSwapButtonClick();
         });
+    }
 
-        int colorPrimary = getResources().getColor(R.color.colorPrimary);
-        int colorGrey = getResources().getColor(R.color.grey);
+    private void initFavouritesMarker(){
+        flag = true;
+        //TODO versions
+        colorFavourite = getResources().getColor(R.color.colorPrimary);
+        colorNotFavourite = getResources().getColor(R.color.grey);
         favButton.setOnClickListener(v -> {
 
             int colorFrom, colorTo;
 
             if(flag){
-                colorFrom = colorPrimary;
-                colorTo = colorGrey;
+                colorFrom = colorFavourite;
+                colorTo = colorNotFavourite;
             }else {
-                colorFrom = colorGrey;
-                colorTo = colorPrimary;
+                colorFrom = colorNotFavourite;
+                colorTo = colorFavourite;
             }
             flag = !flag;
             ObjectAnimator animator = ObjectAnimator.ofObject(favButton,
@@ -109,27 +133,71 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
         presenter.stop();
     }
 
-    @Override public void setText(Word word) {
-        wordToTranslate.setText(word.word());
+    @Override public void initTranslatorText(Word word) {
+        setText(word.word());
         translation.setText(word.translation());
+        setFavouritesLabel(word.isFavourite());
+    }
+
+    @Override public void setTranslation(Word word) {
+        translation.setText(word.translation());
+        setFavouritesLabel(word.isFavourite());
     }
 
     @Override public void setTranslateDirection(TranslateDirection directionFrom, TranslateDirection directionTo) {
         btnLanguageFrom.setText(directionFrom.name());
 
         btnLanguageTo.setText(directionTo.name());
+
+        setText(wordToTranslate.getText().toString());
+    }
+
+    private void setFavouritesLabel(boolean isFavourite) {
+        flag = isFavourite;
+        favButton.setColorFilter(flag ? colorFavourite : colorNotFavourite);
+    }
+
+    private void setText(String text){
+        wordToTranslate.setText(text);
+        wordToTranslate.setSelection(text.length());
     }
 
     @Override public Observable<String> getTextObservable() {
-        return RxTextView.textChanges(wordToTranslate).map(charSequence -> charSequence.toString());
+        return RxTextView.textChanges(wordToTranslate)
+                .map(charSequence -> charSequence.toString());
+    }
+
+    @Override public Observable<Integer> getTextInputDoneObservable(){
+        return Observable.create(emitter -> {
+            wordToTranslate.setOnEditorActionListener((v, actionId, event) -> {
+                if(actionId == IME_ACTION_DONE){
+                    if (!emitter.isDisposed()){
+                        emitter.onNext(R.id.input_done_id);
+                    }
+                }
+                return true;
+            });
+            mainView.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
+                int rootViewHeight = mainView.getRootView().getHeight();
+                int mainViewHeight = mainView.getHeight();
+                if(fromPixelToDp(rootViewHeight - mainViewHeight) >= MIN_KEYBOARD_HEIGHT){
+                    emitter.onNext(R.id.input_done_id);
+                }
+            });
+        });
     }
 
     @Override public void showSourceLanguageSelector() {
-        LanguageSelectorActivity.start(this.getActivity(), R.id.languageFromType);
+        LanguageSelectorActivity.start(this.getActivity(), R.id.language_from_type);
 
     }
 
     @Override public void showTargetLanguageSelector() {
-        LanguageSelectorActivity.start(this.getActivity(), R.id.languageToType);
+        LanguageSelectorActivity.start(this.getActivity(), R.id.language_to_type);
+    }
+
+    private int fromPixelToDp(int pixels){
+        DisplayMetrics metrics = getResources().getDisplayMetrics();
+        return pixels * DisplayMetrics.DENSITY_DEFAULT / metrics.densityDpi;
     }
 }

@@ -6,6 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".presentation.activity.MainActivity"
+    android:id="@+id/main_layout"
     >
 
     <android.support.v7.widget.Toolbar
@@ -73,8 +74,8 @@
         android:layout_height="100dp"
         android:ems="10"
         android:gravity="top"
-        android:text="Name"
-
+        android:imeOptions="actionDone"
+        android:inputType="text"
         android:layout_marginLeft="8dp"
         app:layout_constraintLeft_toLeftOf="parent"
         android:layout_marginRight="8dp"
@@ -83,6 +84,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginTop="8dp"
+        tools:text="Name"
         app:layout_constraintTop_toBottomOf="@+id/toolbar"/>
 
     <TextView
@@ -104,7 +106,9 @@
         android:layout_marginRight="8dp"
         app:layout_constraintBottom_toBottomOf="@+id/fav_button"
         android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"/>
+        android:layout_marginEnd="8dp"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintVertical_bias="0.0"/>
 
     <ImageButton
         android:id="@+id/fav_button"

@@ -34,6 +34,7 @@ public class LanguageSelectorActivity extends AppCompatActivity implements Langu
     @Inject LanguageSelectorPresenter presenter;
 
     private LanguageSelectorAdapter adapter;
+    private ActionBar actionBar;
 
     @Override public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,9 +63,8 @@ public class LanguageSelectorActivity extends AppCompatActivity implements Langu
         setContentView(R.layout.language_selector);
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
-        ActionBar actionBar = getSupportActionBar();
+        actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setTitle(R.string.title_favourite);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
                 layoutManager.getOrientation());
@@ -78,7 +78,7 @@ public class LanguageSelectorActivity extends AppCompatActivity implements Langu
     }
 
     @Override public void setTitleById(int titleId) {
-        setTitle(titleId);
+        actionBar.setTitle(titleId);
     }
 
     public static void start(Context context, int type){

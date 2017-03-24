@@ -1,5 +1,7 @@
 package org.berendeev.roma.yandexmobilization2017.presentation.view;
 
+import com.jakewharton.rxbinding2.widget.TextViewEditorActionEvent;
+
 import org.berendeev.roma.yandexmobilization2017.domain.entity.LanguageMap;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.TranslateDirection;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.Word;
@@ -20,7 +22,11 @@ public class DummyView implements LanguageSelectorView, TranslatorView, WordList
 
     }
 
-    @Override public void setText(Word word) {
+    @Override public void initTranslatorText(Word word) {
+
+    }
+
+    @Override public void setTranslation(Word word) {
 
     }
 
@@ -30,5 +36,9 @@ public class DummyView implements LanguageSelectorView, TranslatorView, WordList
 
     @Override public Observable<String> getTextObservable() {
         return Observable.empty();
+    }
+
+    @Override public Observable<Integer> getTextInputDoneObservable() {
+        return null;
     }
 }
