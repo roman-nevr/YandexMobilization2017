@@ -95,9 +95,11 @@ public class PreferencesRepositoryImpl implements PreferencesRepository {
 
     @Override public Completable swapDirections() {
         return Completable.fromAction(() -> {
-            saveDirection(DIRECTION_FROM, getTo());
-            saveDirection(DIRECTION_TO, getFrom());
-            changeDirections(getFrom(), getTo());
+            String from = getFrom();
+            String to = getTo();
+            saveDirection(DIRECTION_FROM, to);
+            saveDirection(DIRECTION_TO, from);
+            changeDirections(to, from);
         });
     }
 

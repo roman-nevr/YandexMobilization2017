@@ -24,7 +24,7 @@ public class GetTranslateDirectionInteractor extends Interactor<Pair<TranslateDi
     public GetTranslateDirectionInteractor() {}
 
     @Override protected Observable<Pair<TranslateDirection, TranslateDirection>> buildObservable(Locale locale) {
-        return Observable.zip(
+        return Observable.combineLatest(
                 translationRepository.getLanguages(locale),
                 preferencesRepository.getTranslateDirection(),
                 (map, stringStringPair) -> {

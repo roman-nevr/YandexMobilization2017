@@ -9,6 +9,7 @@ import org.berendeev.roma.yandexmobilization2017.domain.interactor.SetDirectionF
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.SetDirectionToInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.VoidObserver;
 import org.berendeev.roma.yandexmobilization2017.presentation.activity.LanguageSelectorActivity;
+import org.berendeev.roma.yandexmobilization2017.presentation.view.DummyView;
 import org.berendeev.roma.yandexmobilization2017.presentation.view.LanguageSelectorView;
 import org.berendeev.roma.yandexmobilization2017.presentation.view.LanguageSelectorView.Router;
 
@@ -17,6 +18,8 @@ import java.util.Locale;
 import javax.inject.Inject;
 
 import io.reactivex.observers.DisposableObserver;
+
+import static org.berendeev.roma.yandexmobilization2017.presentation.view.DummyView.DUMMY_VIEW;
 
 public class LanguageSelectorPresenter {
 
@@ -40,6 +43,7 @@ public class LanguageSelectorPresenter {
     public void stop(){
         getLanguagesInteractor.dispose();
         interactor.dispose();
+        view = DUMMY_VIEW;
     }
 
     public void onLanguageSelected(String key) {

@@ -12,8 +12,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
+
+import com.jakewharton.rxbinding2.view.RxView;
+import com.jakewharton.rxbinding2.widget.RxTextView;
 
 import org.berendeev.roma.yandexmobilization2017.R;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.TranslateDirection;
@@ -27,11 +31,12 @@ import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.Observable;
 
 
 public class TranslatorFragment extends Fragment implements TranslatorView, TranslatorView.Router{
     @BindView(R.id.toolbar) Toolbar toolbar;
-    @BindView(R.id.word_to_translate) TextView wordToTranslate;
+    @BindView(R.id.word_to_translate) EditText wordToTranslate;
     @BindView(R.id.translation) TextView translation;
     @BindView(R.id.fav_button) ImageButton favButton;
     @BindView(R.id.language_from) Button btnLanguageFrom;
@@ -113,6 +118,10 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
         btnLanguageFrom.setText(directionFrom.name());
 
         btnLanguageTo.setText(directionTo.name());
+    }
+
+    @Override public Observable<String> getTextObservable() {
+        return RxTextView.textChanges(wordToTranslate).map(charSequence -> charSequence.toString());
     }
 
     @Override public void showSourceLanguageSelector() {

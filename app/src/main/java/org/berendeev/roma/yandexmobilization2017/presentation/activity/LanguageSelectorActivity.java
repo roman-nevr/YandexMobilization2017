@@ -53,6 +53,11 @@ public class LanguageSelectorActivity extends AppCompatActivity implements Langu
         presenter.start();
     }
 
+    @Override protected void onStop() {
+        super.onStop();
+        presenter.stop();
+    }
+
     private void initUI() {
         setContentView(R.layout.language_selector);
         ButterKnife.bind(this);
