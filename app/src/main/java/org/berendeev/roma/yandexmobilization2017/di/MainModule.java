@@ -15,7 +15,7 @@ import org.berendeev.roma.yandexmobilization2017.data.deserializer.LanguageMapDe
 import org.berendeev.roma.yandexmobilization2017.data.deserializer.TranslateDirectionsDeserializer;
 import org.berendeev.roma.yandexmobilization2017.data.entity.TranslateDirection;
 import org.berendeev.roma.yandexmobilization2017.data.http.CacheInterceptor;
-import org.berendeev.roma.yandexmobilization2017.data.http.TranslateAPI;
+import org.berendeev.roma.yandexmobilization2017.data.http.TranslateApi;
 import org.berendeev.roma.yandexmobilization2017.data.sqlite.DatabaseHistoryDataSource;
 import org.berendeev.roma.yandexmobilization2017.data.sqlite.DatabaseOpenHelper;
 import org.berendeev.roma.yandexmobilization2017.data.sqlite.HistoryDataSource;
@@ -85,8 +85,8 @@ public class MainModule {
 
     @Provides
     @Singleton
-    public TranslationRepository provideTranslationRepository(TranslateAPI translateAPI, Context context){
-        return new TranslationRepositoryImpl(translateAPI, context);
+    public TranslationRepository provideTranslationRepository(TranslateApi translateApi, Context context){
+        return new TranslationRepositoryImpl(translateApi, context);
     }
 
     @Provides
@@ -108,7 +108,7 @@ public class MainModule {
                 .client(httpClient)
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create(gson))
-                .baseUrl(TranslateAPI.BASE_URL)
+                .baseUrl(TranslateApi.BASE_URL)
                 .build();
     }
 
@@ -125,8 +125,8 @@ public class MainModule {
 
     @Provides
     @Singleton
-    public TranslateAPI provideTranslateAPI(Retrofit retrofit){
-        return retrofit.create(TranslateAPI.class);
+    public TranslateApi provideTranslateAPI(Retrofit retrofit){
+        return retrofit.create(TranslateApi.class);
     }
 
 
@@ -143,6 +143,24 @@ public class MainModule {
         return new CacheControl.Builder()
                 .maxStale(365, TimeUnit.DAYS)
                 .build();
+    }
+
+    @Provides
+    @Singleton
+    public HistoryAndFavouritesRepository provideHistoryAndFavouritesRepository(HistoryDataSource dataSource){
+        return new HistoryAndFavouritesRepositoryImpl(dataSource);
+    }
+
+    @Provides
+    @Singleton
+    public HistoryDataSource provideHistoryDataSource(DatabaseOpenHelper openHelper){
+        return new DatabaseHistoryDataSource(openHelper);
+    }
+
+    @Provides
+    @Singleton
+    public DatabaseOpenHelper provideDatabaseOpenHelper(Context context){
+        return new DatabaseOpenHelper(context);
     }
 
 }

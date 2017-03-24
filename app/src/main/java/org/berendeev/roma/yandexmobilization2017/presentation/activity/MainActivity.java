@@ -110,9 +110,9 @@ public class MainActivity extends AppCompatActivity {
             case TRANSLATOR:
                 return new TranslatorFragment();
             case HISTORY:
-                return new HistoryFragment();
+                return HistoryFragment.getHistoryFragment();
             case FAVOURITE:
-                return new FavouriteFragment();
+                return HistoryFragment.getFavouriteFragment();
             default:
                 throw new IllegalArgumentException();
         }

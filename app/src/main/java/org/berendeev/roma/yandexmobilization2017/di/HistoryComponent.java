@@ -4,8 +4,7 @@ import org.berendeev.roma.yandexmobilization2017.presentation.fragment.HistoryFr
 
 import dagger.Subcomponent;
 
-@ListScope
-@Subcomponent(modules = HistoryAndFavouritesModule.class)
-public interface HistoryAndFavouritesComponent {
+@Subcomponent
+public interface HistoryComponent {
     void inject(HistoryFragment fragment);
 }

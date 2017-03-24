@@ -29,9 +29,9 @@ public class HistoryRepoTest{
         MainModule mainModule = new MainModule(context.getApplicationContext());
         HistoryAndFavouritesModule module = new HistoryAndFavouritesModule();
 
-        DatabaseOpenHelper openHelper = module.provideDatabaseOpenHelper(mainModule.provideContext());
-        historyDataSource = (DatabaseHistoryDataSource) module.provideHistoryDataSource(openHelper);
-        repository = module.provideHistoryAndFavouritesRepository(historyDataSource);
+        DatabaseOpenHelper openHelper = mainModule.provideDatabaseOpenHelper(mainModule.provideContext());
+        historyDataSource = (DatabaseHistoryDataSource) mainModule.provideHistoryDataSource(openHelper);
+        repository = mainModule.provideHistoryAndFavouritesRepository(historyDataSource);
         System.out.println("");
     }
 

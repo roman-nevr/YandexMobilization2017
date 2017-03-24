@@ -15,21 +15,4 @@ import dagger.Provides;
 
 @Module
 public class HistoryAndFavouritesModule {
-    @Provides
-    @ListScope
-    public HistoryAndFavouritesRepository provideHistoryAndFavouritesRepository(HistoryDataSource dataSource){
-        return new HistoryAndFavouritesRepositoryImpl(dataSource);
-    }
-
-    @Provides
-    @ListScope
-    public HistoryDataSource provideHistoryDataSource(DatabaseOpenHelper openHelper){
-        return new DatabaseHistoryDataSource(openHelper);
-    }
-
-    @Provides
-    @ListScope
-    public DatabaseOpenHelper provideDatabaseOpenHelper(Context context){
-        return new DatabaseOpenHelper(context);
-    }
 }

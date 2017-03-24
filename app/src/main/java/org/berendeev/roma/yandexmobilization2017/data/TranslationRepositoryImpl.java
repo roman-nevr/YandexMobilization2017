@@ -4,7 +4,7 @@ import android.content.Context;
 
 import org.berendeev.roma.yandexmobilization2017.data.entity.Languages;
 import org.berendeev.roma.yandexmobilization2017.data.entity.Translation;
-import org.berendeev.roma.yandexmobilization2017.data.http.TranslateAPI;
+import org.berendeev.roma.yandexmobilization2017.data.http.TranslateApi;
 import org.berendeev.roma.yandexmobilization2017.domain.TranslationRepository;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.LanguageMap;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.TranslationQuery;
@@ -19,19 +19,19 @@ import io.reactivex.Observable;
 import timber.log.Timber;
 
 import static org.berendeev.roma.yandexmobilization2017.Consts.API_KEY;
-import static org.berendeev.roma.yandexmobilization2017.data.http.TranslateAPI.OK_CODE;
+import static org.berendeev.roma.yandexmobilization2017.data.http.TranslateApi.OK_CODE;
 
 public class TranslationRepositoryImpl implements TranslationRepository {
 
 
-    TranslateAPI translateAPI;
+    TranslateApi translateApi;
 
-    public TranslationRepositoryImpl(TranslateAPI translateAPI, Context context) {
-        this.translateAPI = translateAPI;
+    public TranslationRepositoryImpl(TranslateApi translateApi, Context context) {
+        this.translateApi = translateApi;
     }
 
     @Override public Observable<Word> translate(TranslationQuery query) {
-        return Observable.create(emitter -> translateAPI
+        return Observable.create(emitter -> translateApi
                 .translate(API_KEY, query.text(), query.langFrom() + "-" + query.langTo())
                 .subscribe(translation -> {
                     if (translation.code == OK_CODE) {
@@ -43,7 +43,7 @@ public class TranslationRepositoryImpl implements TranslationRepository {
     }
 
     @Override public Observable<LanguageMap> getLanguages(Locale locale) {
-        return Observable.create(emitter -> translateAPI
+        return Observable.create(emitter -> translateApi
                 .getLanguages(API_KEY, locale.getLanguage())
                 .subscribe(languages ->
                                 emitter.onNext(buildLanguageMap(languages, locale)),

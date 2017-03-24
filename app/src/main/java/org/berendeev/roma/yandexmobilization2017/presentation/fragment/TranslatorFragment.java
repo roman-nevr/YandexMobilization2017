@@ -2,6 +2,7 @@ package org.berendeev.roma.yandexmobilization2017.presentation.fragment;
 
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -10,6 +11,7 @@ import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -21,6 +23,7 @@ import org.berendeev.roma.yandexmobilization2017.R;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.TranslateDirection;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.Word;
 import org.berendeev.roma.yandexmobilization2017.presentation.App;
+import org.berendeev.roma.yandexmobilization2017.presentation.ImageButtonColorSwitcher;
 import org.berendeev.roma.yandexmobilization2017.presentation.activity.LanguageSelectorActivity;
 import org.berendeev.roma.yandexmobilization2017.presentation.presenter.TranslatorPresenter;
 import org.berendeev.roma.yandexmobilization2017.presentation.view.TranslatorView;
@@ -55,17 +58,7 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
         View view = inflater.inflate(R.layout.translator, container, false);
         ButterKnife.bind(this, view);
         initUI();
-
-        wordToTranslate.setOnEditorActionListener((v, actionId, event) -> {
-            System.out.println("action " + actionId);
-            System.out.println("event " + event);
-            return true;
-
-        });
-
         mainView = view.findViewById(R.id.main_layout);
-
-
         return view;
     }
 
@@ -92,24 +85,7 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
         //TODO versions
         colorFavourite = getResources().getColor(R.color.colorPrimary);
         colorNotFavourite = getResources().getColor(R.color.grey);
-        favButton.setOnClickListener(v -> {
-
-            int colorFrom, colorTo;
-
-            if(flag){
-                colorFrom = colorFavourite;
-                colorTo = colorNotFavourite;
-            }else {
-                colorFrom = colorNotFavourite;
-                colorTo = colorFavourite;
-            }
-            flag = !flag;
-            ObjectAnimator animator = ObjectAnimator.ofObject(favButton,
-                    "colorFilter", new ArgbEvaluator(), colorFrom, colorTo);
-
-            animator.setDuration(500);
-            animator.start();
-        });
+        favButton.setOnClickListener(new ImageButtonColorSwitcher(false, colorFavourite, colorNotFavourite));
     }
 
     @Override public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -171,6 +147,7 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
         return Observable.create(emitter -> {
             wordToTranslate.setOnEditorActionListener((v, actionId, event) -> {
                 if(actionId == IME_ACTION_DONE){
+                    hideKeyboard();
                     if (!emitter.isDisposed()){
                         emitter.onNext(R.id.input_done_id);
                     }
@@ -185,6 +162,12 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
                 }
             });
         });
+    }
+
+    private void hideKeyboard() {
+        InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(wordToTranslate.getWindowToken(),
+                InputMethodManager.HIDE_NOT_ALWAYS);
     }
 
     @Override public void showSourceLanguageSelector() {

@@ -34,7 +34,6 @@
         <activity
             android:name=".presentation.activity.LanguageSelectorActivity"
             android:theme="@style/AppTheme.NoActionBar"
-            android:parentActivityName=".presentation.activity.MainActivity"
             />
     </application>
 

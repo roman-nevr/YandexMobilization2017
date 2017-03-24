@@ -4,7 +4,7 @@ import android.content.Context;
 
 import org.berendeev.roma.yandexmobilization2017.data.TranslationRepositoryImpl;
 import org.berendeev.roma.yandexmobilization2017.data.http.CacheInterceptor;
-import org.berendeev.roma.yandexmobilization2017.data.http.TranslateAPI;
+import org.berendeev.roma.yandexmobilization2017.data.http.TranslateApi;
 import org.berendeev.roma.yandexmobilization2017.di.MainModule;
 import org.berendeev.roma.yandexmobilization2017.domain.TranslationRepository;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.TranslationQuery;
@@ -34,8 +34,8 @@ public class RepositoryTest {
         CacheInterceptor interceptor = mainModule.provideCacheInterceptor(cacheControl);
         OkHttpClient httpClient = mainModule.provideOkHttpClient(interceptor, mainModule.provideContext());
         Retrofit retrofit = mainModule.provideRetrofit(httpClient, mainModule.provideGson());
-        TranslateAPI translateAPI = mainModule.provideTranslateAPI(retrofit);
-        repository = new TranslationRepositoryImpl(translateAPI, mainModule.provideContext());
+        TranslateApi translateApi = mainModule.provideTranslateAPI(retrofit);
+        repository = new TranslationRepositoryImpl(translateApi, mainModule.provideContext());
     }
 
     @Test

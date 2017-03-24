@@ -6,6 +6,8 @@ import org.berendeev.roma.yandexmobilization2017.domain.entity.LanguageMap;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.TranslateDirection;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.Word;
 
+import java.util.List;
+
 import io.reactivex.Observable;
 
 public class DummyView implements LanguageSelectorView, TranslatorView, WordListView {
@@ -40,5 +42,9 @@ public class DummyView implements LanguageSelectorView, TranslatorView, WordList
 
     @Override public Observable<Integer> getTextInputDoneObservable() {
         return null;
+    }
+
+    @Override public void showList(List<Word> wordList) {
+
     }
 }

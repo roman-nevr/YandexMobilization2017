@@ -10,6 +10,8 @@ import android.widget.TextView;
 
 import org.berendeev.roma.yandexmobilization2017.R;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.Word;
+import org.berendeev.roma.yandexmobilization2017.presentation.ImageButtonColorSwitcher;
+import org.berendeev.roma.yandexmobilization2017.presentation.presenter.HistoryPresenter;
 
 import java.util.List;
 
@@ -20,7 +22,12 @@ import butterknife.ButterKnife;
 public class WordListAdapter extends RecyclerView.Adapter<WordListAdapter.WordHolder> {
 
     private List<Word> words;
+    private HistoryPresenter presenter;
 
+    public WordListAdapter(List<Word> words, HistoryPresenter presenter) {
+        this.words = words;
+        this.presenter = presenter;
+    }
 
     @Override public WordHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view =  LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item, parent, false);
@@ -28,11 +35,14 @@ public class WordListAdapter extends RecyclerView.Adapter<WordListAdapter.WordHo
     }
 
     @Override public void onBindViewHolder(WordHolder holder, int position) {
-//TODO
+        Word word = words.get(position);
+        holder.tvText.setText(word.word());
+        holder.translation.setText(word.translation());
+        holder.direction.setText(word.languageFrom() + "-" + word.languageTo());
     }
 
     @Override public int getItemCount() {
-        return 0;
+        return words.size();
     }
 
     public class WordHolder extends RecyclerView.ViewHolder{
