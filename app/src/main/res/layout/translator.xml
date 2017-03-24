@@ -19,10 +19,9 @@
         app:contentInsetStart="0dp"
         >
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:gravity="center_horizontal"
             android:orientation="horizontal"
             >
 
@@ -32,9 +31,13 @@
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:textAllCaps="false"
                 android:textSize="18sp"
-                tools:text="Russian"
+                tools:text="Russian Fed"
                 android:id="@+id/language_from"
-                />
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"
+                android:layout_alignParentTop="true"
+                android:layout_toLeftOf="@+id/swap_button"
+                android:layout_toStartOf="@+id/swap_button"/>
 
             <ImageButton
                 android:layout_gravity="center"
@@ -42,7 +45,9 @@
                 android:layout_height="match_parent"
                 app:srcCompat="@drawable/ic_arrows"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                />
+                android:id="@+id/swap_button"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"/>
 
             <Button
                 android:layout_width="wrap_content"
@@ -50,10 +55,15 @@
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:textAllCaps="false"
                 android:textSize="18sp"
-                tools:text="English"
+                android:minWidth="0dp"
+                tools:text="Engl"
                 android:id="@+id/language_to"
-                />
-        </LinearLayout>
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:layout_alignParentTop="true"
+                android:layout_toRightOf="@+id/swap_button"
+                android:layout_toEndOf="@+id/swap_button"/>
+        </RelativeLayout>
 
     </android.support.v7.widget.Toolbar>
 

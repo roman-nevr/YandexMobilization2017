@@ -15,6 +15,7 @@ import javax.inject.Inject;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
+import io.reactivex.internal.operators.completable.CompletableFromAction;
 import io.reactivex.subjects.BehaviorSubject;
 
 
@@ -64,22 +65,50 @@ public class PreferencesRepositoryImpl implements PreferencesRepository {
         return directionsSubject;
     }
 
+
+    //TODO wrap to code reuse
     @Override public Completable setDirectionTo(String to) {
         return Completable.fromAction(() -> {
-            dirsPreferences.edit()
-                    .putString(DIRECTION_TO, to)
-                    .apply();
-            directionsSubject.onNext(new Pair<>(getFrom(), to));
+            saveDirection(DIRECTION_TO, to);
+            String from;
+            if(to.equals(getFrom())){
+                from = getTo();
+            }else {
+                from = getFrom();
+            }
+            changeDirections(from, to);
         });
     }
 
     @Override public Completable setDirectionFrom(String from) {
         return Completable.fromAction(() -> {
-            dirsPreferences.edit()
-                    .putString(DIRECTION_FROM, from)
-                    .apply();
-            directionsSubject.onNext(new Pair<>(from, getTo()));
+            saveDirection(DIRECTION_FROM, from);
+            String to;
+            if(from.equals(getTo())){
+                to = getFrom();
+            }else {
+                to = getTo();
+            }
+            changeDirections(from, to);
         });
+    }
+
+    @Override public Completable swapDirections() {
+        return Completable.fromAction(() -> {
+            saveDirection(DIRECTION_FROM, getTo());
+            saveDirection(DIRECTION_TO, getFrom());
+            changeDirections(getFrom(), getTo());
+        });
+    }
+
+    private void changeDirections(String from, String to){
+        directionsSubject.onNext(new Pair<>(from, to));
+    }
+
+    private void saveDirection(String direction, String value){
+        dirsPreferences.edit()
+                .putString(direction, value)
+                .apply();
     }
 
     private String getFrom(){
@@ -101,5 +130,9 @@ public class PreferencesRepositoryImpl implements PreferencesRepository {
         }
         String directionFrom = dirsPreferences.getString(DIRECTION_FROM, defaultDirectionFrom);
         directionsSubject.onNext(new Pair<>(directionFrom, directionTo));
+    }
+
+    private void swapLanguages(){
+        directionsSubject.onNext(new Pair<>(getTo(), getTo()));
     }
 }

@@ -28,7 +28,7 @@ public class WordListAdapter extends RecyclerView.Adapter<WordListAdapter.WordHo
     }
 
     @Override public void onBindViewHolder(WordHolder holder, int position) {
-
+//TODO
     }
 
     @Override public int getItemCount() {

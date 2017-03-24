@@ -36,6 +36,7 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
     @BindView(R.id.fav_button) ImageButton favButton;
     @BindView(R.id.language_from) Button btnLanguageFrom;
     @BindView(R.id.language_to) Button btnLanguageTo;
+    @BindView(R.id.swap_button) ImageButton swapButton;
 
     private boolean flag;
 
@@ -55,6 +56,9 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
         });
         btnLanguageFrom.setOnClickListener(v -> {
             presenter.onSourceButtonClick();
+        });
+        swapButton.setOnClickListener(v -> {
+            presenter.onSwapButtonClick();
         });
 
         int colorPrimary = getResources().getColor(R.color.colorPrimary);

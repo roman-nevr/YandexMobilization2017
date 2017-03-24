@@ -18,4 +18,6 @@ public interface PreferencesRepository {
     Completable setDirectionTo(String to);
 
     Completable setDirectionFrom(String from);
+
+    Completable swapDirections();
 }
