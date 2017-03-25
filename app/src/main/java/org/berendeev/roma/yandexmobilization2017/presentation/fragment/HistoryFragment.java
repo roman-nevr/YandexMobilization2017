@@ -63,6 +63,13 @@ public class HistoryFragment extends Fragment implements WordListView {
         presenter.stop();
     }
 
+    @Override public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        if(!hidden){
+            presenter.start();
+        }
+    }
+
     private void initDi() {
         App.getApplication().getMainComponent().plusHistoryComponent().inject(this);
     }

@@ -82,26 +82,38 @@ public class DatabaseHistoryDataSource implements HistoryDataSource {
         contentValues.put(attr, getSqlBooleanFromJavaBoolean(true));
         int count = database.update(WORDS_TABLE, contentValues, selection, selectionArgs);
         if(count == 0){
-            fillContentValuesFromWord(word, false);
-            long id = database.insert(WORDS_TABLE, null, contentValues);
-            System.out.println(id);
+            fillContentValuesFromWord(word, IS_IN_HISTORY.equals(attr));
+            database.insert(WORDS_TABLE, null, contentValues);
         }
     }
 
     @Override public Completable removeFromHistory(Word word) {
         return Completable.fromAction(() -> {
-            fillContentValuesFromWord(word, false);
-            String selection = String.format("%1s = ? AND %2s = ? AND %3s = ? AND %4s = ? AND %4s = ?", WORD, TRANSLATION, LANGUAGE_FROM, LANGUAGE_TO, IS_IN_HISTORY);
-            removeFromTable(selection, word);
+            String selection = String.format("%1s = ? AND %2s = ? AND %3s = ? AND %4s = ? AND %5s = ? AND %6s = ?",
+                    WORD, TRANSLATION, LANGUAGE_FROM, LANGUAGE_TO, IS_IN_HISTORY, IS_IN_FAVOURITES);
+            String[] selectionArgs = {word.word(), word.translation(), word.languageFrom(), word.languageTo(), TRUE, FALSE};
+            int count = database.delete(WORDS_TABLE, selection, selectionArgs);
+            if(count == 0){
+                selectionArgs[5] = TRUE;
+                contentValues.clear();
+                contentValues.put(IS_IN_HISTORY, getSqlBooleanFromJavaBoolean(false));
+                database.update(WORDS_TABLE, contentValues, selection, selectionArgs);
+            }
         });
     }
 
     @Override public Completable removeFromFavourites(Word word) {
         return Completable.fromAction(() -> {
-            fillContentValuesFromWord(word.toBuilder().isFavourite(false).build(), false);
-            contentValues.remove(IS_IN_HISTORY);
-            String selection = String.format("%1s = ? AND %2s = ? AND %3s = ? AND %4s = ? AND %4s = ?", WORD, TRANSLATION, LANGUAGE_FROM, LANGUAGE_TO, IS_IN_FAVOURITES);
-            removeFromTable(selection, word);
+            String selection = String.format("%1s = ? AND %2s = ? AND %3s = ? AND %4s = ? AND %5s = ? AND %6s = ?",
+                    WORD, TRANSLATION, LANGUAGE_FROM, LANGUAGE_TO, IS_IN_FAVOURITES, IS_IN_HISTORY);
+            String[] selectionArgs = {word.word(), word.translation(), word.languageFrom(), word.languageTo(), TRUE, FALSE};
+            int count = database.delete(WORDS_TABLE, selection, selectionArgs);
+            if(count == 0){
+                selectionArgs[5] = TRUE;
+                contentValues.clear();
+                contentValues.put(IS_IN_FAVOURITES, getSqlBooleanFromJavaBoolean(false));
+                database.update(WORDS_TABLE, contentValues, selection, selectionArgs);
+            }
         });
     }
 
@@ -132,21 +144,23 @@ public class DatabaseHistoryDataSource implements HistoryDataSource {
         return words;
     }
 
-    private void removeFromTable(String selection, Word word){
-        String[] selectionArgs = {word.word(), word.translation(), word.languageFrom(), word.languageTo(), TRUE};
-        int count = database.update(WORDS_TABLE, contentValues, selection, selectionArgs);
-//        if(count < 1 && BuildConfig.DEBUG){
-//            throw new SQLException("incorrect remove");
-//        }
+    private void removeFromTable(String selection, Word word, String attr){
+        String[] selectionArgs = {word.word(), word.translation(), word.languageFrom(), word.languageTo(), TRUE, FALSE};
+        int count = database.delete(WORDS_TABLE, selection, selectionArgs);
+        if(count == 0){
+            selectionArgs[5] = TRUE;
+            contentValues.clear();
+            contentValues.put(attr, getSqlBooleanFromJavaBoolean(false));
+            database.update(WORDS_TABLE, contentValues, selection, selectionArgs);
+        }
     }
 
 
     private Observable<List<Word>> getFromSelection(String selection) {
         return Observable.create(emitter -> {
             List<Word> words = new ArrayList<>();
-            String[] selectionArgs = {"1"};
-            String[] columns = {WORD, TRANSLATION, LANGUAGE_TO, LANGUAGE_FROM, IS_IN_FAVOURITES};
-            Cursor cursor = database.query(true, WORDS_TABLE, columns, selection, selectionArgs, null, null, null, null);
+            String[] selectionArgs = {TRUE};
+            Cursor cursor = database.query(true, WORDS_TABLE, null, selection, selectionArgs, null, null, null, null);
             while (cursor.moveToNext()) {
                 words.add(getWordFromCursor(cursor));
             }

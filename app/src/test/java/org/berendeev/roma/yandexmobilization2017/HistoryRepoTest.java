@@ -9,6 +9,7 @@ import org.berendeev.roma.yandexmobilization2017.di.HistoryAndFavouritesModule;
 import org.berendeev.roma.yandexmobilization2017.di.MainModule;
 import org.berendeev.roma.yandexmobilization2017.domain.HistoryAndFavouritesRepository;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.Word;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -39,14 +40,15 @@ public class HistoryRepoTest{
 
     @Test
     public void saveInHistoryTest(){
-        Word word = buildWord("hello", "привет", true);
+        Word word = buildWord("hello", "привет", false);
         repository.saveInHistory(word).subscribe();
         repository.saveInHistory(word).subscribe();
         printAll();
         repository.saveInFavourites(word).subscribe();
         repository.getHistory().subscribe(words -> {
             assert word.equals(words.get(0));
-            System.out.println(words);
+            assert words.size() == 1;
+            //System.out.println(words);
         }, throwable -> {
 
         });
@@ -70,16 +72,34 @@ public class HistoryRepoTest{
         Word hello = buildWord("hello", "привет", true);
         Word world = buildWord("world", "мир", false);
         Word world2 = buildWord("world", "мир", false);
-//        repository.saveInHistory(hello).subscribe();
-//        repository.saveInHistory(hello).subscribe();
         repository.saveInHistory(world).subscribe();
         repository.saveInFavourites(world).subscribe();
         printAll();
-        repository.removeFromHistory(world).subscribe();
-        printAll();
         repository.removeFromFavourites(world).subscribe();
         printAll();
+        repository.removeFromHistory(world).subscribe();
+        printAll();
         historyDataSource.clean();
+        printAll();
+    }
+
+    @Test
+    public void getHistoryAndGetFavouritesTest(){
+        Word hello = buildWord("hello", "привет", true);
+        Word world = buildWord("world", "мир", false);
+        repository.saveInHistory(hello).subscribe();
+        repository.saveInHistory(world).subscribe();
+        repository.getHistory().subscribe(words -> {
+            System.out.println("history:");
+            System.out.println(words);
+            Assert.assertTrue( words.size() == 2);
+        });
+        repository.saveInFavourites(world).subscribe();
+        repository.getFavourites().subscribe(words -> {
+            System.out.println("favourites:");
+            System.out.println(words);
+            Assert.assertTrue( words.size() == 2);
+        });
         printAll();
     }
 

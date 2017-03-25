@@ -63,7 +63,6 @@ public class HistoryPresenter {
     }
 
     public void deleteAll() {
-        //TODO delete interactor
         deleteAllInteractor.execute(new VoidObserver(), null);
     }
 
@@ -76,6 +75,7 @@ public class HistoryPresenter {
         }
 
         @Override public void onComplete() {
+            dispose();
         }
     }
 
