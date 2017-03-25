@@ -2,6 +2,7 @@ package org.berendeev.roma.yandexmobilization2017.presentation.fragment;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -12,6 +13,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.TextView;
 
 import org.berendeev.roma.yandexmobilization2017.R;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.Word;
@@ -35,6 +38,8 @@ public class HistoryFragment extends Fragment implements WordListView {
 
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.recycler_view) RecyclerView recyclerView;
+    @BindView(R.id.title) TextView title;
+    @BindView(R.id.delete_all_button) ImageButton deleteButton;
 
     private WordListAdapter adapter;
 
@@ -69,12 +74,19 @@ public class HistoryFragment extends Fragment implements WordListView {
                 layoutManager.getOrientation());
         recyclerView.addItemDecoration(dividerItemDecoration);
         recyclerView.setLayoutManager(layoutManager);
+        deleteButton.setOnClickListener(v -> {
+            presenter.deleteAll();
+        });
     }
 
 
     @Override public void showList(List<Word> wordList) {
         adapter = new WordListAdapter(wordList, presenter);
         recyclerView.setAdapter(adapter);
+    }
+
+    @Override public void setTitleById(@StringRes int id) {
+        title.setText(id);
     }
 
     public static Fragment getHistoryFragment(){

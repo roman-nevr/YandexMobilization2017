@@ -25,7 +25,6 @@ import javax.inject.Inject;
 
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.observers.DisposableObserver;
-import timber.log.Timber;
 
 public class TranslatorPresenter {
 
@@ -49,11 +48,11 @@ public class TranslatorPresenter {
         disposable = new CompositeDisposable();
     }
 
-    public void init(){
+    public void init() {
         getLastWordInteractor.execute(new LastWordObserver(), null);
     }
 
-    public void start(){
+    public void start() {
         disposable.add(getTranslateDirectionInteractor.execute(new DirectionsObserver(), Locale.getDefault()));
         disposable.add(view.getTextObservable()
                 .distinctUntilChanged()
@@ -62,13 +61,13 @@ public class TranslatorPresenter {
                     translateTextInteractor.execute(new TranslationObserver(), buildQuery(text));
                 }));
         view.getTextInputDoneObservable()
-                .filter(integer -> integer== R.id.input_done_id)
+                .filter(integer -> integer == R.id.input_done_id)
                 .subscribe(integer -> {
                     saveInHistoryInteractor.execute(new VoidObserver(), lastWord);
                 });
     }
 
-    public void stop(){
+    public void stop() {
         disposable.clear();
         saveLastWordInteractor.execute(new VoidObserver(), lastWord);
     }
@@ -93,13 +92,30 @@ public class TranslatorPresenter {
         swapDirectionsInteractor.execute(new VoidObserver(), null);
     }
 
-    private class DirectionsObserver extends DisposableObserver<Pair<TranslateDirection, TranslateDirection>>{
+    public void onFavButtonClick() {
+        if (lastWord.isFavourite()) {
+            lastWord = lastWord.toBuilder()
+                    .isFavourite(false)
+                    .build();
+            view.switchOffFavButton();
+            removeFromFavouritesInteractor.execute(new VoidObserver(), lastWord);
+        }else {
+            lastWord = lastWord.toBuilder()
+                    .isFavourite(true)
+                    .build();
+            view.switchOnFavButton();
+            saveInFavouriteInteractor.execute(lastWord);
+        }
+    }
+
+    private class DirectionsObserver extends DisposableObserver<Pair<TranslateDirection, TranslateDirection>> {
 
         @Override public void onNext(Pair<TranslateDirection, TranslateDirection> pair) {
             langFrom = pair.first.key();
             langTo = pair.second.key();
             view.setTranslateDirection(pair.first, pair.second);
         }
+
         @Override public void onError(Throwable e) {
 
         }
@@ -109,12 +125,14 @@ public class TranslatorPresenter {
         }
 
     }
-    private class TranslationObserver extends DisposableObserver<Word>{
+
+    private class TranslationObserver extends DisposableObserver<Word> {
 
         @Override public void onNext(Word word) {
             view.setTranslation(word);
             lastWord = word;
         }
+
         @Override public void onError(Throwable e) {
 
         }
@@ -124,13 +142,16 @@ public class TranslatorPresenter {
         }
 
     }
-    private class LastWordObserver extends DisposableObserver<Word>{
+
+    private class LastWordObserver extends DisposableObserver<Word> {
 
         @Override public void onNext(Word word) {
-            view.initTranslatorText(word);
+            view.setPreviousWord(word);
+            lastWord = word;
             langFrom = word.languageFrom();
             langTo = word.languageTo();
         }
+
         @Override public void onError(Throwable e) {
 
         }
@@ -140,6 +161,7 @@ public class TranslatorPresenter {
         }
 
     }
+
     private TranslationQuery buildQuery(String text) {
         return TranslationQuery.create(text, langFrom, langTo);
     }

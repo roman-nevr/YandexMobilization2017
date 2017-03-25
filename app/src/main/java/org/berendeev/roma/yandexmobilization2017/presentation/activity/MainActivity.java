@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
 import org.berendeev.roma.yandexmobilization2017.R;
+import org.berendeev.roma.yandexmobilization2017.presentation.Utils;
 import org.berendeev.roma.yandexmobilization2017.presentation.fragment.FavouriteFragment;
 import org.berendeev.roma.yandexmobilization2017.presentation.fragment.HistoryFragment;
 import org.berendeev.roma.yandexmobilization2017.presentation.fragment.TranslatorFragment;
@@ -35,9 +36,11 @@ public class MainActivity extends AppCompatActivity {
                     showFragment(TRANSLATOR, from, 1);
                     return true;
                 case R.id.favourite:
+                    hideKeyboard();
                     showFragment(FAVOURITE, from, 2);
                     return true;
                 case R.id.history:
+                    hideKeyboard();
                     showFragment(HISTORY, from, 3);
                     return true;
             }
@@ -129,5 +132,9 @@ public class MainActivity extends AppCompatActivity {
         hideFragment(transaction, HISTORY);
         hideFragment(transaction, TRANSLATOR);
         hideFragment(transaction, FAVOURITE);
+    }
+
+    private void hideKeyboard() {
+        Utils.hideKeyboard(this, navigation);
     }
 }

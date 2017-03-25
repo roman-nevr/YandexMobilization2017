@@ -1,8 +1,5 @@
 package org.berendeev.roma.yandexmobilization2017.presentation.fragment;
 
-import android.animation.ArgbEvaluator;
-import android.animation.ObjectAnimator;
-import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -11,7 +8,6 @@ import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -23,7 +19,7 @@ import org.berendeev.roma.yandexmobilization2017.R;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.TranslateDirection;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.Word;
 import org.berendeev.roma.yandexmobilization2017.presentation.App;
-import org.berendeev.roma.yandexmobilization2017.presentation.ImageButtonColorSwitcher;
+import org.berendeev.roma.yandexmobilization2017.presentation.Utils;
 import org.berendeev.roma.yandexmobilization2017.presentation.activity.LanguageSelectorActivity;
 import org.berendeev.roma.yandexmobilization2017.presentation.presenter.TranslatorPresenter;
 import org.berendeev.roma.yandexmobilization2017.presentation.view.TranslatorView;
@@ -81,11 +77,12 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
     }
 
     private void initFavouritesMarker(){
-        flag = true;
         //TODO versions
         colorFavourite = getResources().getColor(R.color.colorPrimary);
         colorNotFavourite = getResources().getColor(R.color.grey);
-        favButton.setOnClickListener(new ImageButtonColorSwitcher(false, colorFavourite, colorNotFavourite));
+        favButton.setOnClickListener(v -> {
+            presenter.onFavButtonClick();
+        });
     }
 
     @Override public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -109,7 +106,7 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
         presenter.stop();
     }
 
-    @Override public void initTranslatorText(Word word) {
+    @Override public void setPreviousWord(Word word) {
         setText(word.word());
         translation.setText(word.translation());
         setFavouritesLabel(word.isFavourite());
@@ -164,11 +161,14 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
         });
     }
 
-    private void hideKeyboard() {
-        InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(wordToTranslate.getWindowToken(),
-                InputMethodManager.HIDE_NOT_ALWAYS);
+    @Override public void switchOnFavButton() {
+        Utils.animateImageButtonColor(favButton, colorNotFavourite, colorFavourite);
     }
+
+    @Override public void switchOffFavButton() {
+        Utils.animateImageButtonColor(favButton, colorFavourite, colorNotFavourite);
+    }
+
 
     @Override public void showSourceLanguageSelector() {
         LanguageSelectorActivity.start(this.getActivity(), R.id.language_from_type);
@@ -182,5 +182,9 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
     private int fromPixelToDp(int pixels){
         DisplayMetrics metrics = getResources().getDisplayMetrics();
         return pixels * DisplayMetrics.DENSITY_DEFAULT / metrics.densityDpi;
+    }
+
+    private void hideKeyboard() {
+        Utils.hideKeyboard(getContext(), wordToTranslate);
     }
 }

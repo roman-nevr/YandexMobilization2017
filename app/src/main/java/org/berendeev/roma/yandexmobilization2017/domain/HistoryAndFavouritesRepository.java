@@ -20,5 +20,11 @@ public interface HistoryAndFavouritesRepository {
 
     Completable removeFromHistory(Word word);
 
+    Completable removeAllFromHistory();
+
     Completable removeFromFavourites(Word word);
+
+    Completable removeAllFromFavourites();
+
+
 }

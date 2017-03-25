@@ -9,17 +9,18 @@ import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableObserver;
 
-public class SaveInFavouriteInteractor extends Interactor<Void, Word> {
+public class RemoveAllFromFavouritesInteractor extends Interactor<Void, Void> {
+
     @Inject HistoryAndFavouritesRepository repository;
 
     @Inject
-    public SaveInFavouriteInteractor() {}
+    public RemoveAllFromFavouritesInteractor() {}
 
-    @Override protected Observable<Void> buildObservable(Word param) {
-        return repository.saveInFavourites(param).toObservable();
+    @Override protected Observable<Void> buildObservable(Void param) {
+        return repository.removeAllFromFavourites().toObservable();
     }
 
-    public Disposable execute(Word param) {
-        return execute(new VoidObserver(), param);
+    public Disposable execute() {
+        return execute(new VoidObserver(), null);
     }
 }

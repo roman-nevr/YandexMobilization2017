@@ -16,18 +16,12 @@ public abstract class Interactor<Response, Request> {
     @Inject ThreadPoolExecutor workExecutor;
     @Inject Scheduler mainExecutor;
 
-//    CompositeDisposable disposable = new CompositeDisposable();
-
     public Disposable execute(DisposableObserver<Response> observer, Request param) {
         Observable<Response> observable = buildObservable(param)
                 .subscribeOn(Schedulers.io())
                 .observeOn(mainExecutor);
         return  (observable.subscribeWith(observer));
     }
-
-//    public void dispose(){
-//        disposable.clear();
-//    }
 
     protected abstract Observable<Response> buildObservable(Request param);
 }

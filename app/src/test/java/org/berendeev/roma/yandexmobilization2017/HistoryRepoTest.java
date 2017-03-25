@@ -14,10 +14,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
+import org.robolectric.annotation.Config;
 
 import java.util.List;
 
 @RunWith(RobolectricTestRunner.class)
+@Config(manifest= Config.NONE)
 public class HistoryRepoTest{
 
     private HistoryAndFavouritesRepository repository;
@@ -39,12 +41,16 @@ public class HistoryRepoTest{
     public void saveInHistoryTest(){
         Word word = buildWord("hello", "привет", true);
         repository.saveInHistory(word).subscribe();
+        repository.saveInHistory(word).subscribe();
+        printAll();
+        repository.saveInFavourites(word).subscribe();
         repository.getHistory().subscribe(words -> {
             assert word.equals(words.get(0));
             System.out.println(words);
         }, throwable -> {
 
         });
+        printAll();
     }
 
     @Test

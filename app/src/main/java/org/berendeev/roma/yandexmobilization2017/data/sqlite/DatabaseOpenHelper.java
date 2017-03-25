@@ -9,15 +9,16 @@ import android.provider.BaseColumns;
 public class DatabaseOpenHelper extends SQLiteOpenHelper implements BaseColumns {
 
     private static final String DATABASE_NAME = "yandexMobil2017.db";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 3;
 
     public static final String WORDS_TABLE = "words";
     public static final String WORD = "word";
     public static final String TRANSLATION = "translation";
-    public static final String LANGUAGE_TO = "language_to_id";
-    public static final String LANGUAGE_FROM = "language_from_id";
+    public static final String LANGUAGE_TO = "language_to";
+    public static final String LANGUAGE_FROM = "language_from";
     public static final String IS_IN_HISTORY = "is_in_history";
     public static final String IS_IN_FAVOURITES = "is_in_favourites";
+    public static final String ADD_DATE = "add_date";
 
     public DatabaseOpenHelper(Context context){
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -31,7 +32,8 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper implements BaseColumns 
                 LANGUAGE_FROM + " text not null, " +
                 LANGUAGE_TO + " text not null, " +
                 IS_IN_HISTORY + " integer not null, " +
-                IS_IN_FAVOURITES + " integer not null);";
+                IS_IN_FAVOURITES + " integer not null, " +
+                ADD_DATE + " integer not null);";
         db.execSQL(script);
     }
 

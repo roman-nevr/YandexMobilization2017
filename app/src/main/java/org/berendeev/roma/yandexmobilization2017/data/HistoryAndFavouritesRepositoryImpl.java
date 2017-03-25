@@ -39,18 +39,34 @@ public class HistoryAndFavouritesRepositoryImpl implements HistoryAndFavouritesR
     }
 
     @Override public Completable saveInHistory(Word word) {
-        return historyDataSource.saveInHistory(word);
+        if(word.word().isEmpty()){
+            return Completable.complete();
+        }else {
+            return historyDataSource.saveInHistory(word);
+        }
     }
 
     @Override public Completable saveInFavourites(Word word) {
-        return historyDataSource.saveInFavourites(word);
+        if (word.word().isEmpty()){
+            return Completable.complete();
+        }else {
+            return historyDataSource.saveInFavourites(word);
+        }
     }
 
     @Override public Completable removeFromHistory(Word word) {
         return historyDataSource.removeFromHistory(word);
     }
 
+    @Override public Completable removeAllFromHistory() {
+        return historyDataSource.removeAllFromHistory();
+    }
+
     @Override public Completable removeFromFavourites(Word word) {
         return historyDataSource.removeFromFavourites(word);
+    }
+
+    @Override public Completable removeAllFromFavourites() {
+        return historyDataSource.removeAllFromFavourites();
     }
 }

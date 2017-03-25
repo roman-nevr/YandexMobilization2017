@@ -24,7 +24,7 @@ public class DummyView implements LanguageSelectorView, TranslatorView, WordList
 
     }
 
-    @Override public void initTranslatorText(Word word) {
+    @Override public void setPreviousWord(Word word) {
 
     }
 
@@ -42,6 +42,14 @@ public class DummyView implements LanguageSelectorView, TranslatorView, WordList
 
     @Override public Observable<Integer> getTextInputDoneObservable() {
         return null;
+    }
+
+    @Override public void switchOnFavButton() {
+
+    }
+
+    @Override public void switchOffFavButton() {
+
     }
 
     @Override public void showList(List<Word> wordList) {

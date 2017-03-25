@@ -21,4 +21,8 @@ public interface HistoryDataSource {
     Completable removeFromHistory(Word word);
 
     Completable removeFromFavourites(Word word);
+
+    Completable removeAllFromHistory();
+
+    Completable removeAllFromFavourites();
 }

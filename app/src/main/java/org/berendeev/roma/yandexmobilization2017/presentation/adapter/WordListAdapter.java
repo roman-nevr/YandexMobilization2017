@@ -5,12 +5,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.berendeev.roma.yandexmobilization2017.R;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.Word;
-import org.berendeev.roma.yandexmobilization2017.presentation.ImageButtonColorSwitcher;
 import org.berendeev.roma.yandexmobilization2017.presentation.presenter.HistoryPresenter;
 
 import java.util.List;

@@ -1,5 +1,6 @@
 package org.berendeev.roma.yandexmobilization2017.domain.interactor;
 
+import org.berendeev.roma.yandexmobilization2017.domain.HistoryAndFavouritesRepository;
 import org.berendeev.roma.yandexmobilization2017.domain.TranslationRepository;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.TranslationQuery;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.Word;
@@ -10,12 +11,14 @@ import io.reactivex.Observable;
 
 public class TranslateTextInteractor extends Interactor<Word, TranslationQuery> {
 
-    @Inject TranslationRepository repository;
+    @Inject TranslationRepository translationRepository;
+    @Inject HistoryAndFavouritesRepository historyAndFavouritesRepository;
 
     @Inject
     public TranslateTextInteractor() {}
 
     @Override protected Observable<Word> buildObservable(TranslationQuery param) {
-        return repository.translate(param);
+        return translationRepository.translate(param).flatMap(word ->
+                historyAndFavouritesRepository.checkIfInFavourites(word));
     }
 }

@@ -71,7 +71,6 @@ public class PreferencesRepositoryImpl implements PreferencesRepository {
     //TODO wrap to code reuse
     @Override public Completable setDirectionTo(String to) {
         return Completable.fromAction(() -> {
-            saveDirection(DIRECTION_TO, to);
             String from;
             if(to.equals(getFrom())){
                 from = getTo();
@@ -84,7 +83,6 @@ public class PreferencesRepositoryImpl implements PreferencesRepository {
 
     @Override public Completable setDirectionFrom(String from) {
         return Completable.fromAction(() -> {
-            saveDirection(DIRECTION_FROM, from);
             String to;
             if(from.equals(getTo())){
                 to = getFrom();
@@ -99,13 +97,13 @@ public class PreferencesRepositoryImpl implements PreferencesRepository {
         return Completable.fromAction(() -> {
             String from = getFrom();
             String to = getTo();
-            saveDirection(DIRECTION_FROM, to);
-            saveDirection(DIRECTION_TO, from);
             changeDirections(to, from);
         });
     }
 
     private void changeDirections(String from, String to){
+        saveDirection(DIRECTION_FROM, from);
+        saveDirection(DIRECTION_TO, to);
         directionsSubject.onNext(new Pair<>(from, to));
     }
 
