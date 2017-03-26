@@ -42,6 +42,8 @@ public class HistoryFragment extends Fragment implements WordListView {
     @BindView(R.id.delete_all_button) ImageButton deleteButton;
 
     private WordListAdapter adapter;
+    private int colorFavourite;
+    private int colorNotFavourite;
 
     @Nullable @Override public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.history_layout, container, false);
@@ -84,16 +86,26 @@ public class HistoryFragment extends Fragment implements WordListView {
         deleteButton.setOnClickListener(v -> {
             presenter.deleteAll();
         });
+        colorFavourite = getResources().getColor(R.color.colorPrimary);
+        colorNotFavourite = getResources().getColor(R.color.grey);
     }
 
-
     @Override public void showList(List<Word> wordList) {
-        adapter = new WordListAdapter(wordList, presenter);
+        adapter = new WordListAdapter(wordList, presenter, colorFavourite, colorNotFavourite);
         recyclerView.setAdapter(adapter);
     }
 
     @Override public void setTitleById(@StringRes int id) {
         title.setText(id);
+    }
+
+    @Override public void switchOffFavButtonAt(int index) {
+        ((WordListAdapter.WordHolder)recyclerView.getChildViewHolder(recyclerView.getChildAt(index))).switchOffFavButton();
+
+    }
+
+    @Override public void switchOnFavButtonAt(int index) {
+        ((WordListAdapter.WordHolder)recyclerView.getChildViewHolder(recyclerView.getChildAt(index))).switchOnFavButton();
     }
 
     public static Fragment getHistoryFragment(){

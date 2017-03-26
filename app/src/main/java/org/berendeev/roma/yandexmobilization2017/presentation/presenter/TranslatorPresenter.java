@@ -63,13 +63,26 @@ public class TranslatorPresenter {
         view.getTextInputDoneObservable()
                 .filter(integer -> integer == R.id.input_done_id)
                 .subscribe(integer -> {
-                    saveInHistoryInteractor.execute(new VoidObserver(), lastWord);
+                    //TODO translate
+                    translateAndSaveLastWord();
                 });
     }
 
     public void stop() {
         disposable.clear();
+        saveLastWord();
+    }
+
+    private void saveLastWord(){
         saveLastWordInteractor.execute(new VoidObserver(), lastWord);
+    }
+
+    private void saveLastWordInHistory(){
+        saveInHistoryInteractor.execute(new VoidObserver(), lastWord);
+    }
+
+    private void translateAndSaveLastWord(){
+        translateTextInteractor.execute(new InputDoneObserver(), buildQuery(lastWord.word()));
     }
 
     public void setView(TranslatorView view) {
@@ -114,14 +127,13 @@ public class TranslatorPresenter {
             langFrom = pair.first.key();
             langTo = pair.second.key();
             view.setTranslateDirection(pair.first, pair.second);
+            translateAndSaveLastWord();
         }
 
         @Override public void onError(Throwable e) {
-
         }
 
         @Override public void onComplete() {
-
         }
 
     }
@@ -134,7 +146,6 @@ public class TranslatorPresenter {
         }
 
         @Override public void onError(Throwable e) {
-
         }
 
         @Override public void onComplete() {
@@ -164,5 +175,22 @@ public class TranslatorPresenter {
 
     private TranslationQuery buildQuery(String text) {
         return TranslationQuery.create(text, langFrom, langTo);
+    }
+
+    private class InputDoneObserver extends DisposableObserver<Word>{
+
+        @Override public void onNext(Word word) {
+            view.setTranslation(word);
+            lastWord = word;
+        }
+
+        @Override public void onError(Throwable e) {
+        }
+
+        @Override public void onComplete() {
+            saveLastWordInHistory();
+            saveLastWord();
+            dispose();
+        }
     }
 }

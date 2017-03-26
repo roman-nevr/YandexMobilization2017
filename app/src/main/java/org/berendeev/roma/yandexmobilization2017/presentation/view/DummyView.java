@@ -24,6 +24,14 @@ public class DummyView implements LanguageSelectorView, TranslatorView, WordList
 
     }
 
+    @Override public void switchOffFavButtonAt(int index) {
+
+    }
+
+    @Override public void switchOnFavButtonAt(int index) {
+
+    }
+
     @Override public void setPreviousWord(Word word) {
 
     }

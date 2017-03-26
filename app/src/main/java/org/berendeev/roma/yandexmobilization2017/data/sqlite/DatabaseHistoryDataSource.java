@@ -122,14 +122,22 @@ public class DatabaseHistoryDataSource implements HistoryDataSource {
             String selection = String.format("%1s = ? AND %2s = ?", IS_IN_HISTORY, IS_IN_FAVOURITES);
             String[] selectionArgs = {TRUE, FALSE};
             database.delete(WORDS_TABLE, selection, selectionArgs);
+            selectionArgs[1] = TRUE;
+            contentValues.clear();
+            contentValues.put(IS_IN_HISTORY, getSqlBooleanFromJavaBoolean(false));
+            database.update(WORDS_TABLE, contentValues, selection, selectionArgs);
         });
     }
 
     @Override public Completable removeAllFromFavourites() {
         return Completable.fromAction(() -> {
-            String selection = String.format("%1s = ? AND %2s = ?", IS_IN_HISTORY, IS_IN_FAVOURITES);
-            String[] selectionArgs = {FALSE, TRUE};
+            String selection = String.format("%1s = ? AND %2s = ?", IS_IN_FAVOURITES, IS_IN_HISTORY);
+            String[] selectionArgs = {TRUE, FALSE};
             database.delete(WORDS_TABLE, selection, selectionArgs);
+            selectionArgs[1] = TRUE;
+            contentValues.clear();
+            contentValues.put(IS_IN_FAVOURITES, getSqlBooleanFromJavaBoolean(false));
+            database.update(WORDS_TABLE, contentValues, selection, selectionArgs);
         });
     }
 

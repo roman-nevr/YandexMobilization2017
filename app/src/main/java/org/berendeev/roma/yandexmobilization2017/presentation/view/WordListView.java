@@ -10,4 +10,8 @@ public interface WordListView {
     void showList(List<Word> wordList);
 
     void setTitleById(@StringRes int id);
+
+    void switchOffFavButtonAt(int index);
+
+    void switchOnFavButtonAt(int index);
 }

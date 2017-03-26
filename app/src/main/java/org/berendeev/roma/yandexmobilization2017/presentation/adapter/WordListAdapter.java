@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import org.berendeev.roma.yandexmobilization2017.R;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.Word;
+import org.berendeev.roma.yandexmobilization2017.presentation.Utils;
 import org.berendeev.roma.yandexmobilization2017.presentation.presenter.HistoryPresenter;
 
 import java.util.List;
@@ -21,10 +22,19 @@ public class WordListAdapter extends RecyclerView.Adapter<WordListAdapter.WordHo
 
     private List<Word> words;
     private HistoryPresenter presenter;
+    private int colorFavourite;
+    private int colorNotFavourite;
 
-    public WordListAdapter(List<Word> words, HistoryPresenter presenter) {
+    public WordListAdapter(List<Word> words, HistoryPresenter presenter, int colorFavourite, int colorNotFavourite) {
         this.words = words;
         this.presenter = presenter;
+        this.colorFavourite = colorFavourite;
+        this.colorNotFavourite = colorNotFavourite;
+        setHasStableIds(true);
+    }
+
+    @Override public long getItemId(int position) {
+        return words.get(position).hashCode();
     }
 
     @Override public WordHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -37,6 +47,7 @@ public class WordListAdapter extends RecyclerView.Adapter<WordListAdapter.WordHo
         holder.tvText.setText(word.word());
         holder.translation.setText(word.translation());
         holder.direction.setText(word.languageFrom() + "-" + word.languageTo());
+        holder.favButton.setColorFilter(word.isFavourite() ? colorFavourite : colorNotFavourite);
     }
 
     @Override public int getItemCount() {
@@ -50,17 +61,29 @@ public class WordListAdapter extends RecyclerView.Adapter<WordListAdapter.WordHo
         @BindView(R.id.translation) TextView translation;
         @BindView(R.id.direction) TextView direction;
 
+        public Word word;
+
         public WordHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
             favButton.setOnClickListener(v -> {
-
+                if (getAdapterPosition() != RecyclerView.NO_POSITION){
+                    presenter.onFavButtonClick(getAdapterPosition());
+                }
             });
 
             itemView.setOnClickListener(v -> {
-
+                //TODO set word in translator
             });
 
+        }
+
+        public void switchOnFavButton() {
+            Utils.animateImageButtonColor(favButton, colorNotFavourite, colorFavourite);
+        }
+
+        public void switchOffFavButton() {
+            Utils.animateImageButtonColor(favButton, colorFavourite, colorNotFavourite);
         }
     }
 }

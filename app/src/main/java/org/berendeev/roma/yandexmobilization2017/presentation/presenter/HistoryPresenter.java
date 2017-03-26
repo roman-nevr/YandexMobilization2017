@@ -7,6 +7,8 @@ import org.berendeev.roma.yandexmobilization2017.domain.interactor.GetHistoryInt
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.Interactor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.RemoveAllFromFavouritesInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.RemoveAllFromHistoryInteractor;
+import org.berendeev.roma.yandexmobilization2017.domain.interactor.RemoveFromFavouritesInteractor;
+import org.berendeev.roma.yandexmobilization2017.domain.interactor.SaveInFavouriteInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.VoidObserver;
 import org.berendeev.roma.yandexmobilization2017.presentation.view.WordListView;
 
@@ -23,6 +25,8 @@ public class HistoryPresenter {
     @Inject GetFavouritesInteractor getFavouritesInteractor;
     @Inject RemoveAllFromFavouritesInteractor removeAllFromFavouritesInteractor;
     @Inject RemoveAllFromHistoryInteractor removeAllFromHistoryInteractor;
+    @Inject SaveInFavouriteInteractor saveInFavouriteInteractor;
+    @Inject RemoveFromFavouritesInteractor removeFromFavouritesInteractor;
 
     private int type;
     private Interactor<List<Word>, Void> getInteractor;
@@ -30,6 +34,7 @@ public class HistoryPresenter {
     private WordListView view;
     private CompositeDisposable disposable;
     private int titleId;
+    private List<Word> words;
 
     @Inject
     public HistoryPresenter() {
@@ -38,6 +43,7 @@ public class HistoryPresenter {
 
     public void start(){
         disposable.add(getInteractor.execute(new WordsObserver(), null));
+        view.setTitleById(titleId);
     }
 
     public void stop(){
@@ -64,11 +70,31 @@ public class HistoryPresenter {
 
     public void deleteAll() {
         deleteAllInteractor.execute(new VoidObserver(), null);
+        start();
+    }
+
+    public void onFavButtonClick(int index) {
+        Word word = words.get(index);
+        if(word.isFavourite()){
+            word = word.toBuilder()
+                    .isFavourite(false)
+                    .build();
+            view.switchOffFavButtonAt(index);
+            removeFromFavouritesInteractor.execute(new VoidObserver(), word);
+        }else {
+            word = word.toBuilder()
+                    .isFavourite(true)
+                    .build();
+            view.switchOnFavButtonAt(index);
+            saveInFavouriteInteractor.execute(new VoidObserver(), word);
+        }
+        words.set(index, word);
     }
 
     private class WordsObserver extends DisposableObserver<List<Word>>{
         @Override public void onNext(List<Word> words) {
             view.showList(words);
+            HistoryPresenter.this.words = words;
         }
 
         @Override public void onError(Throwable e) {

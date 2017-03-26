@@ -103,6 +103,24 @@ public class HistoryRepoTest{
         printAll();
     }
 
+    @Test
+    public void removeAllTest(){
+        Word hello = buildWord("hello", "привет", true);
+        Word hello1 = buildWord("hello1", "привет", true);
+        Word hello2 = buildWord("hello2", "привет", true);
+        Word hello3 = buildWord("hello3", "привет", true);
+        repository.saveInHistory(hello).subscribe();
+        repository.saveInHistory(hello1).subscribe();
+        repository.saveInHistory(hello2).subscribe();
+        repository.saveInHistory(hello3).subscribe();
+        printHistory();
+        repository.removeAllFromHistory().subscribe();
+        printHistory();
+        printAll();
+        repository.removeAllFromFavourites().subscribe();
+        printAll();
+    }
+
     private Word buildWord(String word, String translation, boolean isFavourite){
         return Word.create(word, translation, "en", "ru", isFavourite);
     }
@@ -110,14 +128,18 @@ public class HistoryRepoTest{
     private void printHistory(){
         repository.getHistory().subscribe(words -> {
             System.out.println("history");
-            System.out.println(words);
+            for (Word word : words) {
+                System.out.println(word);
+            }
         });
     }
 
     private void printFavourites(){
         repository.getHistory().subscribe(words -> {
             System.out.println("favourite");
-            System.out.println(words);
+            for (Word word : words) {
+                System.out.println(word);
+            }
         });
     }
 
