@@ -6,6 +6,7 @@ import org.berendeev.roma.yandexmobilization2017.R;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.TranslateDirection;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.TranslationQuery;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.Word;
+import org.berendeev.roma.yandexmobilization2017.domain.interactor.CheckIfFavouriteInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.GetLastWordInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.GetTranslateDirectionInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.RemoveFromFavouritesInteractor;
@@ -15,6 +16,7 @@ import org.berendeev.roma.yandexmobilization2017.domain.interactor.SaveLastWordI
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.SwapDirectionsInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.TranslateTextInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.VoidObserver;
+import org.berendeev.roma.yandexmobilization2017.presentation.view.DummyView;
 import org.berendeev.roma.yandexmobilization2017.presentation.view.TranslatorView;
 import org.berendeev.roma.yandexmobilization2017.presentation.view.TranslatorView.Router;
 
@@ -38,6 +40,7 @@ public class TranslatorPresenter {
     @Inject SaveInFavouriteInteractor saveInFavouriteInteractor;
     @Inject RemoveFromFavouritesInteractor removeFromFavouritesInteractor;
     @Inject SaveInHistoryInteractor saveInHistoryInteractor;
+    @Inject CheckIfFavouriteInteractor checkIfFavouriteInteractor;
     private Router router;
     private final CompositeDisposable disposable;
     private String langFrom, langTo;
@@ -63,13 +66,13 @@ public class TranslatorPresenter {
         view.getTextInputDoneObservable()
                 .filter(integer -> integer == R.id.input_done_id)
                 .subscribe(integer -> {
-                    //TODO translate
                     translateAndSaveLastWord();
                 });
     }
 
     public void stop() {
         disposable.clear();
+        view = DummyView.DUMMY_VIEW;
         saveLastWord();
     }
 
@@ -119,6 +122,10 @@ public class TranslatorPresenter {
             view.switchOnFavButton();
             saveInFavouriteInteractor.execute(lastWord);
         }
+    }
+
+    public void onShow() {
+        checkIfFavouriteInteractor.execute(new TranslationObserver(), lastWord);
     }
 
     private class DirectionsObserver extends DisposableObserver<Pair<TranslateDirection, TranslateDirection>> {

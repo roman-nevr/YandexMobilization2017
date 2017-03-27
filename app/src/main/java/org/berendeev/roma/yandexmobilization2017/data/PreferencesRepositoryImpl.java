@@ -46,10 +46,6 @@ public class PreferencesRepositoryImpl implements PreferencesRepository {
                     .putString(TEXT, word.word())
                     .putString(TRANSLATION, word.translation())
                     .apply();
-//            dirsPreferences.edit()
-//                    .putString(DIRECTION_FROM, word.languageFrom())
-//                    .putString(DIRECTION_TO, word.languageTo())
-//                    .apply();
         });
     }
 
@@ -68,7 +64,6 @@ public class PreferencesRepositoryImpl implements PreferencesRepository {
     }
 
 
-    //TODO wrap to code reuse
     @Override public Completable setDirectionTo(String to) {
         return Completable.fromAction(() -> {
             String from;
@@ -132,9 +127,5 @@ public class PreferencesRepositoryImpl implements PreferencesRepository {
         }
         String directionFrom = dirsPreferences.getString(DIRECTION_FROM, defaultDirectionFrom);
         directionsSubject.onNext(new Pair<>(directionFrom, directionTo));
-    }
-
-    private void swapLanguages(){
-        directionsSubject.onNext(new Pair<>(getTo(), getTo()));
     }
 }

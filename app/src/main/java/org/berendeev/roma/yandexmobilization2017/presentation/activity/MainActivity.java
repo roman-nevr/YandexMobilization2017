@@ -10,14 +10,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
 import org.berendeev.roma.yandexmobilization2017.R;
+import org.berendeev.roma.yandexmobilization2017.domain.entity.Word;
 import org.berendeev.roma.yandexmobilization2017.presentation.Utils;
-import org.berendeev.roma.yandexmobilization2017.presentation.fragment.FavouriteFragment;
 import org.berendeev.roma.yandexmobilization2017.presentation.fragment.HistoryFragment;
 import org.berendeev.roma.yandexmobilization2017.presentation.fragment.TranslatorFragment;
+import org.berendeev.roma.yandexmobilization2017.presentation.view.WordListView;
 
-import java.util.Locale;
-
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements WordListView.Router{
 
     public static final String TRANSLATOR = "translator";
     public static final String HISTORY = "history";
@@ -136,5 +135,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void hideKeyboard() {
         Utils.hideKeyboard(this, navigation);
+    }
+
+    @Override public void moveShowWordInTranslator(Word word) {
+
     }
 }

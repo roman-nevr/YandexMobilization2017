@@ -10,6 +10,7 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 
 import org.berendeev.roma.yandexmobilization2017.R;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.LanguageMap;
@@ -93,5 +94,14 @@ public class LanguageSelectorActivity extends AppCompatActivity implements Langu
 
     @Override public void moveToTranslator() {
         finish();
+    }
+
+    @Override public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId() == android.R.id.home){
+            moveToTranslator();
+            return true;
+        }else {
+            return super.onOptionsItemSelected(item);
+        }
     }
 }

@@ -2,6 +2,7 @@ package org.berendeev.roma.yandexmobilization2017.data.sqlite;
 
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Pair;
 
@@ -12,6 +13,7 @@ import java.util.List;
 
 import io.reactivex.Completable;
 import io.reactivex.Observable;
+import timber.log.Timber;
 
 import static org.berendeev.roma.yandexmobilization2017.data.sqlite.DatabaseOpenHelper.ADD_DATE;
 import static org.berendeev.roma.yandexmobilization2017.data.sqlite.DatabaseOpenHelper.IS_IN_FAVOURITES;
@@ -55,9 +57,16 @@ public class DatabaseHistoryDataSource implements HistoryDataSource {
     @Override public boolean checkIfInFavourites(Word word) {
         String selection = String.format("%1s = ? AND %2s = ? AND %3s = ? AND %4s = ? AND %5s = ?", WORD, TRANSLATION, LANGUAGE_FROM, LANGUAGE_TO, IS_IN_FAVOURITES);
         String[] selectionArgs = {word.word(), word.translation(), word.languageFrom(), word.languageTo(), "" + getSqlBooleanFromJavaBoolean(true)};
-        Cursor cursor = database.query(WORDS_TABLE, null, selection, selectionArgs, null, null, null, null);
-        boolean result = cursor.moveToFirst();
-        cursor.close();
+        boolean result;
+        try {
+            Cursor cursor = database.query(WORDS_TABLE, null, selection, selectionArgs, null, null, null, null);
+            result = cursor.moveToFirst();
+            cursor.close();
+        }catch (SQLException e){
+            result = false;
+            Timber.d("SQL Exception " + e);
+            Timber.d(e);
+        }
         return result;
     }
 

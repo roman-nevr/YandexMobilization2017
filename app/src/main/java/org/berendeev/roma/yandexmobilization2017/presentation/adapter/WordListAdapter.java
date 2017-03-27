@@ -74,6 +74,7 @@ public class WordListAdapter extends RecyclerView.Adapter<WordListAdapter.WordHo
 
             itemView.setOnClickListener(v -> {
                 //TODO set word in translator
+                presenter.onItemClick(getAdapterPosition());
             });
 
         }

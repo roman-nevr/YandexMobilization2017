@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
@@ -66,7 +67,6 @@ public class HistoryFragment extends Fragment implements WordListView {
     }
 
     @Override public void onHiddenChanged(boolean hidden) {
-        super.onHiddenChanged(hidden);
         if(!hidden){
             presenter.start();
         }
@@ -86,8 +86,8 @@ public class HistoryFragment extends Fragment implements WordListView {
         deleteButton.setOnClickListener(v -> {
             presenter.deleteAll();
         });
-        colorFavourite = getResources().getColor(R.color.colorPrimary);
-        colorNotFavourite = getResources().getColor(R.color.grey);
+        colorFavourite = ContextCompat.getColor(getContext(), R.color.colorPrimary);
+        colorNotFavourite = ContextCompat.getColor(getContext(), R.color.grey);
     }
 
     @Override public void showList(List<Word> wordList) {
@@ -123,4 +123,5 @@ public class HistoryFragment extends Fragment implements WordListView {
         fragment.setArguments(bundle);
         return fragment;
     }
+
 }

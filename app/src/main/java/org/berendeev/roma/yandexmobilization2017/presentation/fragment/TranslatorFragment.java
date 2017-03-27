@@ -3,6 +3,7 @@ package org.berendeev.roma.yandexmobilization2017.presentation.fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
@@ -77,9 +78,8 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
     }
 
     private void initFavouritesMarker(){
-        //TODO versions
-        colorFavourite = getResources().getColor(R.color.colorPrimary);
-        colorNotFavourite = getResources().getColor(R.color.grey);
+        colorFavourite = ContextCompat.getColor(getContext(), R.color.colorPrimary);
+        colorNotFavourite = ContextCompat.getColor(getContext(), R.color.grey);
         favButton.setOnClickListener(v -> {
             presenter.onFavButtonClick();
         });
@@ -121,8 +121,6 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
         btnLanguageFrom.setText(directionFrom.name());
 
         btnLanguageTo.setText(directionTo.name());
-
-        setText(wordToTranslate.getText().toString());
     }
 
     private void setFavouritesLabel(boolean isFavourite) {
@@ -177,6 +175,12 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
 
     @Override public void showTargetLanguageSelector() {
         LanguageSelectorActivity.start(this.getActivity(), R.id.language_to_type);
+    }
+
+    @Override public void onHiddenChanged(boolean hidden) {
+        if(!hidden){
+            presenter.onShow();
+        }
     }
 
     private int fromPixelToDp(int pixels){

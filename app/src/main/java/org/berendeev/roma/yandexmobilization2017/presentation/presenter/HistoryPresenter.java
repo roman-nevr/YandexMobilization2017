@@ -91,6 +91,11 @@ public class HistoryPresenter {
         words.set(index, word);
     }
 
+    public void onItemClick(int adapterPosition) {
+        //TODO
+        int a =0;
+    }
+
     private class WordsObserver extends DisposableObserver<List<Word>>{
         @Override public void onNext(List<Word> words) {
             view.showList(words);
@@ -101,7 +106,6 @@ public class HistoryPresenter {
         }
 
         @Override public void onComplete() {
-            dispose();
         }
     }
 

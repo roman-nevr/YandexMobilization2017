@@ -14,4 +14,8 @@ public interface WordListView {
     void switchOffFavButtonAt(int index);
 
     void switchOnFavButtonAt(int index);
+
+    interface Router{
+        void moveShowWordInTranslator(Word word);
+    }
 }
