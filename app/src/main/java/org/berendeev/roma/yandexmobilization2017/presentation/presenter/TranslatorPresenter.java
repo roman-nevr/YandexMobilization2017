@@ -52,22 +52,16 @@ public class TranslatorPresenter {
     }
 
     public void init() {
-        getLastWordInteractor.execute(new LastWordObserver(), null);
+        showLastWord();
     }
 
     public void start() {
         disposable.add(getTranslateDirectionInteractor.execute(new DirectionsObserver(), Locale.getDefault()));
         disposable.add(view.getTextObservable()
-                .distinctUntilChanged()
                 .debounce(500, TimeUnit.MILLISECONDS)
                 .subscribe(text -> {
                     translateTextInteractor.execute(new TranslationObserver(), buildQuery(text));
                 }));
-        view.getTextInputDoneObservable()
-                .filter(integer -> integer == R.id.input_done_id)
-                .subscribe(integer -> {
-                    translateAndSaveLastWord();
-                });
     }
 
     public void stop() {
@@ -76,16 +70,20 @@ public class TranslatorPresenter {
         saveLastWord();
     }
 
-    private void saveLastWord(){
+    private void saveLastWord() {
         saveLastWordInteractor.execute(new VoidObserver(), lastWord);
     }
 
-    private void saveLastWordInHistory(){
+    private void saveLastWordInHistory() {
         saveInHistoryInteractor.execute(new VoidObserver(), lastWord);
     }
 
-    private void translateAndSaveLastWord(){
+    private void translateAndSaveLastWord() {
         translateTextInteractor.execute(new InputDoneObserver(), buildQuery(lastWord.word()));
+    }
+
+    private void showLastWord() {
+        getLastWordInteractor.execute(new LastWordObserver(), null);
     }
 
     public void setView(TranslatorView view) {
@@ -105,7 +103,7 @@ public class TranslatorPresenter {
     }
 
     public void onSwapButtonClick() {
-        swapDirectionsInteractor.execute(new VoidObserver(), null);
+        swapDirectionsInteractor.execute(new SwapDirectionsObserver(), null);
     }
 
     public void onFavButtonClick() {
@@ -115,7 +113,7 @@ public class TranslatorPresenter {
                     .build();
             view.switchOffFavButton();
             removeFromFavouritesInteractor.execute(new VoidObserver(), lastWord);
-        }else {
+        } else {
             lastWord = lastWord.toBuilder()
                     .isFavourite(true)
                     .build();
@@ -125,7 +123,11 @@ public class TranslatorPresenter {
     }
 
     public void onShow() {
-        checkIfFavouriteInteractor.execute(new TranslationObserver(), lastWord);
+        showLastWord();
+    }
+
+    public void onInputDone() {
+        translateAndSaveLastWord();
     }
 
     private class DirectionsObserver extends DisposableObserver<Pair<TranslateDirection, TranslateDirection>> {
@@ -134,7 +136,6 @@ public class TranslatorPresenter {
             langFrom = pair.first.key();
             langTo = pair.second.key();
             view.setTranslateDirection(pair.first, pair.second);
-            translateAndSaveLastWord();
         }
 
         @Override public void onError(Throwable e) {
@@ -164,6 +165,7 @@ public class TranslatorPresenter {
     private class LastWordObserver extends DisposableObserver<Word> {
 
         @Override public void onNext(Word word) {
+            lastWord = word;
             view.setPreviousWord(word);
             lastWord = word;
             langFrom = word.languageFrom();
@@ -184,7 +186,7 @@ public class TranslatorPresenter {
         return TranslationQuery.create(text, langFrom, langTo);
     }
 
-    private class InputDoneObserver extends DisposableObserver<Word>{
+    private class InputDoneObserver extends DisposableObserver<Word> {
 
         @Override public void onNext(Word word) {
             view.setTranslation(word);
@@ -196,7 +198,24 @@ public class TranslatorPresenter {
 
         @Override public void onComplete() {
             saveLastWordInHistory();
-            saveLastWord();
+            dispose();
+        }
+    }
+
+    private class SwapDirectionsObserver extends DisposableObserver<Void> {
+
+        @Override public void onNext(Void aVoid) {
+        }
+
+        @Override public void onError(Throwable e) {
+
+        }
+
+        @Override public void onComplete() {
+            view.setPreviousWord(lastWord.toBuilder()
+                    .word(lastWord.translation())
+                    .translation(lastWord.word())
+                    .build());
             dispose();
         }
     }

@@ -41,6 +41,20 @@ public abstract class Word {
         return false;
     }
 
+    @Override public int hashCode() {
+        int h = 1;
+        h *= 1000003;
+        h ^= this.word().hashCode();
+        h *= 1000003;
+        h ^= this.translation().hashCode();
+        h *= 1000003;
+        h ^= this.languageFrom().hashCode();
+        h *= 1000003;
+        h ^= this.languageTo().hashCode();
+        h *= 1000003;
+        return h;
+    }
+
     public static Builder builder() {
         return new AutoValue_Word.Builder();
     }

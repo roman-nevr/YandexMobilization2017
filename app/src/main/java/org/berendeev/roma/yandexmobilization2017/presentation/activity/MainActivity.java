@@ -137,7 +137,7 @@ public class MainActivity extends AppCompatActivity implements WordListView.Rout
         Utils.hideKeyboard(this, navigation);
     }
 
-    @Override public void moveShowWordInTranslator(Word word) {
-
+    @Override public void moveShowWordInTranslator() {
+       navigation.setSelectedItemId(R.id.translator);
     }
 }

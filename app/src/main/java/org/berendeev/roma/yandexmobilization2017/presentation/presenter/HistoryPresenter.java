@@ -9,7 +9,11 @@ import org.berendeev.roma.yandexmobilization2017.domain.interactor.RemoveAllFrom
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.RemoveAllFromHistoryInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.RemoveFromFavouritesInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.SaveInFavouriteInteractor;
+import org.berendeev.roma.yandexmobilization2017.domain.interactor.SaveLastWordInteractor;
+import org.berendeev.roma.yandexmobilization2017.domain.interactor.SetDirectionFromInteractor;
+import org.berendeev.roma.yandexmobilization2017.domain.interactor.SetDirectionToInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.VoidObserver;
+import org.berendeev.roma.yandexmobilization2017.presentation.view.DummyView;
 import org.berendeev.roma.yandexmobilization2017.presentation.view.WordListView;
 
 import java.util.List;
@@ -27,11 +31,15 @@ public class HistoryPresenter {
     @Inject RemoveAllFromHistoryInteractor removeAllFromHistoryInteractor;
     @Inject SaveInFavouriteInteractor saveInFavouriteInteractor;
     @Inject RemoveFromFavouritesInteractor removeFromFavouritesInteractor;
+    @Inject SaveLastWordInteractor saveLastWordInteractor;
+    @Inject SetDirectionToInteractor setDirectionToInteractor;
+    @Inject SetDirectionFromInteractor setDirectionFromInteractor;
 
     private int type;
     private Interactor<List<Word>, Void> getInteractor;
-    private Interactor<Void, Void> deleteAllInteractor;
+    private Interactor<List<Word>, Void> deleteAllInteractor;
     private WordListView view;
+    private WordListView.Router router;
     private CompositeDisposable disposable;
     private int titleId;
     private List<Word> words;
@@ -42,12 +50,13 @@ public class HistoryPresenter {
     }
 
     public void start(){
-        disposable.add(getInteractor.execute(new WordsObserver(), null));
-        view.setTitleById(titleId);
+        loadWordList();
+        setTitle();
     }
 
     public void stop(){
         disposable.clear();
+        view = DummyView.DUMMY_VIEW;
     }
 
     public void setView(WordListView view) {
@@ -69,8 +78,7 @@ public class HistoryPresenter {
     }
 
     public void deleteAll() {
-        deleteAllInteractor.execute(new VoidObserver(), null);
-        start();
+        deleteAllInteractor.execute(new WordsObserver(), null);
     }
 
     public void onFavButtonClick(int index) {
@@ -93,7 +101,27 @@ public class HistoryPresenter {
 
     public void onItemClick(int adapterPosition) {
         //TODO
-        int a =0;
+        saveLastWordInteractor.execute(new VoidObserver(), words.get(adapterPosition));
+        setDirectionToInteractor.execute(new VoidObserver(), words.get(adapterPosition).languageTo());
+        setDirectionFromInteractor.execute(new VoidObserver(), words.get(adapterPosition).languageFrom());
+        router.moveShowWordInTranslator();
+    }
+
+    public void setRouter(WordListView.Router router) {
+        this.router = router;
+    }
+
+    public void onShow() {
+        //TODO refresh list
+        loadWordList();
+    }
+
+    private void loadWordList(){
+        getInteractor.execute(new WordsObserver(), null);
+    }
+
+    private void setTitle() {
+        view.setTitleById(titleId);
     }
 
     private class WordsObserver extends DisposableObserver<List<Word>>{
@@ -106,6 +134,7 @@ public class HistoryPresenter {
         }
 
         @Override public void onComplete() {
+            dispose();
         }
     }
 

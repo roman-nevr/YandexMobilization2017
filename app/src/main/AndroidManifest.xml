@@ -32,6 +32,7 @@
             android:name=".presentation.activity.LanguageSelectorActivity"
             android:theme="@style/AppTheme.NoActionBar"
             />
+        <service android:name=".presentation.service.LastWordService"/>
     </application>
 
 </manifest>

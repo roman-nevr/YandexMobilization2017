@@ -5,8 +5,6 @@ import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -58,6 +56,9 @@ public class HistoryFragment extends Fragment implements WordListView {
         int type = getArguments().getInt(TYPE);
         presenter.setType(type);
         presenter.setView(this);
+        if(getActivity() instanceof WordListView.Router){
+            presenter.setRouter((WordListView.Router)getActivity());
+        }
         presenter.start();
     }
 
@@ -68,7 +69,7 @@ public class HistoryFragment extends Fragment implements WordListView {
 
     @Override public void onHiddenChanged(boolean hidden) {
         if(!hidden){
-            presenter.start();
+            presenter.onShow();
         }
     }
 
@@ -88,11 +89,16 @@ public class HistoryFragment extends Fragment implements WordListView {
         });
         colorFavourite = ContextCompat.getColor(getContext(), R.color.colorPrimary);
         colorNotFavourite = ContextCompat.getColor(getContext(), R.color.grey);
+        recyclerView.getItemAnimator().setChangeDuration(0);
     }
 
     @Override public void showList(List<Word> wordList) {
-        adapter = new WordListAdapter(wordList, presenter, colorFavourite, colorNotFavourite);
-        recyclerView.setAdapter(adapter);
+        if (adapter == null){
+            adapter = new WordListAdapter(wordList, presenter, colorFavourite, colorNotFavourite);
+            recyclerView.setAdapter(adapter);
+        }else {
+            adapter.updateList(wordList);
+        }
     }
 
     @Override public void setTitleById(@StringRes int id) {
@@ -101,11 +107,13 @@ public class HistoryFragment extends Fragment implements WordListView {
 
     @Override public void switchOffFavButtonAt(int index) {
         ((WordListAdapter.WordHolder)recyclerView.getChildViewHolder(recyclerView.getChildAt(index))).switchOffFavButton();
+        //adapter.setIsItemFavourite(index, false);
 
     }
 
     @Override public void switchOnFavButtonAt(int index) {
         ((WordListAdapter.WordHolder)recyclerView.getChildViewHolder(recyclerView.getChildAt(index))).switchOnFavButton();
+       // adapter.setIsItemFavourite(index, true);
     }
 
     public static Fragment getHistoryFragment(){

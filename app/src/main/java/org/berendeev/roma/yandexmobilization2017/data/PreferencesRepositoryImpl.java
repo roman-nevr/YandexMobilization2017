@@ -45,7 +45,7 @@ public class PreferencesRepositoryImpl implements PreferencesRepository {
             wordPreferences.edit()
                     .putString(TEXT, word.word())
                     .putString(TRANSLATION, word.translation())
-                    .apply();
+                    .commit();
         });
     }
 
@@ -105,7 +105,7 @@ public class PreferencesRepositoryImpl implements PreferencesRepository {
     private void saveDirection(String direction, String value){
         dirsPreferences.edit()
                 .putString(direction, value)
-                .apply();
+                .commit();
     }
 
     private String getFrom(){

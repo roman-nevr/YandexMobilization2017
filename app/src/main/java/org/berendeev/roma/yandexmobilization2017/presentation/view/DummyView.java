@@ -48,9 +48,6 @@ public class DummyView implements LanguageSelectorView, TranslatorView, WordList
         return Observable.empty();
     }
 
-    @Override public Observable<Integer> getTextInputDoneObservable() {
-        return null;
-    }
 
     @Override public void switchOnFavButton() {
 

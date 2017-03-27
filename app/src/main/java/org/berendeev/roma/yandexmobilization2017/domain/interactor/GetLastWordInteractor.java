@@ -1,5 +1,6 @@
 package org.berendeev.roma.yandexmobilization2017.domain.interactor;
 
+import org.berendeev.roma.yandexmobilization2017.domain.HistoryAndFavouritesRepository;
 import org.berendeev.roma.yandexmobilization2017.domain.PreferencesRepository;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.Word;
 
@@ -10,11 +11,14 @@ import io.reactivex.Observable;
 public class GetLastWordInteractor extends Interactor<Word, Void> {
 
     @Inject PreferencesRepository repository;
+    @Inject HistoryAndFavouritesRepository historyAndFavouritesRepository;
 
     @Inject
     public GetLastWordInteractor() {}
 
     @Override protected Observable<Word> buildObservable(Void param) {
-        return repository.getLastWord().toObservable();
+        return repository.getLastWord().flatMapObservable(word ->
+            historyAndFavouritesRepository.checkIfInFavourites(word)
+        );
     }
 }

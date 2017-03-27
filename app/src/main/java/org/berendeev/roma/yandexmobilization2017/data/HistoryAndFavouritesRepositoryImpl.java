@@ -27,29 +27,32 @@ public class HistoryAndFavouritesRepositoryImpl implements HistoryAndFavouritesR
     }
 
     @Override public Observable<Word> checkIfInFavourites(Word word) {
-        if(historyDataSource.checkIfInFavourites(word)){
+        if (historyDataSource.checkIfInFavourites(word)) {
             return Observable
                     .just(word
+                            .toBuilder()
+                            .isFavourite(true)
+                            .build());
+        } else {
+            return Observable.just(word
                     .toBuilder()
-                    .isFavourite(true)
+                    .isFavourite(false)
                     .build());
-        }else {
-            return Observable.just(word);
         }
     }
 
     @Override public Completable saveInHistory(Word word) {
-        if(word.word().isEmpty()){
+        if (word.word().isEmpty()) {
             return Completable.complete();
-        }else {
+        } else {
             return historyDataSource.saveInHistory(word);
         }
     }
 
     @Override public Completable saveInFavourites(Word word) {
-        if (word.word().isEmpty()){
+        if (word.word().isEmpty()) {
             return Completable.complete();
-        }else {
+        } else {
             return historyDataSource.saveInFavourites(word);
         }
     }

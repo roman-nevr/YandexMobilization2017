@@ -5,6 +5,8 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -44,12 +46,11 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
     @BindView(R.id.language_to) Button btnLanguageTo;
     @BindView(R.id.swap_button) ImageButton swapButton;
 
-    private boolean flag;
-
     @Inject TranslatorPresenter presenter;
     private int colorFavourite;
     private int colorNotFavourite;
     private View mainView;
+    private boolean keyboardWasOpen = false;
 
     @Nullable @Override public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.translator, container, false);
@@ -62,6 +63,7 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
     private void initUI() {
         initHeaderView();
         initFavouritesMarker();
+        initEditorActionListener();
         presenter.init();
     }
 
@@ -108,8 +110,7 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
 
     @Override public void setPreviousWord(Word word) {
         setText(word.word());
-        translation.setText(word.translation());
-        setFavouritesLabel(word.isFavourite());
+        setTranslation(word);
     }
 
     @Override public void setTranslation(Word word) {
@@ -119,13 +120,11 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
 
     @Override public void setTranslateDirection(TranslateDirection directionFrom, TranslateDirection directionTo) {
         btnLanguageFrom.setText(directionFrom.name());
-
         btnLanguageTo.setText(directionTo.name());
     }
 
     private void setFavouritesLabel(boolean isFavourite) {
-        flag = isFavourite;
-        favButton.setColorFilter(flag ? colorFavourite : colorNotFavourite);
+        favButton.setColorFilter(isFavourite ? colorFavourite : colorNotFavourite);
     }
 
     private void setText(String text){
@@ -134,28 +133,45 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
     }
 
     @Override public Observable<String> getTextObservable() {
+        wordToTranslate.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override public void afterTextChanged(Editable s) {
+
+            }
+        });
+        Observable.create(emitter -> {
+            wordToTranslate.addTextChangedListener(new TextWatcher() {
+                @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                }
+
+                @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                }
+
+                @Override public void afterTextChanged(Editable s) {
+
+                }
+            });
+        });
         return RxTextView.textChanges(wordToTranslate)
                 .map(charSequence -> charSequence.toString());
     }
 
-    @Override public Observable<Integer> getTextInputDoneObservable(){
-        return Observable.create(emitter -> {
-            wordToTranslate.setOnEditorActionListener((v, actionId, event) -> {
-                if(actionId == IME_ACTION_DONE){
-                    hideKeyboard();
-                    if (!emitter.isDisposed()){
-                        emitter.onNext(R.id.input_done_id);
-                    }
-                }
-                return true;
-            });
-            mainView.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
-                int rootViewHeight = mainView.getRootView().getHeight();
-                int mainViewHeight = mainView.getHeight();
-                if(fromPixelToDp(rootViewHeight - mainViewHeight) >= MIN_KEYBOARD_HEIGHT){
-                    emitter.onNext(R.id.input_done_id);
-                }
-            });
+    private void initEditorActionListener(){
+        wordToTranslate.setOnEditorActionListener((v, actionId, event) -> {
+            if(actionId == IME_ACTION_DONE){
+                hideKeyboard();
+                presenter.onInputDone();
+            }
+            return true;
         });
     }
 
@@ -180,12 +196,9 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
     @Override public void onHiddenChanged(boolean hidden) {
         if(!hidden){
             presenter.onShow();
+        }else {
+            presenter.onInputDone();
         }
-    }
-
-    private int fromPixelToDp(int pixels){
-        DisplayMetrics metrics = getResources().getDisplayMetrics();
-        return pixels * DisplayMetrics.DENSITY_DEFAULT / metrics.densityDpi;
     }
 
     private void hideKeyboard() {

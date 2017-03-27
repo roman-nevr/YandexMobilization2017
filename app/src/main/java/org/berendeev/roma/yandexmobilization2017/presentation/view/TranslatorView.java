@@ -16,8 +16,6 @@ public interface TranslatorView {
 
     Observable<String> getTextObservable();
 
-    Observable<Integer> getTextInputDoneObservable();
-
     void switchOnFavButton();
 
     void switchOffFavButton();
