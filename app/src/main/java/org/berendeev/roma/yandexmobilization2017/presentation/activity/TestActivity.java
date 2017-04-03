@@ -1,7 +1,5 @@
 package org.berendeev.roma.yandexmobilization2017.presentation.activity;
 
-import android.animation.ArgbEvaluator;
-import android.animation.ObjectAnimator;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -12,6 +10,7 @@ import android.widget.TextView;
 
 import com.jakewharton.rxbinding2.widget.RxTextView;
 
+import org.berendeev.roma.yandexmobilization2017.BuildConfig;
 import org.berendeev.roma.yandexmobilization2017.R;
 import org.berendeev.roma.yandexmobilization2017.data.http.TranslateApi;
 import org.berendeev.roma.yandexmobilization2017.presentation.App;
@@ -21,12 +20,9 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
-
-import static org.berendeev.roma.yandexmobilization2017.Consts.API_KEY;
 
 
 public class TestActivity extends AppCompatActivity {
@@ -79,7 +75,7 @@ public class TestActivity extends AppCompatActivity {
                 .debounce(500, TimeUnit.MILLISECONDS)
                 .map(charSequence -> charSequence.toString())
                 .subscribe(string -> {
-                    api.translate(API_KEY, string, "en-ru")
+                    api.translate(BuildConfig.TRANSLATE_API_KEY, string, "en-ru")
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(word -> {

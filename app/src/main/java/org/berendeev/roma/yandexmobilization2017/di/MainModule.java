@@ -8,17 +8,22 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
+import org.berendeev.roma.yandexmobilization2017.data.DictionaryRepositoryImpl;
 import org.berendeev.roma.yandexmobilization2017.data.HistoryAndFavouritesRepositoryImpl;
 import org.berendeev.roma.yandexmobilization2017.data.PreferencesRepositoryImpl;
 import org.berendeev.roma.yandexmobilization2017.data.TranslationRepositoryImpl;
 import org.berendeev.roma.yandexmobilization2017.data.deserializer.LanguageMapDeserializer;
 import org.berendeev.roma.yandexmobilization2017.data.deserializer.TranslateDirectionsDeserializer;
+import org.berendeev.roma.yandexmobilization2017.data.entity.HttpDefinition;
+import org.berendeev.roma.yandexmobilization2017.data.entity.DictionaryTranslation;
 import org.berendeev.roma.yandexmobilization2017.data.entity.TranslateDirection;
 import org.berendeev.roma.yandexmobilization2017.data.http.CacheInterceptor;
+import org.berendeev.roma.yandexmobilization2017.data.http.DictionaryApi;
 import org.berendeev.roma.yandexmobilization2017.data.http.TranslateApi;
 import org.berendeev.roma.yandexmobilization2017.data.sqlite.DatabaseHistoryDataSource;
 import org.berendeev.roma.yandexmobilization2017.data.sqlite.DatabaseOpenHelper;
 import org.berendeev.roma.yandexmobilization2017.data.sqlite.HistoryDataSource;
+import org.berendeev.roma.yandexmobilization2017.domain.DictionaryRepository;
 import org.berendeev.roma.yandexmobilization2017.domain.HistoryAndFavouritesRepository;
 import org.berendeev.roma.yandexmobilization2017.domain.PreferencesRepository;
 import org.berendeev.roma.yandexmobilization2017.domain.TranslationRepository;
@@ -129,7 +134,17 @@ public class MainModule {
         return retrofit.create(TranslateApi.class);
     }
 
+    @Provides
+    @Singleton
+    public DictionaryApi provideDictionaryApi(Retrofit retrofit){
+        return retrofit.create(DictionaryApi.class);
+    }
 
+    @Provides
+    @Singleton
+    public DictionaryRepository provideDictionaryRepository(DictionaryApi dictionaryApi){
+        return new DictionaryRepositoryImpl(dictionaryApi);
+    }
 
     @Provides
     @Singleton
@@ -162,5 +177,6 @@ public class MainModule {
     public DatabaseOpenHelper provideDatabaseOpenHelper(Context context){
         return new DatabaseOpenHelper(context);
     }
+
 
 }

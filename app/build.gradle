@@ -2,6 +2,11 @@ apply plugin: 'com.android.application'
 apply plugin: 'com.neenbedankt.android-apt'
 apply plugin: 'me.tatarka.retrolambda'
 
+ext.private = new Properties()
+if (rootProject.file('private.properties').exists()) {
+    ext.private.load(new FileInputStream(rootProject.file('private.properties')));
+}
+
 android {
     compileSdkVersion 25
     buildToolsVersion "25.0.2"
@@ -13,6 +18,8 @@ android {
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
+        buildConfigField "String", "TRANSLATE_API_KEY", project.ext.private.getProperty("translateApiKey", "")
+        buildConfigField "String", "DICTIONARY_API_KEY", project.ext.private.getProperty("dictionaryApiKey", "")
     }
     buildTypes {
         release {

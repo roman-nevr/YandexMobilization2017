@@ -6,6 +6,7 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Pair;
 
+import org.berendeev.roma.yandexmobilization2017.R;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.Word;
 
 import java.util.ArrayList;
@@ -13,6 +14,7 @@ import java.util.List;
 
 import io.reactivex.Completable;
 import io.reactivex.Observable;
+import io.reactivex.subjects.PublishSubject;
 import timber.log.Timber;
 
 import static org.berendeev.roma.yandexmobilization2017.data.sqlite.DatabaseOpenHelper.ADD_DATE;
@@ -30,16 +32,11 @@ public class DatabaseHistoryDataSource implements HistoryDataSource {
     public static final String FALSE = "0";
     private SQLiteDatabase database;
     private final ContentValues contentValues;
-
-//    private BehaviorSubject<List<Word>> historySubject;
-//    private BehaviorSubject<List<Word>> favouritesSubject;
+    private PublishSubject<Integer> publishSubject;
 
     public DatabaseHistoryDataSource(DatabaseOpenHelper openHelper) {
         this.database = openHelper.getWritableDatabase();
         contentValues = new ContentValues();
-//        historySubject = BehaviorSubject.createDefault(new ArrayList<Word>());
-//        favouritesSubject = BehaviorSubject.createDefault(new ArrayList<Word>());
-
     }
 
     @Override public Observable<List<Word>> getHistory() {
@@ -71,15 +68,16 @@ public class DatabaseHistoryDataSource implements HistoryDataSource {
     }
 
     @Override public Completable saveInHistory(Word word) {
-
         return Completable.fromAction(() -> {
             insertOrUpdate(word, IS_IN_HISTORY);
+            publishSubject.onNext(R.id.history_type);
         });
     }
 
     @Override public Completable saveInFavourites(Word word) {
         return Completable.fromAction(() -> {
             insertOrUpdate(word.toBuilder().isFavourite(true).build(), IS_IN_FAVOURITES);
+            publishSubject.onNext(R.id.favourites_type);
         });
     }
 
@@ -108,6 +106,7 @@ public class DatabaseHistoryDataSource implements HistoryDataSource {
                 contentValues.put(IS_IN_HISTORY, getSqlBooleanFromJavaBoolean(false));
                 database.update(WORDS_TABLE, contentValues, selection, selectionArgs);
             }
+            publishSubject.onNext(R.id.history_type);
         });
     }
 
@@ -123,6 +122,7 @@ public class DatabaseHistoryDataSource implements HistoryDataSource {
                 contentValues.put(IS_IN_FAVOURITES, getSqlBooleanFromJavaBoolean(false));
                 database.update(WORDS_TABLE, contentValues, selection, selectionArgs);
             }
+            publishSubject.onNext(R.id.favourites_type);
         });
     }
 
@@ -135,6 +135,7 @@ public class DatabaseHistoryDataSource implements HistoryDataSource {
             contentValues.clear();
             contentValues.put(IS_IN_HISTORY, getSqlBooleanFromJavaBoolean(false));
             database.update(WORDS_TABLE, contentValues, selection, selectionArgs);
+            publishSubject.onNext(R.id.history_type);
         });
     }
 
@@ -147,7 +148,12 @@ public class DatabaseHistoryDataSource implements HistoryDataSource {
             contentValues.clear();
             contentValues.put(IS_IN_FAVOURITES, getSqlBooleanFromJavaBoolean(false));
             database.update(WORDS_TABLE, contentValues, selection, selectionArgs);
+            publishSubject.onNext(R.id.favourites_type);
         });
+    }
+
+    @Override public Observable<Integer> getOnChangeObservable() {
+        return publishSubject;
     }
 
     public List<Pair<Word, Boolean>> getAll(){
@@ -161,23 +167,12 @@ public class DatabaseHistoryDataSource implements HistoryDataSource {
         return words;
     }
 
-    private void removeFromTable(String selection, Word word, String attr){
-        String[] selectionArgs = {word.word(), word.translation(), word.languageFrom(), word.languageTo(), TRUE, FALSE};
-        int count = database.delete(WORDS_TABLE, selection, selectionArgs);
-        if(count == 0){
-            selectionArgs[5] = TRUE;
-            contentValues.clear();
-            contentValues.put(attr, getSqlBooleanFromJavaBoolean(false));
-            database.update(WORDS_TABLE, contentValues, selection, selectionArgs);
-        }
-    }
-
-
     private Observable<List<Word>> getFromSelection(String selection) {
         return Observable.create(emitter -> {
             List<Word> words = new ArrayList<>();
             String[] selectionArgs = {TRUE};
-            Cursor cursor = database.query(true, WORDS_TABLE, null, selection, selectionArgs, null, null, null, null);
+            String orderBy = DatabaseOpenHelper.ADD_DATE + " DESC";
+            Cursor cursor = database.query(true, WORDS_TABLE, null, selection, selectionArgs, null, null, orderBy, null);
             while (cursor.moveToNext()) {
                 words.add(getWordFromCursor(cursor));
             }

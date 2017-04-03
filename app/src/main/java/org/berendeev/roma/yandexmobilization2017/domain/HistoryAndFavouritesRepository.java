@@ -26,5 +26,6 @@ public interface HistoryAndFavouritesRepository {
 
     Completable removeAllFromFavourites();
 
+    Observable<Integer> getOnChangeObservable();
 
 }

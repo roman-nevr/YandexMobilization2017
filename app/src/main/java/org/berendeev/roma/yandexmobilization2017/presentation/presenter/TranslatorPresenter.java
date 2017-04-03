@@ -3,10 +3,13 @@ package org.berendeev.roma.yandexmobilization2017.presentation.presenter;
 import android.util.Pair;
 
 import org.berendeev.roma.yandexmobilization2017.R;
+import org.berendeev.roma.yandexmobilization2017.domain.entity.Definition;
+import org.berendeev.roma.yandexmobilization2017.domain.entity.Dictionary;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.TranslateDirection;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.TranslationQuery;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.Word;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.CheckIfFavouriteInteractor;
+import org.berendeev.roma.yandexmobilization2017.domain.interactor.GetDictionaryInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.GetLastWordInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.GetTranslateDirectionInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.RemoveFromFavouritesInteractor;
@@ -20,6 +23,7 @@ import org.berendeev.roma.yandexmobilization2017.presentation.view.DummyView;
 import org.berendeev.roma.yandexmobilization2017.presentation.view.TranslatorView;
 import org.berendeev.roma.yandexmobilization2017.presentation.view.TranslatorView.Router;
 
+import java.net.ConnectException;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
@@ -41,6 +45,7 @@ public class TranslatorPresenter {
     @Inject RemoveFromFavouritesInteractor removeFromFavouritesInteractor;
     @Inject SaveInHistoryInteractor saveInHistoryInteractor;
     @Inject CheckIfFavouriteInteractor checkIfFavouriteInteractor;
+    @Inject GetDictionaryInteractor getDictionaryInteractor;
     private Router router;
     private final CompositeDisposable disposable;
     private String langFrom, langTo;
@@ -60,18 +65,24 @@ public class TranslatorPresenter {
         disposable.add(view.getTextObservable()
                 .debounce(500, TimeUnit.MILLISECONDS)
                 .subscribe(text -> {
+                    getDictionaryInteractor.execute(new DictionaryObserver(), buildQuery(text));
                     translateTextInteractor.execute(new TranslationObserver(), buildQuery(text));
+                    lastWord = lastWord.toBuilder()
+                            .word(text)
+                            .translation("")
+                            .build();
                 }));
     }
 
     public void stop() {
         disposable.clear();
         view = DummyView.DUMMY_VIEW;
-        saveLastWord();
     }
 
     private void saveLastWord() {
-        saveLastWordInteractor.execute(new VoidObserver(), lastWord);
+        saveLastWordInteractor
+                .getObservable(lastWord)
+                .subscribeWith(new VoidObserver());
     }
 
     private void saveLastWordInHistory() {
@@ -130,6 +141,14 @@ public class TranslatorPresenter {
         translateAndSaveLastWord();
     }
 
+    public void pause() {
+        saveLastWord();
+    }
+
+    public void onRepeat() {
+        translateTextInteractor.execute(new TranslationObserver(), buildQuery(lastWord.word()));
+    }
+
     private class DirectionsObserver extends DisposableObserver<Pair<TranslateDirection, TranslateDirection>> {
 
         @Override public void onNext(Pair<TranslateDirection, TranslateDirection> pair) {
@@ -154,6 +173,9 @@ public class TranslatorPresenter {
         }
 
         @Override public void onError(Throwable e) {
+            if (e instanceof ConnectException){
+                view.showConnectionError();
+            }
         }
 
         @Override public void onComplete() {
@@ -217,6 +239,20 @@ public class TranslatorPresenter {
                     .translation(lastWord.word())
                     .build());
             dispose();
+        }
+    }
+
+    private class DictionaryObserver extends DisposableObserver<Dictionary>{
+        @Override public void onNext(Dictionary dictionary) {
+            view.showDictionary(dictionary);
+        }
+
+        @Override public void onError(Throwable e) {
+
+        }
+
+        @Override public void onComplete() {
+
         }
     }
 }

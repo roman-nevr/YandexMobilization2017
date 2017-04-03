@@ -8,6 +8,7 @@ import java.util.List;
 
 import io.reactivex.Completable;
 import io.reactivex.Observable;
+import io.reactivex.subjects.PublishSubject;
 
 
 public class HistoryAndFavouritesRepositoryImpl implements HistoryAndFavouritesRepository {
@@ -71,5 +72,9 @@ public class HistoryAndFavouritesRepositoryImpl implements HistoryAndFavouritesR
 
     @Override public Completable removeAllFromFavourites() {
         return historyDataSource.removeAllFromFavourites();
+    }
+
+    @Override public Observable<Integer> getOnChangeObservable() {
+        return historyDataSource.getOnChangeObservable();
     }
 }

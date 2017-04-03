@@ -25,4 +25,6 @@ public interface HistoryDataSource {
     Completable removeAllFromHistory();
 
     Completable removeAllFromFavourites();
+
+    Observable<Integer> getOnChangeObservable();
 }

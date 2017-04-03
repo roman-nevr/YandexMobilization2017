@@ -2,6 +2,7 @@ package org.berendeev.roma.yandexmobilization2017.presentation.view;
 
 import com.jakewharton.rxbinding2.widget.TextViewEditorActionEvent;
 
+import org.berendeev.roma.yandexmobilization2017.domain.entity.Dictionary;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.TranslateDirection;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.Word;
 
@@ -20,6 +21,11 @@ public interface TranslatorView {
 
     void switchOffFavButton();
 
+    void showDictionary(Dictionary dictionary);
+
+    void showConnectionError();
+
+    void hideConnectionError();
 
     interface Router {
         void showSourceLanguageSelector();

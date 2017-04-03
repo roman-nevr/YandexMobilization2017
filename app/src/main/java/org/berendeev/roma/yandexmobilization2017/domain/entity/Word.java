@@ -1,5 +1,7 @@
 package org.berendeev.roma.yandexmobilization2017.domain.entity;
 
+import android.os.Parcelable;
+
 import com.google.auto.value.AutoValue;
 import com.google.gson.Gson;
 import com.google.gson.TypeAdapter;

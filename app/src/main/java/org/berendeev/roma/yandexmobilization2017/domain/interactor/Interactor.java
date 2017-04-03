@@ -23,5 +23,9 @@ public abstract class Interactor<Response, Request> {
         return  (observable.subscribeWith(observer));
     }
 
+    public Observable<Response> getObservable(Request param){
+        return buildObservable(param);
+    }
+
     protected abstract Observable<Response> buildObservable(Request param);
 }

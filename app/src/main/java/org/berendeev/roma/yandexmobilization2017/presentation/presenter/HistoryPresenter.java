@@ -100,7 +100,6 @@ public class HistoryPresenter {
     }
 
     public void onItemClick(int adapterPosition) {
-        //TODO
         saveLastWordInteractor.execute(new VoidObserver(), words.get(adapterPosition));
         setDirectionToInteractor.execute(new VoidObserver(), words.get(adapterPosition).languageTo());
         setDirectionFromInteractor.execute(new VoidObserver(), words.get(adapterPosition).languageFrom());
@@ -112,7 +111,6 @@ public class HistoryPresenter {
     }
 
     public void onShow() {
-        //TODO refresh list
         loadWordList();
     }
 
@@ -124,6 +122,7 @@ public class HistoryPresenter {
         view.setTitleById(titleId);
     }
 
+    //TODO
     private class WordsObserver extends DisposableObserver<List<Word>>{
         @Override public void onNext(List<Word> words) {
             view.showList(words);
