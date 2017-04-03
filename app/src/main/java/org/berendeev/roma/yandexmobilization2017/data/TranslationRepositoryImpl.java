@@ -10,6 +10,7 @@ import org.berendeev.roma.yandexmobilization2017.domain.TranslationRepository;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.LanguageMap;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.TranslationQuery;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.Word;
+import org.berendeev.roma.yandexmobilization2017.domain.exception.TranslationException;
 
 import java.util.Locale;
 
@@ -34,8 +35,10 @@ public class TranslationRepositoryImpl implements TranslationRepository {
                     if (translation.code == OK_CODE) {
                         Word word = TranslateMapper.map(query, translation);
                         emitter.onNext(word);
+                        emitter.onComplete();
+                    }else{
+                        emitter.onError(new TranslationException());
                     }
-                    emitter.onComplete();
                 }, throwable ->
                         emitter.onError(throwable)));
     }

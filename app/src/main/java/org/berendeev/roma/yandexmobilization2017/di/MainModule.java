@@ -156,7 +156,7 @@ public class MainModule {
     @Singleton
     public CacheControl provideCacheControl(){
         return new CacheControl.Builder()
-                .maxStale(365, TimeUnit.DAYS)
+                .maxStale(1, TimeUnit.DAYS)
                 .build();
     }
 

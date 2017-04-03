@@ -141,11 +141,18 @@ public class DictionaryAdapter extends RecyclerView.Adapter {
 
     private void bindTranscriptionHolder(int position, TranscriptionHolder holder) {
         holder.text.setText(dictionary.text());
-        holder.transcription.setText("[" + dictionary.transcription() + "]");
+        if(!dictionary.transcription().isEmpty()){
+            holder.transcription.setText("[" + dictionary.transcription() + "]");
+        }else {
+            holder.transcription.setText("");
+        }
     }
 
     @Override public int getItemCount() {
-        int count = 1; //есть транскрипция
+        if(dictionary.text().equals("")){
+            return 0;
+        }
+        int count = 1; //есть транскрипция, may be
         for (Definition definition : dictionary.definitions()) {
             count = count + definition.translations().size() + 1;//есть часть речи
         }

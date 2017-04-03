@@ -1,7 +1,5 @@
 package org.berendeev.roma.yandexmobilization2017.di;
 
-import org.berendeev.roma.yandexmobilization2017.presentation.activity.TestActivity;
-
 import javax.inject.Singleton;
 
 import dagger.Component;

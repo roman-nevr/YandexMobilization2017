@@ -25,7 +25,6 @@ import retrofit2.Retrofit;
 public class HttpDictionaryTest {
 
     private DictionaryApi api;
-    public static final String KEY = "dict.1.1.20170320T055703Z.8c96b153231390d8.6aca2f4ff53f2d8865537199a2d49932b57641a9";
 
     @Before
     public void before(){
@@ -43,7 +42,7 @@ public class HttpDictionaryTest {
 
     @Test
     public void apiTest(){
-        String url = String.format("%1slookup?key=%2s&text=%3s&lang=%4s", DictionaryApi.BASE_URL, KEY, "time", "en-ru");
+        String url = String.format("%1slookup?key=%2s&text=%3s&lang=%4s", DictionaryApi.BASE_URL, BuildConfig.DICTIONARY_API_KEY, "time", "en-ru");
         api.lookup(url).subscribe(translation -> {
             Dictionary dictionary = DictionaryMapper.map(translation);
             System.out.println(dictionary);

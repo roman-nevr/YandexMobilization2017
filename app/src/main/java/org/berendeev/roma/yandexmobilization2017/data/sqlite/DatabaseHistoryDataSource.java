@@ -37,6 +37,7 @@ public class DatabaseHistoryDataSource implements HistoryDataSource {
     public DatabaseHistoryDataSource(DatabaseOpenHelper openHelper) {
         this.database = openHelper.getWritableDatabase();
         contentValues = new ContentValues();
+        publishSubject = PublishSubject.create();
     }
 
     @Override public Observable<List<Word>> getHistory() {
@@ -87,11 +88,14 @@ public class DatabaseHistoryDataSource implements HistoryDataSource {
         String[] selectionArgs = {word.word(), word.translation(), word.languageFrom(), word.languageTo(), TRUE, TRUE};
         contentValues.clear();
         contentValues.put(attr, getSqlBooleanFromJavaBoolean(true));
+        database.beginTransaction();
         int count = database.update(WORDS_TABLE, contentValues, selection, selectionArgs);
         if(count == 0){
             fillContentValuesFromWord(word, IS_IN_HISTORY.equals(attr));
             database.insert(WORDS_TABLE, null, contentValues);
         }
+        database.setTransactionSuccessful();
+        database.endTransaction();
     }
 
     @Override public Completable removeFromHistory(Word word) {
@@ -99,6 +103,7 @@ public class DatabaseHistoryDataSource implements HistoryDataSource {
             String selection = String.format("%1s = ? AND %2s = ? AND %3s = ? AND %4s = ? AND %5s = ? AND %6s = ?",
                     WORD, TRANSLATION, LANGUAGE_FROM, LANGUAGE_TO, IS_IN_HISTORY, IS_IN_FAVOURITES);
             String[] selectionArgs = {word.word(), word.translation(), word.languageFrom(), word.languageTo(), TRUE, FALSE};
+            database.beginTransaction();
             int count = database.delete(WORDS_TABLE, selection, selectionArgs);
             if(count == 0){
                 selectionArgs[5] = TRUE;
@@ -106,6 +111,8 @@ public class DatabaseHistoryDataSource implements HistoryDataSource {
                 contentValues.put(IS_IN_HISTORY, getSqlBooleanFromJavaBoolean(false));
                 database.update(WORDS_TABLE, contentValues, selection, selectionArgs);
             }
+            database.setTransactionSuccessful();
+            database.endTransaction();
             publishSubject.onNext(R.id.history_type);
         });
     }
@@ -115,6 +122,7 @@ public class DatabaseHistoryDataSource implements HistoryDataSource {
             String selection = String.format("%1s = ? AND %2s = ? AND %3s = ? AND %4s = ? AND %5s = ? AND %6s = ?",
                     WORD, TRANSLATION, LANGUAGE_FROM, LANGUAGE_TO, IS_IN_FAVOURITES, IS_IN_HISTORY);
             String[] selectionArgs = {word.word(), word.translation(), word.languageFrom(), word.languageTo(), TRUE, FALSE};
+            database.beginTransaction();
             int count = database.delete(WORDS_TABLE, selection, selectionArgs);
             if(count == 0){
                 selectionArgs[5] = TRUE;
@@ -122,6 +130,8 @@ public class DatabaseHistoryDataSource implements HistoryDataSource {
                 contentValues.put(IS_IN_FAVOURITES, getSqlBooleanFromJavaBoolean(false));
                 database.update(WORDS_TABLE, contentValues, selection, selectionArgs);
             }
+            database.setTransactionSuccessful();
+            database.endTransaction();
             publishSubject.onNext(R.id.favourites_type);
         });
     }
@@ -218,9 +228,4 @@ public class DatabaseHistoryDataSource implements HistoryDataSource {
         contentValues.put(ADD_DATE, System.currentTimeMillis());
     }
 
-    public void clean(){
-        String selection = String.format("%1s = ? AND %2s = ?", IS_IN_HISTORY, IS_IN_FAVOURITES);
-        String[] selectionArgs = {FALSE, FALSE};
-        database.delete(WORDS_TABLE, selection, selectionArgs);
-    }
 }

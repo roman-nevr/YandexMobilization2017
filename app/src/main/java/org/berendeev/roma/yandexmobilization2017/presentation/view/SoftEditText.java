@@ -24,7 +24,8 @@ public class SoftEditText extends android.support.v7.widget.AppCompatEditText {
 
     @Override public boolean onKeyPreIme(int keyCode, KeyEvent event) {
         if(keyImeChangeListener != null){
-            return keyImeChangeListener.onKeyPreIme(keyCode, event);
+            keyImeChangeListener.onKeyPreIme(keyCode, event);
+            return super.onKeyPreIme(keyCode, event);
         }else {
             return super.onKeyPreIme(keyCode, event);
         }

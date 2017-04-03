@@ -17,7 +17,7 @@
             android:name=".presentation.activity.MainActivity"
             android:theme="@style/NoActionBar"
             android:label="@string/app_name"
-            android:windowSoftInputMode="stateAlwaysHidden|adjustResize"
+            android:windowSoftInputMode="stateAlwaysHidden|adjustPan"
             >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -25,14 +25,10 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".presentation.activity.TestActivity">
-
-        </activity>
         <activity
             android:name=".presentation.activity.LanguageSelectorActivity"
             android:theme="@style/AppTheme.NoActionBar"
             />
-        <service android:name=".presentation.service.LastWordService"/>
     </application>
 
 </manifest>

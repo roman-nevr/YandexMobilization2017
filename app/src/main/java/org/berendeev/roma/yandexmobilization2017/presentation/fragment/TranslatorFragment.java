@@ -1,5 +1,7 @@
 package org.berendeev.roma.yandexmobilization2017.presentation.fragment;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
@@ -169,13 +171,10 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
 
     private void initEditorActionListener(){
         wordToTranslate.setKeyImeChangeListener(new KeyImeChangeListener() {
-            @Override public boolean onKeyPreIme(int keyCode, KeyEvent event) {
+            @Override public void onKeyPreIme(int keyCode, KeyEvent event) {
                 if(keyCode == KEYCODE_BACK){
                     presenter.onInputDone();
-                    hideKeyboard();
-                    return true;
-                }else {
-                    return false;
+                   // hideKeyboard();
                 }
             }
         });
@@ -214,6 +213,10 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
     @Override public void hideConnectionError() {
         errorLayout.setVisibility(View.GONE);
         translationLayout.setVisibility(View.VISIBLE);
+    }
+
+    @Override public void showTranslationError() {
+        //TODO
     }
 
 

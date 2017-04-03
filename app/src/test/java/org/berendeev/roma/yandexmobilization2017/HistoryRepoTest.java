@@ -79,8 +79,6 @@ public class HistoryRepoTest{
         printAll();
         repository.removeFromHistory(world).subscribe();
         printAll();
-        historyDataSource.clean();
-        printAll();
     }
 
     @Test

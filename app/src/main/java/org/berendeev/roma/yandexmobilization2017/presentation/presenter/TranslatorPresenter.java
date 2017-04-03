@@ -8,6 +8,7 @@ import org.berendeev.roma.yandexmobilization2017.domain.entity.Dictionary;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.TranslateDirection;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.TranslationQuery;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.Word;
+import org.berendeev.roma.yandexmobilization2017.domain.exception.TranslationException;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.CheckIfFavouriteInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.GetDictionaryInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.GetLastWordInteractor;
@@ -24,6 +25,7 @@ import org.berendeev.roma.yandexmobilization2017.presentation.view.TranslatorVie
 import org.berendeev.roma.yandexmobilization2017.presentation.view.TranslatorView.Router;
 
 import java.net.ConnectException;
+import java.net.UnknownHostException;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
@@ -31,9 +33,11 @@ import javax.inject.Inject;
 
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.observers.DisposableObserver;
+import timber.log.Timber;
 
 public class TranslatorPresenter {
 
+    public static final String ERROR = "translator_error";
     private TranslatorView view;
 
     @Inject GetTranslateDirectionInteractor getTranslateDirectionInteractor;
@@ -67,6 +71,13 @@ public class TranslatorPresenter {
                 .subscribe(text -> {
                     getDictionaryInteractor.execute(new DictionaryObserver(), buildQuery(text));
                     translateTextInteractor.execute(new TranslationObserver(), buildQuery(text));
+                    saveLastWordInteractor.execute(new VoidObserver(), Word.builder()
+                            .word(text)
+                            .translation("")
+                            .isFavourite(false)
+                            .languageFrom("")
+                            .languageTo("")
+                            .build());
                     lastWord = lastWord.toBuilder()
                             .word(text)
                             .translation("")
@@ -146,7 +157,8 @@ public class TranslatorPresenter {
     }
 
     public void onRepeat() {
-        translateTextInteractor.execute(new TranslationObserver(), buildQuery(lastWord.word()));
+        disposable.clear();
+        start();
     }
 
     private class DirectionsObserver extends DisposableObserver<Pair<TranslateDirection, TranslateDirection>> {
@@ -155,9 +167,12 @@ public class TranslatorPresenter {
             langFrom = pair.first.key();
             langTo = pair.second.key();
             view.setTranslateDirection(pair.first, pair.second);
+            view.hideConnectionError();
         }
 
         @Override public void onError(Throwable e) {
+            view.showConnectionError();
+            Timber.d(e, ERROR);
         }
 
         @Override public void onComplete() {
@@ -170,16 +185,18 @@ public class TranslatorPresenter {
         @Override public void onNext(Word word) {
             view.setTranslation(word);
             lastWord = word;
+            view.hideConnectionError();
         }
 
         @Override public void onError(Throwable e) {
-            if (e instanceof ConnectException){
-                view.showConnectionError();
+            if(e instanceof TranslationException){
+                view.showTranslationError();
             }
+            view.showConnectionError();
+            Timber.d(e, ERROR);
         }
 
         @Override public void onComplete() {
-            dispose();
         }
 
     }
@@ -187,7 +204,6 @@ public class TranslatorPresenter {
     private class LastWordObserver extends DisposableObserver<Word> {
 
         @Override public void onNext(Word word) {
-            lastWord = word;
             view.setPreviousWord(word);
             lastWord = word;
             langFrom = word.languageFrom();
@@ -213,13 +229,13 @@ public class TranslatorPresenter {
         @Override public void onNext(Word word) {
             view.setTranslation(word);
             lastWord = word;
+            saveLastWordInHistory();
         }
 
         @Override public void onError(Throwable e) {
         }
 
         @Override public void onComplete() {
-            saveLastWordInHistory();
             dispose();
         }
     }
@@ -242,17 +258,18 @@ public class TranslatorPresenter {
         }
     }
 
-    private class DictionaryObserver extends DisposableObserver<Dictionary>{
+    private class DictionaryObserver extends DisposableObserver<Dictionary> {
         @Override public void onNext(Dictionary dictionary) {
             view.showDictionary(dictionary);
+            view.hideConnectionError();
         }
 
         @Override public void onError(Throwable e) {
-
+            view.showConnectionError();
+            Timber.d(e, ERROR);
         }
 
         @Override public void onComplete() {
-
         }
     }
 }

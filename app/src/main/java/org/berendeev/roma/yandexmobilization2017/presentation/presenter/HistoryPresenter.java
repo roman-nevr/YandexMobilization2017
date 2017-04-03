@@ -5,6 +5,8 @@ import org.berendeev.roma.yandexmobilization2017.domain.entity.Word;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.GetFavouritesInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.GetHistoryInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.Interactor;
+import org.berendeev.roma.yandexmobilization2017.domain.interactor.OnFavouritesChangedInteractor;
+import org.berendeev.roma.yandexmobilization2017.domain.interactor.OnHistoryChangedInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.RemoveAllFromFavouritesInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.RemoveAllFromHistoryInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.RemoveFromFavouritesInteractor;
@@ -34,10 +36,13 @@ public class HistoryPresenter {
     @Inject SaveLastWordInteractor saveLastWordInteractor;
     @Inject SetDirectionToInteractor setDirectionToInteractor;
     @Inject SetDirectionFromInteractor setDirectionFromInteractor;
+    @Inject OnHistoryChangedInteractor onHistoryChangedInteractor;
+    @Inject OnFavouritesChangedInteractor onFavouritesChangedInteractor;
 
     private int type;
     private Interactor<List<Word>, Void> getInteractor;
     private Interactor<List<Word>, Void> deleteAllInteractor;
+    private Interactor<Integer, Void> changesInteractor;
     private WordListView view;
     private WordListView.Router router;
     private CompositeDisposable disposable;
@@ -52,6 +57,11 @@ public class HistoryPresenter {
     public void start(){
         loadWordList();
         setTitle();
+        subscribeOnChanges();
+    }
+
+    private void subscribeOnChanges() {
+        disposable.add(changesInteractor.execute(new OnChangeObserver(), null));
     }
 
     public void stop(){
@@ -69,10 +79,12 @@ public class HistoryPresenter {
             getInteractor = getFavouritesInteractor;
             deleteAllInteractor = removeAllFromFavouritesInteractor;
             titleId = R.string.title_favourite;
+            changesInteractor = onFavouritesChangedInteractor;
         }
         if (type == R.id.history_type){
             getInteractor = getHistoryInteractor;
             deleteAllInteractor = removeAllFromHistoryInteractor;
+            changesInteractor = onHistoryChangedInteractor;
             titleId = R.string.title_history;
         }
     }
@@ -122,7 +134,6 @@ public class HistoryPresenter {
         view.setTitleById(titleId);
     }
 
-    //TODO
     private class WordsObserver extends DisposableObserver<List<Word>>{
         @Override public void onNext(List<Word> words) {
             view.showList(words);
@@ -137,5 +148,19 @@ public class HistoryPresenter {
         }
     }
 
+    private class OnChangeObserver extends DisposableObserver<Integer> {
+
+        @Override public void onNext(Integer integer) {
+            loadWordList();
+        }
+
+        @Override public void onError(Throwable e) {
+
+        }
+
+        @Override public void onComplete() {
+
+        }
+    }
 
 }
