@@ -44,50 +44,13 @@ public class ExampleUnitTest {
 
     @Test
     public void rxTest(){
-        Thread thread = Thread.currentThread();
-        TestObserver<Integer> testObserver = TestObserver.create();
-        CompositeDisposable disposable = new CompositeDisposable();
-        Observable<Integer> observable1 = Observable.create(e -> {
-            int a = 0;
-            while (a < 10){
-                try {
-                    Thread.sleep(100);
-                }catch (Exception e1){
-                }
-                e.onNext(10 + a++);
-            }
+        Observable<Integer> observable = Observable.just(1, 2,3).cache();
+        observable.subscribe(integer -> {
+            System.out.println(integer);
         });
-        Disposable disposable1 = observable1
-                .subscribeOn(Schedulers.computation())
-                .observeOn(Schedulers.single())
-                .subscribeWith(testObserver);
-        Observable<Integer> observable2 = Observable.create(e -> {
-            while (true){
-                int a = 0;
-                while (a < 10){
-                    try {
-                        Thread.sleep(100);
-                    }catch (Exception e1){
-                    }
-                    e.onNext(a++);
-                }
-            }
+        observable.subscribe(integer -> {
+            System.out.println(integer);
         });
-        Disposable disposable2 = observable2
-                .subscribeOn(Schedulers.computation())
-                .observeOn(Schedulers.single())
-                .subscribeWith(testObserver);
-        disposable.add(disposable1);
-        disposable.add(disposable2);
-        disposable1.dispose();
-        observable1.subscribe();
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        if(disposable2.isDisposed()){
-            System.out.println("1111");
-        }
+
     }
 }

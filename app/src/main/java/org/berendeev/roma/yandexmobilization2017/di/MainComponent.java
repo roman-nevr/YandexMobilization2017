@@ -8,8 +8,6 @@ import dagger.Component;
 @Singleton
 public interface MainComponent {
 
-    void inject(TestActivity activity);
-
     LanguageSelectorComponent plusLanguageSelectorComponent();
 
     TranslatorComponent plusTranslatorComponent();
