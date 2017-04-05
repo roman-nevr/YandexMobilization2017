@@ -13,7 +13,7 @@ public class SwapDirectionsInteractor extends Interactor<Void, Void> {
     @Inject
     public SwapDirectionsInteractor() {}
 
-    @Override protected Observable<Void> buildObservable(Void param) {
+    @Override public Observable<Void> buildObservable(Void param) {
         return repository.swapDirections().toObservable();
     }
 }

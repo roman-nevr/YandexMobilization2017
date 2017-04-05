@@ -27,8 +27,6 @@ public interface TranslatorView {
 
     void hideConnectionError();
 
-    void showTranslationError();
-
     interface Router {
         void showSourceLanguageSelector();
 

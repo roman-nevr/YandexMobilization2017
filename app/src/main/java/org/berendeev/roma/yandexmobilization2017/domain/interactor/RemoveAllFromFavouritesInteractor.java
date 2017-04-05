@@ -8,8 +8,6 @@ import java.util.List;
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.observers.DisposableObserver;
 
 public class RemoveAllFromFavouritesInteractor extends Interactor<List<Word>, Void> {
 
@@ -18,7 +16,7 @@ public class RemoveAllFromFavouritesInteractor extends Interactor<List<Word>, Vo
     @Inject
     public RemoveAllFromFavouritesInteractor() {}
 
-    @Override protected Observable<List<Word>> buildObservable(Void param) {
+    @Override public Observable<List<Word>> buildObservable(Void param) {
         return repository.removeAllFromFavourites()
                 .andThen(repository.getFavourites());
     }

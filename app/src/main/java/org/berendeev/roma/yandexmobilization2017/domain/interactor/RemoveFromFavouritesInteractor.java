@@ -14,7 +14,7 @@ public class RemoveFromFavouritesInteractor extends Interactor<Void, Word> {
     @Inject
     public RemoveFromFavouritesInteractor() {}
 
-    @Override protected Observable<Void> buildObservable(Word param) {
+    @Override public Observable<Void> buildObservable(Word param) {
         return repository.removeFromFavourites(param).toObservable();
     }
 }

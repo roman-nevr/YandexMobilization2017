@@ -16,7 +16,7 @@ public class GetFavouritesInteractor extends Interactor<List<Word>, Void> {
     @Inject
     public GetFavouritesInteractor() {}
 
-    @Override protected Observable<List<Word>> buildObservable(Void param) {
+    @Override public Observable<List<Word>> buildObservable(Void param) {
         return repository.getFavourites();
     }
 }

@@ -2,14 +2,11 @@ package org.berendeev.roma.yandexmobilization2017.presentation.presenter;
 
 import android.util.Pair;
 
-import org.berendeev.roma.yandexmobilization2017.R;
-import org.berendeev.roma.yandexmobilization2017.domain.entity.Definition;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.Dictionary;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.TranslateDirection;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.TranslationQuery;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.Word;
 import org.berendeev.roma.yandexmobilization2017.domain.exception.TranslationException;
-import org.berendeev.roma.yandexmobilization2017.domain.interactor.CheckIfFavouriteInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.GetDictionaryInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.GetLastWordInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.GetTranslateDirectionInteractor;
@@ -19,13 +16,10 @@ import org.berendeev.roma.yandexmobilization2017.domain.interactor.SaveInHistory
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.SaveLastWordInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.SwapDirectionsInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.TranslateTextInteractor;
-import org.berendeev.roma.yandexmobilization2017.domain.interactor.VoidObserver;
 import org.berendeev.roma.yandexmobilization2017.presentation.view.DummyView;
 import org.berendeev.roma.yandexmobilization2017.presentation.view.TranslatorView;
 import org.berendeev.roma.yandexmobilization2017.presentation.view.TranslatorView.Router;
 
-import java.net.ConnectException;
-import java.net.UnknownHostException;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
@@ -48,7 +42,6 @@ public class TranslatorPresenter {
     @Inject SaveInFavouriteInteractor saveInFavouriteInteractor;
     @Inject RemoveFromFavouritesInteractor removeFromFavouritesInteractor;
     @Inject SaveInHistoryInteractor saveInHistoryInteractor;
-    @Inject CheckIfFavouriteInteractor checkIfFavouriteInteractor;
     @Inject GetDictionaryInteractor getDictionaryInteractor;
     private Router router;
     private final CompositeDisposable disposable;
@@ -65,39 +58,33 @@ public class TranslatorPresenter {
     }
 
     public void start() {
-        disposable.add(getTranslateDirectionInteractor.execute(new DirectionsObserver(), Locale.getDefault()));
+        getTranslateDirectionInteractor.execute(new DirectionsObserver(), Locale.getDefault());
         disposable.add(view.getTextObservable()
                 .debounce(500, TimeUnit.MILLISECONDS)
                 .subscribe(text -> {
                     getDictionaryInteractor.execute(new DictionaryObserver(), buildQuery(text));
                     translateTextInteractor.execute(new TranslationObserver(), buildQuery(text));
-                    saveLastWordInteractor.execute(new VoidObserver(), Word.builder()
-                            .word(text)
-                            .translation("")
-                            .isFavourite(false)
-                            .languageFrom("")
-                            .languageTo("")
-                            .build());
                     lastWord = lastWord.toBuilder()
                             .word(text)
                             .translation("")
                             .build();
+                    saveLastWordInteractor.execute(null, lastWord);
                 }));
     }
 
     public void stop() {
         disposable.clear();
-        view = DummyView.DUMMY_VIEW;
+        getDictionaryInteractor.dispose();
+        translateTextInteractor.dispose();
+        view = DummyView.DUMMY_VIEW;   //даже если какой-то запрос зависнет и ответ придет после остановки активити, то ничего не упадет
     }
 
     private void saveLastWord() {
-        saveLastWordInteractor
-                .getObservable(lastWord)
-                .subscribeWith(new VoidObserver());
+        saveLastWordInteractor.execute(null, lastWord);
     }
 
     private void saveLastWordInHistory() {
-        saveInHistoryInteractor.execute(new VoidObserver(), lastWord);
+        saveInHistoryInteractor.execute(null, lastWord);
     }
 
     private void translateAndSaveLastWord() {
@@ -134,13 +121,13 @@ public class TranslatorPresenter {
                     .isFavourite(false)
                     .build();
             view.switchOffFavButton();
-            removeFromFavouritesInteractor.execute(new VoidObserver(), lastWord);
+            removeFromFavouritesInteractor.execute(null, lastWord);
         } else {
             lastWord = lastWord.toBuilder()
                     .isFavourite(true)
                     .build();
             view.switchOnFavButton();
-            saveInFavouriteInteractor.execute(lastWord);
+            saveInFavouriteInteractor.execute(null, lastWord);
         }
     }
 
@@ -189,9 +176,6 @@ public class TranslatorPresenter {
         }
 
         @Override public void onError(Throwable e) {
-            if(e instanceof TranslationException){
-                view.showTranslationError();
-            }
             view.showConnectionError();
             Timber.d(e, ERROR);
         }
@@ -211,11 +195,9 @@ public class TranslatorPresenter {
         }
 
         @Override public void onError(Throwable e) {
-
         }
 
         @Override public void onComplete() {
-            dispose();
         }
 
     }

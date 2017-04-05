@@ -35,7 +35,7 @@ public class RepositoryTest {
         OkHttpClient httpClient = mainModule.provideOkHttpClient(interceptor, mainModule.provideContext());
         Retrofit retrofit = mainModule.provideRetrofit(httpClient, mainModule.provideGson());
         TranslateApi translateApi = mainModule.provideTranslateAPI(retrofit);
-        repository = new TranslationRepositoryImpl(translateApi, mainModule.provideContext());
+        repository = new TranslationRepositoryImpl(translateApi);
     }
 
     @Test

@@ -174,7 +174,6 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
             @Override public void onKeyPreIme(int keyCode, KeyEvent event) {
                 if(keyCode == KEYCODE_BACK){
                     presenter.onInputDone();
-                   // hideKeyboard();
                 }
             }
         });
@@ -214,11 +213,6 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
         errorLayout.setVisibility(View.GONE);
         translationLayout.setVisibility(View.VISIBLE);
     }
-
-    @Override public void showTranslationError() {
-        //TODO
-    }
-
 
     @Override public void showSourceLanguageSelector() {
         LanguageSelectorActivity.start(this.getActivity(), R.id.language_from_type);

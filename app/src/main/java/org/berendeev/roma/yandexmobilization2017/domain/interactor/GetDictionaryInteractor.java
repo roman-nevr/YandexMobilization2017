@@ -15,7 +15,7 @@ public class GetDictionaryInteractor extends Interactor<Dictionary, TranslationQ
     @Inject
     public GetDictionaryInteractor() {}
 
-    @Override protected Observable<Dictionary> buildObservable(TranslationQuery param) {
+    @Override public Observable<Dictionary> buildObservable(TranslationQuery param) {
         return repository.lookup(param);
     }
 }

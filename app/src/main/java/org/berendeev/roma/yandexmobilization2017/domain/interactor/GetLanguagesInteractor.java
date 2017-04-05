@@ -16,7 +16,7 @@ public class GetLanguagesInteractor extends Interactor<LanguageMap, Locale> {
     @Inject
     public GetLanguagesInteractor() {}
 
-    @Override protected Observable<LanguageMap> buildObservable(Locale param) {
+    @Override public Observable<LanguageMap> buildObservable(Locale param) {
         return repository.getLanguages(param);
     }
 }

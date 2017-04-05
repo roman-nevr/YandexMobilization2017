@@ -70,10 +70,6 @@ public class DummyView implements LanguageSelectorView, TranslatorView, WordList
 
     }
 
-    @Override public void showTranslationError() {
-
-    }
-
     @Override public void showList(List<Word> wordList) {
 
     }

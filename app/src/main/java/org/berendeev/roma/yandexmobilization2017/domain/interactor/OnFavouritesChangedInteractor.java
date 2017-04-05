@@ -14,7 +14,7 @@ public class OnFavouritesChangedInteractor extends Interactor<Integer, Void> {
     @Inject
     public OnFavouritesChangedInteractor() {}
 
-    @Override protected Observable<Integer> buildObservable(Void param) {
+    @Override public Observable<Integer> buildObservable(Void param) {
         return repository.getOnChangeObservable()
                 .filter(integer -> integer == R.id.favourites_type);
     }

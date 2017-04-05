@@ -14,7 +14,7 @@ public class SaveLastWordInteractor extends Interactor<Void, Word> {
     @Inject
     public SaveLastWordInteractor() {}
 
-    @Override protected Observable<Void> buildObservable(Word param) {
+    @Override public Observable<Void> buildObservable(Word param) {
         return repository.saveLastWord(param).toObservable();
     }
 }

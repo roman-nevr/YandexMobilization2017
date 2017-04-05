@@ -14,7 +14,7 @@ public class OnHistoryChangedInteractor extends Interactor<Integer, Void> {
     @Inject
     public OnHistoryChangedInteractor() {}
 
-    @Override protected Observable<Integer> buildObservable(Void param) {
+    @Override public Observable<Integer> buildObservable(Void param) {
         return repository.getOnChangeObservable()
                 .filter(integer -> integer == R.id.history_type);
     }

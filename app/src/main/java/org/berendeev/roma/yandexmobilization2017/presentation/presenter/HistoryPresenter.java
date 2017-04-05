@@ -61,11 +61,12 @@ public class HistoryPresenter {
     }
 
     private void subscribeOnChanges() {
-        disposable.add(changesInteractor.execute(new OnChangeObserver(), null));
+        changesInteractor.execute(new OnChangeObserver(), null);
     }
 
     public void stop(){
         disposable.clear();
+        changesInteractor.dispose();
         view = DummyView.DUMMY_VIEW;
     }
 
@@ -144,7 +145,6 @@ public class HistoryPresenter {
         }
 
         @Override public void onComplete() {
-            dispose();
         }
     }
 
@@ -155,11 +155,9 @@ public class HistoryPresenter {
         }
 
         @Override public void onError(Throwable e) {
-
         }
 
         @Override public void onComplete() {
-
         }
     }
 

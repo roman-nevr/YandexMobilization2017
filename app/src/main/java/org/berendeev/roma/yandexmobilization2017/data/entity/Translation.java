@@ -10,6 +10,9 @@ public class Translation {
     @SerializedName("code")
     @Expose
     public Integer code;
+    @SerializedName("message")
+    @Expose
+    public String message;
     @SerializedName("lang")
     @Expose
     public String lang;

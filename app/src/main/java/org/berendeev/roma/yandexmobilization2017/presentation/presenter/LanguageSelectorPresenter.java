@@ -38,17 +38,18 @@ public class LanguageSelectorPresenter {
     }
 
     public void start(){
-        disposable.add(getLanguagesInteractor.execute(new LanguageObserver(), Locale.getDefault()));
+        getLanguagesInteractor.execute(new LanguageObserver(), Locale.getDefault());
         view.setTitleById(titleId);
     }
 
     public void stop(){
         disposable.clear();
         view = DUMMY_VIEW;
+        getLanguagesInteractor.dispose();
     }
 
     public void onLanguageSelected(String key) {
-        disposable.add(interactor.execute(new VoidObserver(), key));
+        interactor.execute(null, key);
         router.moveToTranslator();
     }
 

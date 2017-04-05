@@ -14,8 +14,6 @@ import org.berendeev.roma.yandexmobilization2017.data.PreferencesRepositoryImpl;
 import org.berendeev.roma.yandexmobilization2017.data.TranslationRepositoryImpl;
 import org.berendeev.roma.yandexmobilization2017.data.deserializer.LanguageMapDeserializer;
 import org.berendeev.roma.yandexmobilization2017.data.deserializer.TranslateDirectionsDeserializer;
-import org.berendeev.roma.yandexmobilization2017.data.entity.HttpDefinition;
-import org.berendeev.roma.yandexmobilization2017.data.entity.DictionaryTranslation;
 import org.berendeev.roma.yandexmobilization2017.data.entity.TranslateDirection;
 import org.berendeev.roma.yandexmobilization2017.data.http.CacheInterceptor;
 import org.berendeev.roma.yandexmobilization2017.data.http.DictionaryApi;
@@ -32,7 +30,7 @@ import org.berendeev.roma.yandexmobilization2017.domain.entity.LanguageMap;
 import java.io.File;
 import java.lang.reflect.Type;
 import java.util.List;
-import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -48,10 +46,11 @@ import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-import static org.berendeev.roma.yandexmobilization2017.Consts.HTTP_CACHE_SIZE;
 
 @Module
 public class MainModule {
+
+    private static final int HTTP_CACHE_SIZE = 1 * 1024 * 1024;
 
     private Context context;
 
@@ -72,9 +71,9 @@ public class MainModule {
     ThreadPoolExecutor provideThreadPoolExecutor(){
         int poolSize = 2;
         int maxPoolSize = 4;
-        int timeout = 30;
+        int timeout = 10;
         return new ThreadPoolExecutor(poolSize, maxPoolSize, timeout,
-                TimeUnit.SECONDS, new ArrayBlockingQueue<>(poolSize));
+                TimeUnit.SECONDS, new LinkedBlockingQueue<>(5));
     }
 
     @Singleton
@@ -90,8 +89,8 @@ public class MainModule {
 
     @Provides
     @Singleton
-    public TranslationRepository provideTranslationRepository(TranslateApi translateApi, Context context){
-        return new TranslationRepositoryImpl(translateApi, context);
+    public TranslationRepository provideTranslationRepository(TranslateApi translateApi){
+        return new TranslationRepositoryImpl(translateApi);
     }
 
     @Provides

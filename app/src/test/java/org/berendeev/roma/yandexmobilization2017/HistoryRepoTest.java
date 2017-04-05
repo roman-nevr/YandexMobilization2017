@@ -5,7 +5,6 @@ import android.util.Pair;
 
 import org.berendeev.roma.yandexmobilization2017.data.sqlite.DatabaseHistoryDataSource;
 import org.berendeev.roma.yandexmobilization2017.data.sqlite.DatabaseOpenHelper;
-import org.berendeev.roma.yandexmobilization2017.di.HistoryAndFavouritesModule;
 import org.berendeev.roma.yandexmobilization2017.di.MainModule;
 import org.berendeev.roma.yandexmobilization2017.domain.HistoryAndFavouritesRepository;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.Word;
@@ -30,7 +29,6 @@ public class HistoryRepoTest{
     public void before(){
         Context context = RuntimeEnvironment.application.getApplicationContext();
         MainModule mainModule = new MainModule(context.getApplicationContext());
-        HistoryAndFavouritesModule module = new HistoryAndFavouritesModule();
 
         DatabaseOpenHelper openHelper = mainModule.provideDatabaseOpenHelper(mainModule.provideContext());
         historyDataSource = (DatabaseHistoryDataSource) mainModule.provideHistoryDataSource(openHelper);

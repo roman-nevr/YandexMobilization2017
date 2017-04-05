@@ -6,7 +6,6 @@ import org.berendeev.roma.yandexmobilization2017.domain.entity.Word;
 
 import javax.inject.Inject;
 
-import io.reactivex.Completable;
 import io.reactivex.Observable;
 
 public class SaveInHistoryInteractor extends Interactor<Void, Word> {
@@ -17,7 +16,7 @@ public class SaveInHistoryInteractor extends Interactor<Void, Word> {
     @Inject
     public SaveInHistoryInteractor() {}
 
-    @Override protected Observable<Void> buildObservable(Word param) {
+    @Override public Observable<Void> buildObservable(Word param) {
         return historyAndFavouritesRepository
                 .saveInHistory(param)
                 .mergeWith(preferencesRepository

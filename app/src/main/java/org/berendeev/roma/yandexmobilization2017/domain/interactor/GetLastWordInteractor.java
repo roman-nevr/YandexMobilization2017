@@ -16,7 +16,7 @@ public class GetLastWordInteractor extends Interactor<Word, Void> {
     @Inject
     public GetLastWordInteractor() {}
 
-    @Override protected Observable<Word> buildObservable(Void param) {
+    @Override public Observable<Word> buildObservable(Void param) {
         return repository.getLastWord().flatMapObservable(word ->
             historyAndFavouritesRepository.checkIfInFavourites(word)
         );

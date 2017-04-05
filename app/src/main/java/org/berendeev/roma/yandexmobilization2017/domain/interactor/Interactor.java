@@ -6,8 +6,8 @@ import javax.inject.Inject;
 
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
+import io.reactivex.annotations.Nullable;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 
@@ -16,16 +16,52 @@ public abstract class Interactor<Response, Request> {
     @Inject ThreadPoolExecutor workExecutor;
     @Inject Scheduler mainExecutor;
 
-    public Disposable execute(DisposableObserver<Response> observer, Request param) {
+    private CompositeDisposable disposable = new CompositeDisposable();
+
+    protected abstract Observable<Response> buildObservable(Request param);
+
+    /**
+     * Executes the current interactor on background.
+     *
+     * @param observer {@link DisposableObserver} which will be listening to the
+     * observable build by {@link #buildObservable(Request)} () method.
+     * null if don't need listen to events
+     * @param param Parameter which need to to {@link #buildObservable(Request)} () method.
+     */
+    public void execute(@Nullable DisposableObserver<Response> observer, Request param) {
+        if(observer == null){
+            observer = new EmptyObserver();
+        }
         Observable<Response> observable = buildObservable(param)
-                .subscribeOn(Schedulers.io())
+                .subscribeOn(Schedulers.from(workExecutor))
                 .observeOn(mainExecutor);
-        return  (observable.subscribeWith(observer));
+        disposable.add(observable.subscribeWith(observer));
     }
 
-    public Observable<Response> getObservable(Request param){
+    /**
+     * Executes the current interactor on main thread.
+     *
+     * @param param Parameter which need to to {@link #buildObservable(Request)} ()} method.
+     */
+
+    public Observable<Response> execute(Request param){
         return buildObservable(param);
     }
 
-    protected abstract Observable<Response> buildObservable(Request param);
+    public void dispose(){
+        disposable.dispose();
+    }
+
+    private class EmptyObserver extends DisposableObserver<Response>{
+
+        @Override public void onNext(Response response) {
+        }
+
+        @Override public void onError(Throwable e) {
+        }
+
+        @Override public void onComplete() {
+            disposable.clear();
+        }
+    }
 }

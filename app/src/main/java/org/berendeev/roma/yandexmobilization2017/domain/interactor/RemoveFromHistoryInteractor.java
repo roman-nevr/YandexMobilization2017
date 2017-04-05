@@ -14,7 +14,7 @@ public class RemoveFromHistoryInteractor extends Interactor<Void, Word> {
     @Inject
     public RemoveFromHistoryInteractor() {}
 
-    @Override protected Observable<Void> buildObservable(Word param) {
+    @Override public Observable<Void> buildObservable(Word param) {
         return repository.removeFromHistory(param).toObservable();
     }
 }

@@ -19,7 +19,7 @@ public class Utils {
         ObjectAnimator animator = ObjectAnimator.ofObject(button,
                 "colorFilter", new ArgbEvaluator(), colorFrom, colorTo);
 
-        animator.setDuration(500);
+        animator.setDuration(300);
         animator.start();
     }
 }

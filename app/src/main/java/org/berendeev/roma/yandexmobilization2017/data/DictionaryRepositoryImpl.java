@@ -26,6 +26,13 @@ public class DictionaryRepositoryImpl implements DictionaryRepository {
     }
 
     @Override public Observable<Dictionary> lookup(TranslationQuery query) {
+        if (query.text().equals("")) {
+            return Observable.just(Dictionary.builder()
+                    .text("")
+                    .transcription("")
+                    .definitions(new ArrayList<>())
+                    .build());
+        }
         String url = String.format("%slookup?key=%s&text=%s&lang=%s&ui=%s", DictionaryApi.BASE_URL,
                 BuildConfig.DICTIONARY_API_KEY, query.text(), query.langFrom() + "-" + query.langTo(),
                 getUiLanguage());
@@ -35,11 +42,11 @@ public class DictionaryRepositoryImpl implements DictionaryRepository {
                 .map(httpDictionary -> DictionaryMapper.map(httpDictionary));
     }
 
-    private String getUiLanguage(){
+    private String getUiLanguage() {
         int index = uiLangs.indexOf(Locale.getDefault().getLanguage());
-        if(index == -1){
+        if (index == -1) {
             return "en";
-        }else {
+        } else {
             return uiLangs.get(index);
         }
     }

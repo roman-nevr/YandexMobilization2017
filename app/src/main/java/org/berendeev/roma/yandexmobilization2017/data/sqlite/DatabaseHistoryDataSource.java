@@ -43,13 +43,11 @@ public class DatabaseHistoryDataSource implements HistoryDataSource {
     @Override public Observable<List<Word>> getHistory() {
         String selection = IS_IN_HISTORY + " = ?";
         return getFromSelection(selection);
-//        return historySubject;
     }
 
     @Override public Observable<List<Word>> getFavourites() {
         String selection = IS_IN_FAVOURITES + " = ?";
         return getFromSelection(selection);
-//        return favouritesSubject;
     }
 
     @Override public boolean checkIfInFavourites(Word word) {

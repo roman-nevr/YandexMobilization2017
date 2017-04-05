@@ -16,7 +16,7 @@ public class GetHistoryInteractor extends Interactor<List<Word>, Void> {
     @Inject
     public GetHistoryInteractor() {}
 
-    @Override protected Observable<List<Word>> buildObservable(Void param) {
+    @Override public Observable<List<Word>> buildObservable(Void param) {
         return repository.getHistory();
     }
 }

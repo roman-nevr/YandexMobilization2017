@@ -13,7 +13,7 @@ public class SetDirectionFromInteractor extends Interactor<Void, String> {
     @Inject
     public SetDirectionFromInteractor() {}
 
-    @Override protected Observable<Void> buildObservable(String param) {
+    @Override public Observable<Void> buildObservable(String param) {
         return repository.setDirectionFrom(param).toObservable();
     }
 }
