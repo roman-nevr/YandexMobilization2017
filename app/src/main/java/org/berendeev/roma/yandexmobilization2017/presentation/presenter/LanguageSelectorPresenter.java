@@ -7,7 +7,6 @@ import org.berendeev.roma.yandexmobilization2017.domain.interactor.GetLanguagesI
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.Interactor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.SetDirectionFromInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.SetDirectionToInteractor;
-import org.berendeev.roma.yandexmobilization2017.domain.interactor.VoidObserver;
 import org.berendeev.roma.yandexmobilization2017.presentation.view.LanguageSelectorView;
 import org.berendeev.roma.yandexmobilization2017.presentation.view.LanguageSelectorView.Router;
 

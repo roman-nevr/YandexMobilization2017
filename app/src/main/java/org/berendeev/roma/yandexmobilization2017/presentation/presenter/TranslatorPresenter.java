@@ -6,7 +6,6 @@ import org.berendeev.roma.yandexmobilization2017.domain.entity.Dictionary;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.TranslateDirection;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.TranslationQuery;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.Word;
-import org.berendeev.roma.yandexmobilization2017.domain.exception.TranslationException;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.GetDictionaryInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.GetLastWordInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.GetTranslateDirectionInteractor;
@@ -77,6 +76,7 @@ public class TranslatorPresenter {
         getDictionaryInteractor.dispose();
         translateTextInteractor.dispose();
         view = DummyView.DUMMY_VIEW;   //даже если какой-то запрос зависнет и ответ придет после остановки активити, то ничего не упадет
+        router = null;
     }
 
     private void saveLastWord() {
@@ -148,6 +148,18 @@ public class TranslatorPresenter {
         start();
     }
 
+    public void onDeleteTextButtonClick() {
+        view.setPreviousWord(Word.EMPTY);
+    }
+
+    private void setImages(String text){
+        if (text.equals("")){
+            view.hideImageButtons();
+        }else {
+            view.showImageButtons();
+        }
+    }
+
     private class DirectionsObserver extends DisposableObserver<Pair<TranslateDirection, TranslateDirection>> {
 
         @Override public void onNext(Pair<TranslateDirection, TranslateDirection> pair) {
@@ -170,6 +182,7 @@ public class TranslatorPresenter {
     private class TranslationObserver extends DisposableObserver<Word> {
 
         @Override public void onNext(Word word) {
+            setImages(word.word());
             view.setTranslation(word);
             lastWord = word;
             view.hideConnectionError();
@@ -188,6 +201,7 @@ public class TranslatorPresenter {
     private class LastWordObserver extends DisposableObserver<Word> {
 
         @Override public void onNext(Word word) {
+            setImages(word.word());
             view.setPreviousWord(word);
             lastWord = word;
             langFrom = word.languageFrom();
@@ -209,6 +223,7 @@ public class TranslatorPresenter {
     private class InputDoneObserver extends DisposableObserver<Word> {
 
         @Override public void onNext(Word word) {
+            setImages(word.word());
             view.setTranslation(word);
             lastWord = word;
             saveLastWordInHistory();
@@ -232,6 +247,7 @@ public class TranslatorPresenter {
         }
 
         @Override public void onComplete() {
+            setImages(lastWord.word());
             view.setPreviousWord(lastWord.toBuilder()
                     .word(lastWord.translation())
                     .translation(lastWord.word())

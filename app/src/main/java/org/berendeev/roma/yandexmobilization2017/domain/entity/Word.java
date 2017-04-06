@@ -9,6 +9,8 @@ import com.google.gson.TypeAdapter;
 @AutoValue
 public abstract class Word {
 
+    public static Word EMPTY = create("", "", "", "", false);
+
     public abstract String word();
     public abstract String translation();
 

@@ -18,7 +18,9 @@ public class TranslateTextInteractor extends Interactor<Word, TranslationQuery> 
     public TranslateTextInteractor() {}
 
     @Override public Observable<Word> buildObservable(TranslationQuery param) {
-        return translationRepository.translate(param).flatMap(word ->
-                historyAndFavouritesRepository.checkIfInFavourites(word));
+        return Observable.concat(
+                historyAndFavouritesRepository.getWord(param).toObservable(),
+                translationRepository.translate(param))
+                .firstElement().toObservable();
     }
 }

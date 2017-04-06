@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Locale;
 
 import io.reactivex.Observable;
+import timber.log.Timber;
 
 
 public class DictionaryRepositoryImpl implements DictionaryRepository {
@@ -46,7 +47,9 @@ public class DictionaryRepositoryImpl implements DictionaryRepository {
                         .blockingGet();
                 return DictionaryMapper.map(httpDictionary);
             }catch (Throwable throwable){
+                Timber.d(throwable, "wft");
                 throw new ConnectionException(throwable);
+//                return null;
             }
         });
     }

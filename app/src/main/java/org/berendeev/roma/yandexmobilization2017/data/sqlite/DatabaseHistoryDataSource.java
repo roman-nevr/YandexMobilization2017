@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Pair;
 
 import org.berendeev.roma.yandexmobilization2017.R;
+import org.berendeev.roma.yandexmobilization2017.domain.entity.TranslationQuery;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.Word;
 import org.berendeev.roma.yandexmobilization2017.domain.exception.HistoryException;
 
@@ -15,6 +16,7 @@ import java.util.List;
 
 import io.reactivex.Completable;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import io.reactivex.subjects.PublishSubject;
 import timber.log.Timber;
 
@@ -87,6 +89,7 @@ public class DatabaseHistoryDataSource implements HistoryDataSource {
         String[] selectionArgs = {word.word(), word.translation(), word.languageFrom(), word.languageTo(), TRUE, TRUE};
         contentValues.clear();
         contentValues.put(attr, getSqlBooleanFromJavaBoolean(true));
+        contentValues.put(ADD_DATE, System.currentTimeMillis());
         database.beginTransaction();
         int count = database.update(WORDS_TABLE, contentValues, selection, selectionArgs);
         if(count == 0){
@@ -163,6 +166,23 @@ public class DatabaseHistoryDataSource implements HistoryDataSource {
 
     @Override public Observable<Integer> getOnChangeObservable() {
         return publishSubject;
+    }
+
+    @Override public Word getWord(TranslationQuery query) {
+        String selection = String.format("%1s = ? AND %2s = ? AND %3s = ?", WORD, LANGUAGE_FROM, LANGUAGE_TO);
+        String[] selectionArgs = {query.text(), query.langFrom(), query.langTo()};
+        Word word;
+        try {
+            Cursor cursor = database.query(WORDS_TABLE, null, selection, selectionArgs, null, null, null, null);
+            cursor.moveToFirst();
+            word = getWordFromCursor(cursor);
+            cursor.close();
+        }catch (Exception e){
+            word = Word.EMPTY;
+            Timber.d("SQL Exception " + e);
+            Timber.d(e);
+        }
+        return word;
     }
 
     public List<Pair<Word, Boolean>> getAll(){

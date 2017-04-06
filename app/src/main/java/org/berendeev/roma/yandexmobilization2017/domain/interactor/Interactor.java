@@ -33,7 +33,7 @@ public abstract class Interactor<Response, Request> {
             observer = new EmptyObserver();
         }
         Observable<Response> observable = buildObservable(param)
-                .subscribeOn(Schedulers.from(workExecutor))
+                .subscribeOn(Schedulers.io())
                 .observeOn(mainExecutor);
         disposable.add(observable.subscribeWith(observer));
     }
@@ -49,7 +49,7 @@ public abstract class Interactor<Response, Request> {
     }
 
     public void dispose(){
-        disposable.dispose();
+        disposable.clear();
     }
 
     private class EmptyObserver extends DisposableObserver<Response>{

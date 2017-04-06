@@ -1,11 +1,14 @@
 package org.berendeev.roma.yandexmobilization2017.domain;
 
+import org.berendeev.roma.yandexmobilization2017.domain.entity.TranslationQuery;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.Word;
 
 import java.util.List;
 
 import io.reactivex.Completable;
+import io.reactivex.Maybe;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 
 public interface HistoryAndFavouritesRepository {
     Observable<List<Word>> getHistory();
@@ -28,4 +31,5 @@ public interface HistoryAndFavouritesRepository {
 
     Observable<Integer> getOnChangeObservable();
 
+    Maybe<Word> getWord(TranslationQuery query);
 }

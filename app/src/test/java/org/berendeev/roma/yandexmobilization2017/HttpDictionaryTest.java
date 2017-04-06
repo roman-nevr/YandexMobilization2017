@@ -55,7 +55,7 @@ public class HttpDictionaryTest {
             HttpDictionary httpDictionary = api
                     .lookup(url)
                     .delay(100, TimeUnit.MILLISECONDS)
-                    .blockingFirst();
+                    .blockingGet();
             emitter.onNext(httpDictionary);
         });
         Disposable disposable = objectObservable

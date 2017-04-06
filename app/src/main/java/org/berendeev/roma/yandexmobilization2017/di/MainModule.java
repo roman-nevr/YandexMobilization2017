@@ -100,6 +100,8 @@ public class MainModule {
         Cache cache = new Cache(cacheDir, HTTP_CACHE_SIZE);
         return new OkHttpClient.Builder()
                 .cache(cache)
+                .connectTimeout(15, TimeUnit.SECONDS)
+                .readTimeout(15, TimeUnit.SECONDS)
                 .addInterceptor(cacheInterceptor)
                 .addNetworkInterceptor(new StethoInterceptor())
                 .build();

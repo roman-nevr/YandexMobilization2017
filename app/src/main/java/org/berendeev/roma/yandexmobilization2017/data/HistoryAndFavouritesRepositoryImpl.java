@@ -2,12 +2,15 @@ package org.berendeev.roma.yandexmobilization2017.data;
 
 import org.berendeev.roma.yandexmobilization2017.data.sqlite.HistoryDataSource;
 import org.berendeev.roma.yandexmobilization2017.domain.HistoryAndFavouritesRepository;
+import org.berendeev.roma.yandexmobilization2017.domain.entity.TranslationQuery;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.Word;
 
 import java.util.List;
 
 import io.reactivex.Completable;
+import io.reactivex.Maybe;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import io.reactivex.subjects.PublishSubject;
 
 
@@ -76,5 +79,26 @@ public class HistoryAndFavouritesRepositoryImpl implements HistoryAndFavouritesR
 
     @Override public Observable<Integer> getOnChangeObservable() {
         return historyDataSource.getOnChangeObservable();
+    }
+
+    @Override public Maybe<Word> getWord(TranslationQuery query) {
+        return Maybe.create(emitter -> {
+            try {
+                Word word = historyDataSource.getWord(query);
+                if (emitter.isDisposed()) {
+                    return;
+                }
+                if (word == Word.EMPTY) {
+                    emitter.onComplete();
+                } else {
+                    emitter.onSuccess(word);
+                }
+            } catch (Throwable throwable) {
+                if (emitter.isDisposed()) {
+                    return;
+                }
+                emitter.onError(throwable);
+            }
+        });
     }
 }

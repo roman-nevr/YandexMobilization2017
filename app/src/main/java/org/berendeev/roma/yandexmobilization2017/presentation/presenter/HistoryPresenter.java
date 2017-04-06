@@ -14,7 +14,6 @@ import org.berendeev.roma.yandexmobilization2017.domain.interactor.SaveInFavouri
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.SaveLastWordInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.SetDirectionFromInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.SetDirectionToInteractor;
-import org.berendeev.roma.yandexmobilization2017.domain.interactor.VoidObserver;
 import org.berendeev.roma.yandexmobilization2017.presentation.view.DummyView;
 import org.berendeev.roma.yandexmobilization2017.presentation.view.WordListView;
 
@@ -69,6 +68,7 @@ public class HistoryPresenter {
         disposable.clear();
         changesInteractor.dispose();
         view = DummyView.DUMMY_VIEW;
+        router = null;
     }
 
     public void setView(WordListView view) {
@@ -103,21 +103,21 @@ public class HistoryPresenter {
                     .isFavourite(false)
                     .build();
             view.switchOffFavButtonAt(index);
-            removeFromFavouritesInteractor.execute(new VoidObserver(), word);
+            removeFromFavouritesInteractor.execute(null, word);
         }else {
             word = word.toBuilder()
                     .isFavourite(true)
                     .build();
             view.switchOnFavButtonAt(index);
-            saveInFavouriteInteractor.execute(new VoidObserver(), word);
+            saveInFavouriteInteractor.execute(null, word);
         }
         words.set(index, word);
     }
 
     public void onItemClick(int adapterPosition) {
-        saveLastWordInteractor.execute(new VoidObserver(), words.get(adapterPosition));
-        setDirectionToInteractor.execute(new VoidObserver(), words.get(adapterPosition).languageTo());
-        setDirectionFromInteractor.execute(new VoidObserver(), words.get(adapterPosition).languageFrom());
+        saveLastWordInteractor.execute(null, words.get(adapterPosition));
+        setDirectionToInteractor.execute(null, words.get(adapterPosition).languageTo());
+        setDirectionFromInteractor.execute(null, words.get(adapterPosition).languageFrom());
         router.moveShowWordInTranslator();
     }
 

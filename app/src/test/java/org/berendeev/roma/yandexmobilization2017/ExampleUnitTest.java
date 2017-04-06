@@ -1,6 +1,7 @@
 package org.berendeev.roma.yandexmobilization2017;
 
 import org.berendeev.roma.yandexmobilization2017.domain.entity.LanguageMap;
+import org.berendeev.roma.yandexmobilization2017.domain.exception.ConnectionException;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -15,8 +16,10 @@ import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.observers.DisposableObserver;
 import io.reactivex.observers.TestObserver;
 import io.reactivex.schedulers.Schedulers;
+import io.reactivex.subjects.BehaviorSubject;
 
 /**
  * Example locale unit test, which will execute on the development machine (host).
@@ -44,13 +47,26 @@ public class ExampleUnitTest {
 
     @Test
     public void rxTest(){
-        Observable<Integer> observable = Observable.just(1, 2,3).cache();
-        observable.subscribe(integer -> {
-            System.out.println(integer);
-        });
-        observable.subscribe(integer -> {
-            System.out.println(integer);
-        });
+        try {
+            Observable.fromCallable(() -> {
+                throw new ConnectionException();
+            }).subscribeWith(new Obs());
+        }catch (Throwable throwable){
+            throwable.printStackTrace();
+        }
+    }
 
+    private class Obs extends DisposableObserver<Object>{
+        @Override public void onNext(Object o) {
+
+        }
+
+        @Override public void onError(Throwable e) {
+            System.out.println(e.toString());
+        }
+
+        @Override public void onComplete() {
+
+        }
     }
 }

@@ -61,6 +61,7 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
     @BindView(R.id.translation_layout) ConstraintLayout translationLayout;
     @BindView(R.id.error_layout) ConstraintLayout errorLayout;
     @BindView(R.id.repeat_button) Button repeatButton;
+    @BindView(R.id.delete_text_button) ImageButton deleteTextButton;
 
     @Inject TranslatorPresenter presenter;
     private int colorFavourite;
@@ -77,10 +78,19 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
     private void initUI() {
         initHeaderView();
         initFavouritesMarker();
+        initEditor();
         initEditorActionListener();
         initDictionary();
         initErrorUi();
         presenter.init();
+    }
+
+    private void initEditor() {
+        wordToTranslate.setHorizontallyScrolling(false);
+        wordToTranslate.setLines(3);
+        deleteTextButton.setOnClickListener(v -> {
+            presenter.onDeleteTextButtonClick();
+        });
     }
 
     private void initErrorUi() {
@@ -216,6 +226,16 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
     @Override public void hideConnectionError() {
         errorLayout.setVisibility(View.GONE);
         translationLayout.setVisibility(View.VISIBLE);
+    }
+
+    @Override public void hideImageButtons() {
+        deleteTextButton.setVisibility(View.GONE);
+        favButton.setVisibility(View.GONE);
+    }
+
+    @Override public void showImageButtons() {
+        deleteTextButton.setVisibility(View.VISIBLE);
+        favButton.setVisibility(View.VISIBLE);
     }
 
     @Override public void showSourceLanguageSelector() {
