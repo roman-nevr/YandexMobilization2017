@@ -5,6 +5,7 @@ import android.content.Context;
 import com.jakewharton.retrofit2.adapter.rxjava2.HttpException;
 
 import org.berendeev.roma.yandexmobilization2017.BuildConfig;
+import org.berendeev.roma.yandexmobilization2017.data.entity.Languages;
 import org.berendeev.roma.yandexmobilization2017.data.entity.Translation;
 import org.berendeev.roma.yandexmobilization2017.data.http.TranslateApi;
 import org.berendeev.roma.yandexmobilization2017.data.mapper.LanguageMapper;
@@ -40,7 +41,7 @@ public class TranslationRepositoryImpl implements TranslationRepository {
             try {
                 Translation translation = translateApi
                         .translate(BuildConfig.TRANSLATE_API_KEY, query.text(), query.langFrom() + "-" + query.langTo())
-                        .blockingFirst();
+                        .blockingGet();
                 if (translation.code == OK_CODE) {
                     return TranslateMapper.map(query, translation);
                 } else {
@@ -56,14 +57,16 @@ public class TranslationRepositoryImpl implements TranslationRepository {
     }
 
     @Override public Observable<LanguageMap> getLanguages(Locale locale) {
-        return Observable.create(emitter ->
-                translateApi
-                .getLanguages(BuildConfig.TRANSLATE_API_KEY, locale.getLanguage())
-                .subscribe(languages ->
-                                emitter.onNext(LanguageMapper.map(languages, locale))
-                        , throwable ->
-                                emitter.onError(throwable))
-        );
+        return Observable.fromCallable(() -> {
+           try{
+               Languages languages = translateApi
+                       .getLanguages(BuildConfig.TRANSLATE_API_KEY, locale.getLanguage())
+                       .blockingGet();
+               return LanguageMapper.map(languages, locale);
+           }catch (Throwable throwable){
+               throw new  ConnectionException(throwable);
+           }
+        });
     }
 
 }

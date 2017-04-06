@@ -91,6 +91,10 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
 
     private void initDictionary() {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.getItemAnimator().setChangeDuration(0);
+        recyclerView.getItemAnimator().setAddDuration(0);
+        recyclerView.getItemAnimator().setRemoveDuration(0);
+        recyclerView.getItemAnimator().setMoveDuration(0);
     }
 
     private void initHeaderView(){

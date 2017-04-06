@@ -48,6 +48,7 @@ public class HistoryPresenter {
     private CompositeDisposable disposable;
     private int titleId;
     private List<Word> words;
+    private boolean lookAtChanges = true;
 
     @Inject
     public HistoryPresenter() {
@@ -95,6 +96,7 @@ public class HistoryPresenter {
     }
 
     public void onFavButtonClick(int index) {
+        lookAtChanges = false;
         Word word = words.get(index);
         if(word.isFavourite()){
             word = word.toBuilder()
@@ -123,8 +125,9 @@ public class HistoryPresenter {
         this.router = router;
     }
 
-    public void onShow() {
+    public void show() {
         loadWordList();
+        lookAtChanges = true;
     }
 
     private void loadWordList(){
@@ -151,7 +154,9 @@ public class HistoryPresenter {
     private class OnChangeObserver extends DisposableObserver<Integer> {
 
         @Override public void onNext(Integer integer) {
-            loadWordList();
+            if(lookAtChanges){
+                loadWordList();
+            }
         }
 
         @Override public void onError(Throwable e) {

@@ -8,6 +8,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SimpleItemAnimator;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -69,7 +70,7 @@ public class HistoryFragment extends Fragment implements WordListView {
 
     @Override public void onHiddenChanged(boolean hidden) {
         if(!hidden){
-            presenter.onShow();
+            presenter.show();
         }
     }
 
@@ -84,12 +85,14 @@ public class HistoryFragment extends Fragment implements WordListView {
                 layoutManager.getOrientation());
         recyclerView.addItemDecoration(dividerItemDecoration);
         recyclerView.setLayoutManager(layoutManager);
-        deleteButton.setOnClickListener(v -> {
-            presenter.deleteAll();
-        });
+        deleteButton.setOnClickListener(v -> presenter.deleteAll());
         colorFavourite = ContextCompat.getColor(getContext(), R.color.colorPrimary);
         colorNotFavourite = ContextCompat.getColor(getContext(), R.color.grey);
+        ((SimpleItemAnimator) recyclerView.getItemAnimator()).setSupportsChangeAnimations(false);
         recyclerView.getItemAnimator().setChangeDuration(0);
+        recyclerView.getItemAnimator().setAddDuration(0);
+        recyclerView.getItemAnimator().setRemoveDuration(0);
+        recyclerView.getItemAnimator().setMoveDuration(0);
     }
 
     @Override public void showList(List<Word> wordList) {
@@ -107,13 +110,10 @@ public class HistoryFragment extends Fragment implements WordListView {
 
     @Override public void switchOffFavButtonAt(int index) {
         ((WordListAdapter.WordHolder)recyclerView.getChildViewHolder(recyclerView.getChildAt(index))).switchOffFavButton();
-        //adapter.setIsItemFavourite(index, false);
-
     }
 
     @Override public void switchOnFavButtonAt(int index) {
         ((WordListAdapter.WordHolder)recyclerView.getChildViewHolder(recyclerView.getChildAt(index))).switchOnFavButton();
-       // adapter.setIsItemFavourite(index, true);
     }
 
     public static Fragment getHistoryFragment(){

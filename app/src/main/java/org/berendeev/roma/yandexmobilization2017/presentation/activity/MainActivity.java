@@ -10,7 +10,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
 import org.berendeev.roma.yandexmobilization2017.R;
-import org.berendeev.roma.yandexmobilization2017.domain.entity.Word;
 import org.berendeev.roma.yandexmobilization2017.presentation.Utils;
 import org.berendeev.roma.yandexmobilization2017.presentation.fragment.HistoryFragment;
 import org.berendeev.roma.yandexmobilization2017.presentation.fragment.TranslatorFragment;
@@ -19,8 +18,16 @@ import org.berendeev.roma.yandexmobilization2017.presentation.view.WordListView;
 public class MainActivity extends AppCompatActivity implements WordListView.Router{
 
     public static final String TRANSLATOR = "translator";
+    public static final String FAVOURITES = "favourite";
     public static final String HISTORY = "history";
-    public static final String FAVOURITE = "favourite";
+
+    public static final int TRANSLATOR_ID = 1;
+    public static final int FAVOURITES_ID = 2;
+    public static final int HISTORY_ID = 3;
+
+    private FragmentManager fragmentManager;
+    private FragmentTransaction transaction;
+    private BottomNavigationView navigation;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -32,24 +39,21 @@ public class MainActivity extends AppCompatActivity implements WordListView.Rout
 
             switch (item.getItemId()) {
                 case R.id.translator:
-                    showFragment(TRANSLATOR, from, 1);
+                    showFragment(TRANSLATOR, from, TRANSLATOR_ID);
                     return true;
                 case R.id.favourite:
                     hideKeyboard();
-                    showFragment(FAVOURITE, from, 2);
+                    showFragment(FAVOURITES, from, FAVOURITES_ID);
                     return true;
                 case R.id.history:
                     hideKeyboard();
-                    showFragment(HISTORY, from, 3);
+                    showFragment(HISTORY, from, HISTORY_ID);
                     return true;
             }
             return false;
         }
 
     };
-    private FragmentManager fragmentManager;
-    private FragmentTransaction transaction;
-    private BottomNavigationView navigation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,7 +80,7 @@ public class MainActivity extends AppCompatActivity implements WordListView.Rout
         }
         beginTransaction();
         setAnimation(from, to);
-        hidePreviousFragment();
+        hidePreviousFragment(from);
         showEnterFragment(tag);
         commitTransaction();
     }
@@ -113,7 +117,7 @@ public class MainActivity extends AppCompatActivity implements WordListView.Rout
                 return new TranslatorFragment();
             case HISTORY:
                 return HistoryFragment.getHistoryFragment();
-            case FAVOURITE:
+            case FAVOURITES:
                 return HistoryFragment.getFavouriteFragment();
             default:
                 throw new IllegalArgumentException();
@@ -127,10 +131,21 @@ public class MainActivity extends AppCompatActivity implements WordListView.Rout
         }
     }
 
-    private void hidePreviousFragment(){
-        hideFragment(transaction, HISTORY);
-        hideFragment(transaction, TRANSLATOR);
-        hideFragment(transaction, FAVOURITE);
+    private void hidePreviousFragment(int from){
+        hideFragment(transaction, getFragmentTag(from));
+    }
+
+    private String getFragmentTag(int id){
+        switch (id){
+            case TRANSLATOR_ID:
+                return TRANSLATOR;
+            case FAVOURITES_ID:
+                return FAVOURITES;
+            case HISTORY_ID:
+                return HISTORY;
+            default:
+                return TRANSLATOR;
+        }
     }
 
     private void hideKeyboard() {

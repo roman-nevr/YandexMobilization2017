@@ -1,12 +1,14 @@
 package org.berendeev.roma.yandexmobilization2017.data;
 
 import org.berendeev.roma.yandexmobilization2017.BuildConfig;
+import org.berendeev.roma.yandexmobilization2017.data.entity.HttpDictionary;
 import org.berendeev.roma.yandexmobilization2017.data.http.DictionaryApi;
 import org.berendeev.roma.yandexmobilization2017.data.mapper.DictionaryMapper;
 import org.berendeev.roma.yandexmobilization2017.domain.DictionaryRepository;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.Dictionary;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.TranslationQuery;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.Word;
+import org.berendeev.roma.yandexmobilization2017.domain.exception.ConnectionException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,9 +39,16 @@ public class DictionaryRepositoryImpl implements DictionaryRepository {
                 BuildConfig.DICTIONARY_API_KEY, query.text(), query.langFrom() + "-" + query.langTo(),
                 getUiLanguage());
 
-        return dictionaryApi
-                .lookup(url)
-                .map(httpDictionary -> DictionaryMapper.map(httpDictionary));
+        return Observable.fromCallable(() -> {
+            try {
+                HttpDictionary httpDictionary = dictionaryApi
+                        .lookup(url)
+                        .blockingGet();
+                return DictionaryMapper.map(httpDictionary);
+            }catch (Throwable throwable){
+                throw new ConnectionException(throwable);
+            }
+        });
     }
 
     private String getUiLanguage() {

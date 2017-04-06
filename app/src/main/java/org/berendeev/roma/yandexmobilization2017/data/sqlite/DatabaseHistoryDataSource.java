@@ -8,6 +8,7 @@ import android.util.Pair;
 
 import org.berendeev.roma.yandexmobilization2017.R;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.Word;
+import org.berendeev.roma.yandexmobilization2017.domain.exception.HistoryException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -176,18 +177,19 @@ public class DatabaseHistoryDataSource implements HistoryDataSource {
     }
 
     private Observable<List<Word>> getFromSelection(String selection) {
-        return Observable.create(emitter -> {
-            List<Word> words = new ArrayList<>();
-            String[] selectionArgs = {TRUE};
-            String orderBy = DatabaseOpenHelper.ADD_DATE + " DESC";
-            Cursor cursor = database.query(true, WORDS_TABLE, null, selection, selectionArgs, null, null, orderBy, null);
-            while (cursor.moveToNext()) {
-                words.add(getWordFromCursor(cursor));
-            }
-            cursor.close();
-            if (!emitter.isDisposed()) {
-                emitter.onNext(words);
-                emitter.onComplete();
+        return Observable.fromCallable(() -> {
+            try {
+                List<Word> words = new ArrayList<>();
+                String[] selectionArgs = {TRUE};
+                String orderBy = DatabaseOpenHelper.ADD_DATE + " DESC";
+                Cursor cursor = database.query(true, WORDS_TABLE, null, selection, selectionArgs, null, null, orderBy, null);
+                while (cursor.moveToNext()) {
+                    words.add(getWordFromCursor(cursor));
+                }
+                cursor.close();
+                return words;
+            }catch (Throwable throwable){
+                throw new HistoryException(throwable);
             }
         });
     }
