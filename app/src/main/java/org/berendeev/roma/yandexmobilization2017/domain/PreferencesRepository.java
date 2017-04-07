@@ -11,7 +11,7 @@ import io.reactivex.Single;
 public interface PreferencesRepository {
     Completable saveLastWord(Word word);
 
-    Single<Word> getLastWord();
+    Observable<Word> getLastWord();
 
     Observable<Pair<String, String>> getTranslateDirection();
 

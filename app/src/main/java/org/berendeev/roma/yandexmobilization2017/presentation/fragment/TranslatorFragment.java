@@ -1,11 +1,8 @@
 package org.berendeev.roma.yandexmobilization2017.presentation.fragment;
 
-import android.content.Context;
-import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
@@ -13,14 +10,11 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.text.method.KeyListener;
-import android.util.DisplayMetrics;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -44,6 +38,7 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.Observable;
+import okhttp3.Response;
 
 import static android.view.KeyEvent.KEYCODE_BACK;
 import static android.view.inputmethod.EditorInfo.IME_ACTION_DONE;
@@ -143,23 +138,20 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
         presenter.start();
     }
 
-    @Override public void onPause() {
-        super.onPause();
-        presenter.pause();
-    }
-
     @Override public void onStop() {
         super.onStop();
         presenter.stop();
     }
 
     @Override public void setPreviousWord(Word word) {
-        setText(word.word());
+        setTextToTranslate(word.word());
         setTranslation(word);
     }
 
     @Override public void setTranslation(Word word) {
-        translation.setText(word.translation());
+        if(!word.translation().equals(translation.getText().toString())){
+            translation.setText(word.translation());
+        }
         setFavouritesLabel(word.isFavourite());
         hideConnectionError();
     }
@@ -173,14 +165,33 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
         favButton.setColorFilter(isFavourite ? colorFavourite : colorNotFavourite);
     }
 
-    private void setText(String text){
-        wordToTranslate.setText(text);
-        wordToTranslate.setSelection(text.length());
+    private void setTextToTranslate(String text){
+        if(!text.equals(wordToTranslate.getText().toString())){
+            wordToTranslate.setText(text);
+            wordToTranslate.setSelection(text.length());
+        }
+
     }
 
     @Override public Observable<String> getTextObservable() {
-        return RxTextView.textChanges(wordToTranslate)
-                .map(charSequence -> charSequence.toString());
+//        return RxTextView.textChanges(wordToTranslate)
+//                .map(charSequence -> charSequence.toString());
+        return Observable.create(emitter -> {
+            wordToTranslate.addTextChangedListener(new TextWatcher() {
+                @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                }
+
+                @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    if(wordToTranslate.hasFocus()){
+                        emitter.onNext(s.toString());
+                    }
+                }
+
+                @Override public void afterTextChanged(Editable s) {
+                }
+            });
+        });
     }
 
     private void initEditorActionListener(){
@@ -188,6 +199,7 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
             @Override public void onKeyPreIme(int keyCode, KeyEvent event) {
                 if(keyCode == KEYCODE_BACK){
                     presenter.onInputDone();
+                    wordToTranslate.clearFocus();
                 }
             }
         });
@@ -195,6 +207,7 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
             if(actionId == IME_ACTION_DONE){
                 hideKeyboard();
                 presenter.onInputDone();
+                wordToTranslate.clearFocus();
             }
             return false;
         });
@@ -247,13 +260,6 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
         LanguageSelectorActivity.start(this.getActivity(), R.id.language_to_type);
     }
 
-    @Override public void onHiddenChanged(boolean hidden) {
-        if(!hidden){
-            presenter.onShow();
-        }else {
-            presenter.onInputDone();
-        }
-    }
 
     private void hideKeyboard() {
         Utils.hideKeyboard(getContext(), wordToTranslate);

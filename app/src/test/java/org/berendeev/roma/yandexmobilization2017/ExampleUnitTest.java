@@ -69,4 +69,17 @@ public class ExampleUnitTest {
 
         }
     }
+
+    @Test
+    public void compositeTest(){
+        CompositeDisposable disposable = new CompositeDisposable();
+        for(int i = 0; i < 1000; i++){
+            Observable<Integer> observable = Observable.just(1, 2);
+            disposable.add(observable.subscribe(integer -> {
+                System.out.println(integer);
+            }));
+        }
+        int a = 0;
+    }
+
 }

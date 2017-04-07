@@ -172,15 +172,22 @@ public class DatabaseHistoryDataSource implements HistoryDataSource {
         String selection = String.format("%1s = ? AND %2s = ? AND %3s = ?", WORD, LANGUAGE_FROM, LANGUAGE_TO);
         String[] selectionArgs = {query.text(), query.langFrom(), query.langTo()};
         Word word;
+        Cursor cursor = null;
         try {
-            Cursor cursor = database.query(WORDS_TABLE, null, selection, selectionArgs, null, null, null, null);
-            cursor.moveToFirst();
-            word = getWordFromCursor(cursor);
+            cursor = database.query(WORDS_TABLE, null, selection, selectionArgs, null, null, null, null);
+            if(cursor.moveToFirst()){
+                word = getWordFromCursor(cursor);
+            }else {
+                word = Word.EMPTY;
+            }
             cursor.close();
         }catch (Exception e){
+            if (cursor != null){
+                cursor.close();
+            }
             word = Word.EMPTY;
             Timber.d("SQL Exception " + e);
-            Timber.d(e);
+            Timber.d("may be text not found");
         }
         return word;
     }

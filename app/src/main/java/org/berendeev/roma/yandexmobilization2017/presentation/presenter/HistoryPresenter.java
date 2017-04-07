@@ -47,26 +47,24 @@ public class HistoryPresenter {
     private CompositeDisposable disposable;
     private int titleId;
     private List<Word> words;
-    private boolean lookAtChanges = true;
 
     @Inject
     public HistoryPresenter() {
         disposable = new CompositeDisposable();
     }
 
-    public void start(){
+    public void start() {
         loadWordList();
         setTitle();
         subscribeOnChanges();
     }
 
     private void subscribeOnChanges() {
-        changesInteractor.execute(new OnChangeObserver(), null);
+        disposable.add(changesInteractor.execute(new OnChangeObserver(), null));
     }
 
-    public void stop(){
+    public void stop() {
         disposable.clear();
-        changesInteractor.dispose();
         view = DummyView.DUMMY_VIEW;
         router = null;
     }
@@ -77,13 +75,13 @@ public class HistoryPresenter {
 
     public void setType(int type) {
         this.type = type;
-        if(type == R.id.favourites_type){
+        if (type == R.id.favourites_type) {
             getInteractor = getFavouritesInteractor;
             deleteAllInteractor = removeAllFromFavouritesInteractor;
             titleId = R.string.title_favourite;
             changesInteractor = onFavouritesChangedInteractor;
         }
-        if (type == R.id.history_type){
+        if (type == R.id.history_type) {
             getInteractor = getHistoryInteractor;
             deleteAllInteractor = removeAllFromHistoryInteractor;
             changesInteractor = onHistoryChangedInteractor;
@@ -96,15 +94,15 @@ public class HistoryPresenter {
     }
 
     public void onFavButtonClick(int index) {
-        lookAtChanges = false;
+        disposable.clear();
         Word word = words.get(index);
-        if(word.isFavourite()){
+        if (word.isFavourite()) {
             word = word.toBuilder()
                     .isFavourite(false)
                     .build();
             view.switchOffFavButtonAt(index);
             removeFromFavouritesInteractor.execute(null, word);
-        }else {
+        } else {
             word = word.toBuilder()
                     .isFavourite(true)
                     .build();
@@ -125,12 +123,16 @@ public class HistoryPresenter {
         this.router = router;
     }
 
-    public void show() {
+    public void onShow() {
         loadWordList();
-        lookAtChanges = true;
+        subscribeOnChanges();
     }
 
-    private void loadWordList(){
+    public void onHide() {
+        disposable.clear();
+    }
+
+    private void loadWordList() {
         getInteractor.execute(new WordsObserver(), null);
     }
 
@@ -138,7 +140,7 @@ public class HistoryPresenter {
         view.setTitleById(titleId);
     }
 
-    private class WordsObserver extends DisposableObserver<List<Word>>{
+    private class WordsObserver extends DisposableObserver<List<Word>> {
         @Override public void onNext(List<Word> words) {
             view.showList(words);
             HistoryPresenter.this.words = words;
@@ -154,9 +156,7 @@ public class HistoryPresenter {
     private class OnChangeObserver extends DisposableObserver<Integer> {
 
         @Override public void onNext(Integer integer) {
-            if(lookAtChanges){
-                loadWordList();
-            }
+            loadWordList();
         }
 
         @Override public void onError(Throwable e) {

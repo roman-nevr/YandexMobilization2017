@@ -21,16 +21,18 @@ import io.reactivex.subjects.BehaviorSubject;
 
 public class PreferencesRepositoryImpl implements PreferencesRepository {
 
-    public static final String WORD = "word";
-    public static final String TEXT = "text";
-    public static final String DIRECTIONS = "dirs";
-    public static final String TRANSLATION = "translation";
-    public static final String DIRECTION_TO = "to";
-    public static final String DIRECTION_FROM = "from";
+    private static final String WORD = "word";
+    private static final String TEXT = "text";
+    private static final String DIRECTIONS = "dirs";
+    private static final String TRANSLATION = "translation";
+    private static final String IS_FAVOURITE = "is_favourite";
+    private static final String DIRECTION_TO = "to";
+    private static final String DIRECTION_FROM = "from";
 
     Context context;
     private final SharedPreferences wordPreferences, dirsPreferences;
     private BehaviorSubject<Pair<String, String>> directionsSubject;//FROM - TO
+    private BehaviorSubject<Word> lastWordSubject;
 
     @Inject
     public PreferencesRepositoryImpl(Context context) {
@@ -38,31 +40,28 @@ public class PreferencesRepositoryImpl implements PreferencesRepository {
         this.wordPreferences = context.getSharedPreferences(WORD, Context.MODE_PRIVATE);
         this.dirsPreferences = context.getSharedPreferences(DIRECTIONS, Context.MODE_PRIVATE);
         initDirections();
+        initLastWord();
     }
 
     @Override public Completable saveLastWord(Word word) {
         return Completable.fromAction(() -> {
+            lastWordSubject.onNext(word);
             wordPreferences.edit()
                     .putString(TEXT, word.word())
                     .putString(TRANSLATION, word.translation())
-                    .commit();
+                    .putBoolean(IS_FAVOURITE, word.isFavourite())
+                    .apply();
         });
     }
 
-    @Override public Single<Word> getLastWord() {
-        return Single.just(Word.builder()
-                .word(wordPreferences.getString(TEXT, ""))
-                .translation(wordPreferences.getString(TRANSLATION, ""))
-                .languageFrom(dirsPreferences.getString(DIRECTION_FROM, ""))
-                .languageTo(dirsPreferences.getString(DIRECTION_TO, ""))
-                .isFavourite(false)
-                .build());
+    @Override public Observable<Word> getLastWord() {
+        return lastWordSubject;
+
     }
 
     @Override public Observable<Pair<String, String>> getTranslateDirection() {
         return directionsSubject;
     }
-
 
     @Override public Completable setDirectionTo(String to) {
         return Completable.fromAction(() -> {
@@ -75,6 +74,7 @@ public class PreferencesRepositoryImpl implements PreferencesRepository {
             changeDirections(from, to);
         });
     }
+
 
     @Override public Completable setDirectionFrom(String from) {
         return Completable.fromAction(() -> {
@@ -105,7 +105,7 @@ public class PreferencesRepositoryImpl implements PreferencesRepository {
     private void saveDirection(String direction, String value){
         dirsPreferences.edit()
                 .putString(direction, value)
-                .commit();
+                .apply();
     }
 
     private String getFrom(){
@@ -119,7 +119,7 @@ public class PreferencesRepositoryImpl implements PreferencesRepository {
     private void initDirections(){
         directionsSubject = BehaviorSubject.create();
         String directionTo = dirsPreferences.getString(DIRECTION_TO, Locale.getDefault().getLanguage());
-        String defaultDirectionFrom = null;
+        String defaultDirectionFrom;
         if(Locale.getDefault().getLanguage().equals("en")){
             defaultDirectionFrom = "ru";
         }else {
@@ -127,5 +127,17 @@ public class PreferencesRepositoryImpl implements PreferencesRepository {
         }
         String directionFrom = dirsPreferences.getString(DIRECTION_FROM, defaultDirectionFrom);
         directionsSubject.onNext(new Pair<>(directionFrom, directionTo));
+    }
+
+    private void initLastWord() {
+        Word word = Word.builder()
+                .word(wordPreferences.getString(TEXT, ""))
+                .translation(wordPreferences.getString(TRANSLATION, ""))
+                .languageFrom(dirsPreferences.getString(DIRECTION_FROM, ""))
+                .languageTo(dirsPreferences.getString(DIRECTION_TO, ""))
+                .isFavourite(wordPreferences.getBoolean(IS_FAVOURITE, false))
+                .build();
+        lastWordSubject = BehaviorSubject.createDefault(word);
+
     }
 }

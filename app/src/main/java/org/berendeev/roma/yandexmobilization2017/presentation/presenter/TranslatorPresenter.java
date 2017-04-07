@@ -10,8 +10,8 @@ import org.berendeev.roma.yandexmobilization2017.domain.interactor.GetDictionary
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.GetLastWordInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.GetTranslateDirectionInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.RemoveFromFavouritesInteractor;
-import org.berendeev.roma.yandexmobilization2017.domain.interactor.SaveInFavouriteInteractor;
-import org.berendeev.roma.yandexmobilization2017.domain.interactor.SaveInHistoryInteractor;
+import org.berendeev.roma.yandexmobilization2017.domain.interactor.ToggleIsFavouriteInLastWordInteractor;
+import org.berendeev.roma.yandexmobilization2017.domain.interactor.SaveLastWordInHistoryInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.SaveLastWordInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.SwapDirectionsInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.TranslateTextInteractor;
@@ -25,6 +25,7 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableObserver;
 import timber.log.Timber;
 
@@ -38,9 +39,9 @@ public class TranslatorPresenter {
     @Inject TranslateTextInteractor translateTextInteractor;
     @Inject SaveLastWordInteractor saveLastWordInteractor;
     @Inject GetLastWordInteractor getLastWordInteractor;
-    @Inject SaveInFavouriteInteractor saveInFavouriteInteractor;
+    @Inject ToggleIsFavouriteInLastWordInteractor toggleIsFavouriteInLastWordInteractor;
     @Inject RemoveFromFavouritesInteractor removeFromFavouritesInteractor;
-    @Inject SaveInHistoryInteractor saveInHistoryInteractor;
+    @Inject SaveLastWordInHistoryInteractor saveLastWordInHistoryInteractor;
     @Inject GetDictionaryInteractor getDictionaryInteractor;
     private Router router;
     private final CompositeDisposable disposable;
@@ -53,46 +54,41 @@ public class TranslatorPresenter {
     }
 
     public void init() {
-        showLastWord();
     }
 
     public void start() {
-        getTranslateDirectionInteractor.execute(new DirectionsObserver(), Locale.getDefault());
-        disposable.add(view.getTextObservable()
-                .debounce(500, TimeUnit.MILLISECONDS)
-                .subscribe(text -> {
-                    getDictionaryInteractor.execute(new DictionaryObserver(), buildQuery(text));
-                    translateTextInteractor.execute(new TranslationObserver(), buildQuery(text));
-                    lastWord = lastWord.toBuilder()
-                            .word(text)
-                            .translation("")
-                            .build();
-                    saveLastWordInteractor.execute(null, lastWord);
-                }));
+        subscribeOnTranslateDirections();
+        subscribeOnLastWord();
+        subscribeOnTextInput();
     }
 
     public void stop() {
         disposable.clear();
-        getDictionaryInteractor.dispose();
-        translateTextInteractor.dispose();
         view = DummyView.DUMMY_VIEW;   //даже если какой-то запрос зависнет и ответ придет после остановки активити, то ничего не упадет
         router = null;
     }
 
-    private void saveLastWord() {
-        saveLastWordInteractor.execute(null, lastWord);
+
+    private void subscribeOnTextInput() {
+        disposable.add(view.getTextObservable()
+                .debounce(500, TimeUnit.MILLISECONDS)
+                .subscribe(text -> {
+                    disposable.add(getDictionaryInteractor.execute(new DictionaryObserver(), buildQuery(text)));
+                    disposable.add(translateTextInteractor.execute(new TranslationObserver(), buildQuery(text)));
+                }));
+    }
+
+    private void subscribeOnTranslateDirections() {
+        Disposable disposable = getTranslateDirectionInteractor.execute(new DirectionsObserver(), Locale.getDefault());
+        this.disposable.add(disposable);
+    }
+
+    private void subscribeOnLastWord() {
+        disposable.add(getLastWordInteractor.execute(new LastWordObserver(), null));
     }
 
     private void saveLastWordInHistory() {
-        saveInHistoryInteractor.execute(null, lastWord);
-    }
-
-    private void translateAndSaveLastWord() {
-        translateTextInteractor.execute(new InputDoneObserver(), buildQuery(lastWord.word()));
-    }
-
-    private void showLastWord() {
-        getLastWordInteractor.execute(new LastWordObserver(), null);
+        saveLastWordInHistoryInteractor.execute(null, null);
     }
 
     public void setView(TranslatorView view) {
@@ -112,35 +108,20 @@ public class TranslatorPresenter {
     }
 
     public void onSwapButtonClick() {
-        swapDirectionsInteractor.execute(new SwapDirectionsObserver(), null);
+        swapDirectionsInteractor.execute(null, null);
     }
 
     public void onFavButtonClick() {
         if (lastWord.isFavourite()) {
-            lastWord = lastWord.toBuilder()
-                    .isFavourite(false)
-                    .build();
             view.switchOffFavButton();
-            removeFromFavouritesInteractor.execute(null, lastWord);
         } else {
-            lastWord = lastWord.toBuilder()
-                    .isFavourite(true)
-                    .build();
             view.switchOnFavButton();
-            saveInFavouriteInteractor.execute(null, lastWord);
         }
-    }
-
-    public void onShow() {
-        showLastWord();
+        toggleIsFavouriteInLastWordInteractor.execute(null, null);
     }
 
     public void onInputDone() {
-        translateAndSaveLastWord();
-    }
-
-    public void pause() {
-        saveLastWord();
+        saveLastWordInHistory();
     }
 
     public void onRepeat() {
@@ -220,23 +201,6 @@ public class TranslatorPresenter {
         return TranslationQuery.create(text, langFrom, langTo);
     }
 
-    private class InputDoneObserver extends DisposableObserver<Word> {
-
-        @Override public void onNext(Word word) {
-            setImages(word.word());
-            view.setTranslation(word);
-            lastWord = word;
-            saveLastWordInHistory();
-        }
-
-        @Override public void onError(Throwable e) {
-        }
-
-        @Override public void onComplete() {
-            dispose();
-        }
-    }
-
     private class SwapDirectionsObserver extends DisposableObserver<Void> {
 
         @Override public void onNext(Void aVoid) {
@@ -247,12 +211,12 @@ public class TranslatorPresenter {
         }
 
         @Override public void onComplete() {
-            setImages(lastWord.word());
-            view.setPreviousWord(lastWord.toBuilder()
-                    .word(lastWord.translation())
-                    .translation(lastWord.word())
-                    .build());
-            dispose();
+//            setImages(lastWord.word());
+//            view.setPreviousWord(lastWord.toBuilder()
+//                    .word(lastWord.translation())
+//                    .translation(lastWord.word())
+//                    .build());
+//            dispose();
         }
     }
 

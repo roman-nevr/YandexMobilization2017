@@ -70,7 +70,9 @@ public class HistoryFragment extends Fragment implements WordListView {
 
     @Override public void onHiddenChanged(boolean hidden) {
         if(!hidden){
-            presenter.show();
+            presenter.onShow();
+        }else {
+            presenter.onHide();
         }
     }
 

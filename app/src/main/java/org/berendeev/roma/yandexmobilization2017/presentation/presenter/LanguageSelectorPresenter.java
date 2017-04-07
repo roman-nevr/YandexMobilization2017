@@ -37,14 +37,13 @@ public class LanguageSelectorPresenter {
     }
 
     public void start(){
-        getLanguagesInteractor.execute(new LanguageObserver(), Locale.getDefault());
+        disposable.add(getLanguagesInteractor.execute(new LanguageObserver(), Locale.getDefault()));
         view.setTitleById(titleId);
     }
 
     public void stop(){
         disposable.clear();
         view = DUMMY_VIEW;
-        getLanguagesInteractor.dispose();
     }
 
     public void onLanguageSelected(String key) {

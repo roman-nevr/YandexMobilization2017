@@ -8,19 +8,20 @@ import javax.inject.Inject;
 
 import io.reactivex.Observable;
 
-public class SaveInHistoryInteractor extends Interactor<Void, Word> {
+public class SaveLastWordInHistoryInteractor extends Interactor<Void, Void> {
 
     @Inject HistoryAndFavouritesRepository historyAndFavouritesRepository;
     @Inject PreferencesRepository preferencesRepository;
 
     @Inject
-    public SaveInHistoryInteractor() {}
+    public SaveLastWordInHistoryInteractor() {}
 
-    @Override public Observable<Void> buildObservable(Word param) {
-        return historyAndFavouritesRepository
-                .saveInHistory(param)
-                .mergeWith(preferencesRepository
-                        .saveLastWord(param))
-                .toObservable();
+    @Override public Observable<Void> buildObservable(Void param) {
+        return preferencesRepository
+                .getLastWord()
+                .flatMap(word ->
+                    historyAndFavouritesRepository
+                            .saveInHistory(word)
+                            .toObservable());
     }
 }
