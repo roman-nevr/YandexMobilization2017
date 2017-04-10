@@ -77,7 +77,6 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
         initEditorActionListener();
         initDictionary();
         initErrorUi();
-        presenter.init();
     }
 
     private void initEditor() {
@@ -174,24 +173,24 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
     }
 
     @Override public Observable<String> getTextObservable() {
-//        return RxTextView.textChanges(wordToTranslate)
-//                .map(charSequence -> charSequence.toString());
-        return Observable.create(emitter -> {
-            wordToTranslate.addTextChangedListener(new TextWatcher() {
-                @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-                }
-
-                @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
-                    if(wordToTranslate.hasFocus()){
-                        emitter.onNext(s.toString());
-                    }
-                }
-
-                @Override public void afterTextChanged(Editable s) {
-                }
-            });
-        });
+        return RxTextView.textChanges(wordToTranslate)
+                .map(charSequence -> charSequence.toString());
+//        return Observable.create(emitter -> {
+//            wordToTranslate.addTextChangedListener(new TextWatcher() {
+//                @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+//
+//                }
+//
+//                @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+//                    if(wordToTranslate.hasFocus()){
+//                        emitter.onNext(s.toString());
+//                    }
+//                }
+//
+//                @Override public void afterTextChanged(Editable s) {
+//                }
+//            });
+//        });
     }
 
     private void initEditorActionListener(){
@@ -260,6 +259,11 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
         LanguageSelectorActivity.start(this.getActivity(), R.id.language_to_type);
     }
 
+    @Override public void onHiddenChanged(boolean hidden) {
+        if(!hidden){
+            presenter.onShow();
+        }
+    }
 
     private void hideKeyboard() {
         Utils.hideKeyboard(getContext(), wordToTranslate);

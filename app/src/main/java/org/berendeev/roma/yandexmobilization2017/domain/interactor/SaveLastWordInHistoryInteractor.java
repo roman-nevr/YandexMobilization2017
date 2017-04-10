@@ -19,9 +19,9 @@ public class SaveLastWordInHistoryInteractor extends Interactor<Void, Void> {
     @Override public Observable<Void> buildObservable(Void param) {
         return preferencesRepository
                 .getLastWord()
-                .flatMap(word ->
-                    historyAndFavouritesRepository
-                            .saveInHistory(word)
-                            .toObservable());
+                .firstElement()
+                .flatMapCompletable(word -> historyAndFavouritesRepository
+                        .saveInHistory(word))
+                .toObservable();
     }
 }

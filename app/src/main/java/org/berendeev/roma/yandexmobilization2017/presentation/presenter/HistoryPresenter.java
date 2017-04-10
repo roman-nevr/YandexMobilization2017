@@ -14,6 +14,7 @@ import org.berendeev.roma.yandexmobilization2017.domain.interactor.SaveInFavouri
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.SaveLastWordInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.SetDirectionFromInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.SetDirectionToInteractor;
+import org.berendeev.roma.yandexmobilization2017.domain.interactor.SetWordInTranslatorInteractor;
 import org.berendeev.roma.yandexmobilization2017.presentation.view.DummyView;
 import org.berendeev.roma.yandexmobilization2017.presentation.view.WordListView;
 
@@ -37,6 +38,7 @@ public class HistoryPresenter {
     @Inject SetDirectionFromInteractor setDirectionFromInteractor;
     @Inject OnHistoryChangedInteractor onHistoryChangedInteractor;
     @Inject OnFavouritesChangedInteractor onFavouritesChangedInteractor;
+    @Inject SetWordInTranslatorInteractor setWordInTranslatorInteractor;
 
     private int type;
     private Interactor<List<Word>, Void> getInteractor;
@@ -65,7 +67,7 @@ public class HistoryPresenter {
 
     public void stop() {
         disposable.clear();
-        view = DummyView.DUMMY_VIEW;
+        //view = DummyView.DUMMY_VIEW;
         router = null;
     }
 
@@ -113,9 +115,8 @@ public class HistoryPresenter {
     }
 
     public void onItemClick(int adapterPosition) {
-        saveLastWordInteractor.execute(null, words.get(adapterPosition));
-        setDirectionToInteractor.execute(null, words.get(adapterPosition).languageTo());
-        setDirectionFromInteractor.execute(null, words.get(adapterPosition).languageFrom());
+        setWordInTranslatorInteractor.execute(null, words.get(adapterPosition));
+
         router.moveShowWordInTranslator();
     }
 

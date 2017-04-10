@@ -13,8 +13,8 @@ import retrofit2.http.GET;
 import retrofit2.http.Query;
 
 public interface TranslateApi {
-    public final String BASE_URL = "https://translate.yandex.net/api/v1.5/tr.json/";
-    public static final int OK_CODE = 200;
+    String BASE_URL = "https://translate.yandex.net/api/v1.5/tr.json/";
+    int OK_CODE = 200;
 
 
     @GET("translate")

@@ -14,7 +14,7 @@ import io.reactivex.Observable;
 import io.reactivex.Single;
 
 public interface TranslationRepository {
-    Observable<Word> translate(TranslationQuery word);
+    Single<Word> translate(TranslationQuery word);
     Observable<LanguageMap> getLanguages(Locale locale);
 
 

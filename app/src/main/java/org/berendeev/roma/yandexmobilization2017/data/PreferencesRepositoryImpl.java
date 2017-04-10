@@ -25,7 +25,6 @@ public class PreferencesRepositoryImpl implements PreferencesRepository {
     private static final String TEXT = "text";
     private static final String DIRECTIONS = "dirs";
     private static final String TRANSLATION = "translation";
-    private static final String IS_FAVOURITE = "is_favourite";
     private static final String DIRECTION_TO = "to";
     private static final String DIRECTION_FROM = "from";
 
@@ -49,7 +48,6 @@ public class PreferencesRepositoryImpl implements PreferencesRepository {
             wordPreferences.edit()
                     .putString(TEXT, word.word())
                     .putString(TRANSLATION, word.translation())
-                    .putBoolean(IS_FAVOURITE, word.isFavourite())
                     .apply();
         });
     }
@@ -135,7 +133,7 @@ public class PreferencesRepositoryImpl implements PreferencesRepository {
                 .translation(wordPreferences.getString(TRANSLATION, ""))
                 .languageFrom(dirsPreferences.getString(DIRECTION_FROM, ""))
                 .languageTo(dirsPreferences.getString(DIRECTION_TO, ""))
-                .isFavourite(wordPreferences.getBoolean(IS_FAVOURITE, false))
+                .isFavourite(false)
                 .build();
         lastWordSubject = BehaviorSubject.createDefault(word);
 

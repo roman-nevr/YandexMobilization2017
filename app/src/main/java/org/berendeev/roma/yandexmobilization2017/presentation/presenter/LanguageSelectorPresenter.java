@@ -43,7 +43,7 @@ public class LanguageSelectorPresenter {
 
     public void stop(){
         disposable.clear();
-        view = DUMMY_VIEW;
+        //view = DUMMY_VIEW;
     }
 
     public void onLanguageSelected(String key) {

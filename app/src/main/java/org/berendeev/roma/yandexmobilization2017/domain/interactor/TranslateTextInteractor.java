@@ -1,5 +1,7 @@
 package org.berendeev.roma.yandexmobilization2017.domain.interactor;
 
+import android.util.Pair;
+
 import org.berendeev.roma.yandexmobilization2017.domain.HistoryAndFavouritesRepository;
 import org.berendeev.roma.yandexmobilization2017.domain.PreferencesRepository;
 import org.berendeev.roma.yandexmobilization2017.domain.TranslationRepository;
@@ -10,23 +12,49 @@ import javax.inject.Inject;
 
 import io.reactivex.Observable;
 
-public class TranslateTextInteractor extends Interactor<Word, TranslationQuery> {
+public class TranslateTextInteractor extends Interactor<Word, String> {
 
     @Inject TranslationRepository translationRepository;
     @Inject HistoryAndFavouritesRepository historyAndFavouritesRepository;
     @Inject PreferencesRepository preferencesRepository;
 
     @Inject
-    public TranslateTextInteractor() {}
+    public TranslateTextInteractor() {
+    }
 
-    @Override public Observable<Word> buildObservable(TranslationQuery param) {
-        return Observable.concat(
-                historyAndFavouritesRepository
-                        .getWord(param)
-                        .toObservable(),
-                translationRepository
-                        .translate(param)
-        )
+    @Override public Observable<Word> buildObservable(String param) {
+
+//        Pair<String, String> stringStringPair = preferencesRepository
+//                .getTranslateDirection()
+//                .blockingFirst();
+//
+//        TranslationQuery query = TranslationQuery.create(param, stringStringPair.first, stringStringPair.second);
+//
+//        return Observable.concat(
+//                historyAndFavouritesRepository
+//                        .getWord(param)
+//                        .toObservable(),
+//                translationRepository
+//                        .translate(param)
+//                        .toObservable()
+//        )
+//                .firstElement()
+//                .flatMapCompletable(word ->
+//                        preferencesRepository.saveLastWord(word)
+//                ).toObservable();
+//    }
+
+        return preferencesRepository
+                .getTranslateDirection()
+                .map(dirs -> TranslationQuery.create(param, dirs.first, dirs.second))
+                .flatMap(query -> Observable.concat(
+                        historyAndFavouritesRepository
+                                .getWord(query)
+                                .toObservable(),
+                        translationRepository
+                                .translate(query)
+                                .toObservable()
+                ))
                 .firstElement()
                 .flatMapCompletable(word ->
                         preferencesRepository.saveLastWord(word)

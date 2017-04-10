@@ -20,6 +20,7 @@ import org.berendeev.roma.yandexmobilization2017.domain.exception.TranslationExc
 import java.util.Locale;
 
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import timber.log.Timber;
 
 import static org.berendeev.roma.yandexmobilization2017.data.http.TranslateApi.OK_CODE;
@@ -33,11 +34,11 @@ public class TranslationRepositoryImpl implements TranslationRepository {
         this.translateApi = translateApi;
     }
 
-    @Override public Observable<Word> translate(TranslationQuery query) {
+    @Override public Single<Word> translate(TranslationQuery query) {
         if(query.text().equals("")){
-            return Observable.just(Word.create(query.text(), "", query.langFrom(), query.langTo(), false));
+            return Single.just(Word.create(query.text(), "", query.langFrom(), query.langTo(), false));
         }
-        return Observable.fromCallable(() -> {
+        return Single.fromCallable(() -> {
             try {
                 Translation translation = translateApi
                         .translate(BuildConfig.TRANSLATE_API_KEY, query.text(), query.langFrom() + "-" + query.langTo())

@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Locale;
 
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import timber.log.Timber;
 
 
@@ -28,9 +29,9 @@ public class DictionaryRepositoryImpl implements DictionaryRepository {
         this.dictionaryApi = dictionaryApi;
     }
 
-    @Override public Observable<Dictionary> lookup(TranslationQuery query) {
+    @Override public Single<Dictionary> lookup(TranslationQuery query) {
         if (query.text().equals("")) {
-            return Observable.just(Dictionary.builder()
+            return Single.just(Dictionary.builder()
                     .text("")
                     .transcription("")
                     .definitions(new ArrayList<>())
@@ -40,7 +41,7 @@ public class DictionaryRepositoryImpl implements DictionaryRepository {
                 BuildConfig.DICTIONARY_API_KEY, query.text(), query.langFrom() + "-" + query.langTo(),
                 getUiLanguage());
 
-        return Observable.fromCallable(() -> {
+        return Single.fromCallable(() -> {
             try {
                 HttpDictionary httpDictionary = dictionaryApi
                         .lookup(url)

@@ -30,15 +30,15 @@ public class HistoryAndFavouritesRepositoryImpl implements HistoryAndFavouritesR
         return historyDataSource.getFavourites();
     }
 
-    @Override public Observable<Word> checkIfInFavourites(Word word) {
+    @Override public Single<Word> checkIfInFavourites(Word word) {
         if (historyDataSource.checkIfInFavourites(word)) {
-            return Observable
+            return Single
                     .just(word
                             .toBuilder()
                             .isFavourite(true)
                             .build());
         } else {
-            return Observable.just(word
+            return Single.just(word
                     .toBuilder()
                     .isFavourite(false)
                     .build());

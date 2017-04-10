@@ -6,6 +6,7 @@ import org.berendeev.roma.yandexmobilization2017.domain.entity.Word;
 
 import javax.inject.Inject;
 
+import io.reactivex.Maybe;
 import io.reactivex.Observable;
 
 public class SwapDirectionsInteractor extends Interactor<Void, Void> {
@@ -18,46 +19,22 @@ public class SwapDirectionsInteractor extends Interactor<Void, Void> {
     }
 
     @Override public Observable<Void> buildObservable(Void param) {
-//        return preferencesRepository.swapDirections().toObservable();
 
-//        return preferencesRepository
-//                .getLastWord()
-//                .map(word -> swapMap(word))
-//                .flatMap(word -> historyAndFavouritesRepository
-//                        .saveInHistory(word)
-//                        .toObservable())
-//                .flatMap(o -> {
-//                    sw
-//                }
-        Observable<Word> cache = preferencesRepository
-                .swapDirections()
-                .andThen(preferencesRepository
-                        .getLastWord())
-                .map(word -> swapMap(word))
-                .cache();
+        Word word = preferencesRepository.getLastWord().map(word1 -> swapMap(word1)).blockingFirst();
 
         return Observable.merge(
-                cache.flatMap(word ->
-                    historyAndFavouritesRepository
-                            .saveInHistory(word).toObservable()),
-                cache.flatMap(word ->
-                preferencesRepository.saveLastWord(word).toObservable()));
-
-//        return preferencesRepository
-//                .swapDirections()
-//                .andThen(preferencesRepository
-//                        .getLastWord())
-//                .map(word -> swapMap(word))
-//                .flatMap(word -> historyAndFavouritesRepository
-//                        .saveInHistory(word).toObservable());
+                historyAndFavouritesRepository
+                        .saveInHistory(word).toObservable(),
+                preferencesRepository.saveLastWord(word).toObservable(),
+                preferencesRepository.swapDirections().toObservable());
     }
 
     private Word swapMap(Word word) {
         return word.toBuilder()
                 .translation(word.word())
                 .word(word.translation())
-//                .languageTo(word.languageFrom())
-//                .languageFrom(word.languageTo())
+                .languageFrom(word.languageTo())
+                .languageTo(word.languageFrom())
                 .isFavourite(false)
                 .build();
     }

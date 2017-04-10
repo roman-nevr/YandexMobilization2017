@@ -85,9 +85,6 @@ public class WordListAdapter extends RecyclerView.Adapter<WordListAdapter.WordHo
             itemView.setOnClickListener(v -> {
                 presenter.onItemClick(getAdapterPosition());
             });
-
-
-
         }
 
         public void switchOnFavButton() {

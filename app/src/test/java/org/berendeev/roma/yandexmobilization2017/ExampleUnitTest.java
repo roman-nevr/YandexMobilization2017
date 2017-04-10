@@ -1,5 +1,10 @@
 package org.berendeev.roma.yandexmobilization2017;
 
+import android.graphics.Typeface;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
+import android.text.style.StyleSpan;
+
 import org.berendeev.roma.yandexmobilization2017.domain.entity.LanguageMap;
 import org.berendeev.roma.yandexmobilization2017.domain.exception.ConnectionException;
 import org.junit.Test;
@@ -80,6 +85,15 @@ public class ExampleUnitTest {
             }));
         }
         int a = 0;
+    }
+
+    @Test
+    public void span(){
+        SpannableStringBuilder builder = new SpannableStringBuilder();
+        builder.append("text");
+        StyleSpan boldSpan = new StyleSpan( Typeface.BOLD );
+        builder.setSpan(boldSpan, 0, builder.length(), Spannable.SPAN_COMPOSING);
+//        Spannable spannable = new S
     }
 
 }

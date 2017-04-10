@@ -15,7 +15,7 @@ public interface HistoryAndFavouritesRepository {
 
     Observable<List<Word>> getFavourites();
 
-    Observable<Word> checkIfInFavourites(Word word);
+    Single<Word> checkIfInFavourites(Word word);
 
     Completable saveInHistory(Word word);
 
