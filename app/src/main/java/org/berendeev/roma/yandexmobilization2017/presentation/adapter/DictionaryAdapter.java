@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import org.berendeev.roma.yandexmobilization2017.BuildConfig;
 import org.berendeev.roma.yandexmobilization2017.R;
 import org.berendeev.roma.yandexmobilization2017.data.entity.Translation;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.Definition;
@@ -72,6 +73,9 @@ public class DictionaryAdapter extends RecyclerView.Adapter {
             } else {
                 position = position - definition.translations().size() - 1;
             }
+        }
+        if(BuildConfig.DEBUG){
+            throw new IllegalArgumentException("wrong view type");
         }
         return -1;//it can't be
     }

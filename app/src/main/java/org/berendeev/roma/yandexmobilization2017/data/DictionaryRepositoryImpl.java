@@ -23,7 +23,6 @@ import timber.log.Timber;
 public class DictionaryRepositoryImpl implements DictionaryRepository {
 
     private DictionaryApi dictionaryApi;
-    private List<String> uiLangs = new ArrayList<>(Arrays.asList("ru", "uk", "tk"));
 
     public DictionaryRepositoryImpl(DictionaryApi dictionaryApi) {
         this.dictionaryApi = dictionaryApi;
@@ -48,19 +47,13 @@ public class DictionaryRepositoryImpl implements DictionaryRepository {
                         .blockingGet();
                 return DictionaryMapper.map(httpDictionary);
             }catch (Throwable throwable){
-                Timber.d(throwable, "wft");
+                Timber.wtf(throwable, "wft");
                 throw new ConnectionException(throwable);
-//                return null;
             }
         });
     }
 
     private String getUiLanguage() {
-        int index = uiLangs.indexOf(Locale.getDefault().getLanguage());
-        if (index == -1) {
-            return "en";
-        } else {
-            return uiLangs.get(index);
-        }
+        return Locale.getDefault().getLanguage();
     }
 }

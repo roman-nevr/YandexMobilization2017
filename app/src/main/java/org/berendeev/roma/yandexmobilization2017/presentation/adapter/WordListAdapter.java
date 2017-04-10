@@ -59,11 +59,6 @@ public class WordListAdapter extends RecyclerView.Adapter<WordListAdapter.WordHo
         notifyDataSetChanged();
     }
 
-    public void setIsItemFavourite(int position, boolean isFavourite){
-        words.set(position, words.get(position).toBuilder().isFavourite(isFavourite).build());
-        notifyItemChanged(position);
-    }
-
     public class WordHolder extends RecyclerView.ViewHolder{
 
         @BindView(R.id.fav_button) ImageButton favButton;
@@ -82,9 +77,7 @@ public class WordListAdapter extends RecyclerView.Adapter<WordListAdapter.WordHo
                 }
             });
 
-            itemView.setOnClickListener(v -> {
-                presenter.onItemClick(getAdapterPosition());
-            });
+            itemView.setOnClickListener(v -> presenter.onItemClick(getAdapterPosition()));
         }
 
         public void switchOnFavButton() {

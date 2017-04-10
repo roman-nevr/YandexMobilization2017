@@ -13,7 +13,6 @@ import org.berendeev.roma.yandexmobilization2017.domain.interactor.SaveInFavouri
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.SaveLastWordInHistoryInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.SwapDirectionsInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.TranslateTextInteractor;
-import org.berendeev.roma.yandexmobilization2017.presentation.view.DummyView;
 import org.berendeev.roma.yandexmobilization2017.presentation.view.TranslatorView;
 import org.berendeev.roma.yandexmobilization2017.presentation.view.TranslatorView.Router;
 
@@ -58,7 +57,6 @@ public class TranslatorPresenter {
 
     public void stop() {
         disposable.clear();
-        //view = DummyView.DUMMY_VIEW;   //даже если какой-то запрос зависнет и ответ придет после остановки активити, то ничего не упадет
         router = null;
     }
 
@@ -143,7 +141,6 @@ public class TranslatorPresenter {
     }
 
     public void onShow() {
-
     }
 
     private class DirectionsObserver extends DisposableObserver<Pair<TranslateDirection, TranslateDirection>> {

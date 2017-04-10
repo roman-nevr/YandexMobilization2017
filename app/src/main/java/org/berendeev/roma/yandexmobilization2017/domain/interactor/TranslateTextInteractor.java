@@ -23,41 +23,24 @@ public class TranslateTextInteractor extends Interactor<Word, String> {
     }
 
     @Override public Observable<Word> buildObservable(String param) {
-
-//        Pair<String, String> stringStringPair = preferencesRepository
-//                .getTranslateDirection()
-//                .blockingFirst();
-//
-//        TranslationQuery query = TranslationQuery.create(param, stringStringPair.first, stringStringPair.second);
-//
-//        return Observable.concat(
-//                historyAndFavouritesRepository
-//                        .getWord(param)
-//                        .toObservable(),
-//                translationRepository
-//                        .translate(param)
-//                        .toObservable()
-//        )
-//                .firstElement()
-//                .flatMapCompletable(word ->
-//                        preferencesRepository.saveLastWord(word)
-//                ).toObservable();
-//    }
-
         return preferencesRepository
-                .getTranslateDirection()
-                .map(dirs -> TranslationQuery.create(param, dirs.first, dirs.second))
-                .flatMap(query -> Observable.concat(
-                        historyAndFavouritesRepository
-                                .getWord(query)
-                                .toObservable(),
-                        translationRepository
-                                .translate(query)
-                                .toObservable()
-                ))
-                .firstElement()
-                .flatMapCompletable(word ->
-                        preferencesRepository.saveLastWord(word)
-                ).toObservable();
+                .saveLastWord(Word.EMPTY.toBuilder()
+                        .word(param)
+                        .build())
+                .andThen(preferencesRepository
+                        .getTranslateDirection()
+                        .map(dirs -> TranslationQuery.create(param, dirs.first, dirs.second))
+                        .flatMap(query -> Observable.concat(
+                                historyAndFavouritesRepository
+                                        .getWord(query)
+                                        .toObservable(),
+                                translationRepository
+                                        .translate(query)
+                                        .toObservable()
+                        ))
+                        .firstElement()
+                        .flatMapCompletable(word ->
+                                preferencesRepository.saveLastWord(word)
+                        ).toObservable());
     }
 }

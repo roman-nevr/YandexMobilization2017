@@ -67,7 +67,6 @@ public class HistoryPresenter {
 
     public void stop() {
         disposable.clear();
-        //view = DummyView.DUMMY_VIEW;
         router = null;
     }
 

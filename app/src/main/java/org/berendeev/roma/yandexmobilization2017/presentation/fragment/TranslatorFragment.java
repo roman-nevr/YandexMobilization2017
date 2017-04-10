@@ -175,31 +175,13 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
     @Override public Observable<String> getTextObservable() {
         return RxTextView.textChanges(wordToTranslate)
                 .map(charSequence -> charSequence.toString());
-//        return Observable.create(emitter -> {
-//            wordToTranslate.addTextChangedListener(new TextWatcher() {
-//                @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-//
-//                }
-//
-//                @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
-//                    if(wordToTranslate.hasFocus()){
-//                        emitter.onNext(s.toString());
-//                    }
-//                }
-//
-//                @Override public void afterTextChanged(Editable s) {
-//                }
-//            });
-//        });
     }
 
     private void initEditorActionListener(){
-        wordToTranslate.setKeyImeChangeListener(new KeyImeChangeListener() {
-            @Override public void onKeyPreIme(int keyCode, KeyEvent event) {
-                if(keyCode == KEYCODE_BACK){
-                    presenter.onInputDone();
-                    wordToTranslate.clearFocus();
-                }
+        wordToTranslate.setKeyImeChangeListener((keyCode, event) -> {
+            if(keyCode == KEYCODE_BACK){
+                presenter.onInputDone();
+                wordToTranslate.clearFocus();
             }
         });
         wordToTranslate.setOnEditorActionListener((v, actionId, event) -> {
