@@ -11,6 +11,7 @@ import org.berendeev.roma.yandexmobilization2017.domain.interactor.GetTranslateD
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.RemoveFromFavouritesInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.SaveInFavouriteInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.SaveLastWordInHistoryInteractor;
+import org.berendeev.roma.yandexmobilization2017.domain.interactor.SaveLastWordInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.SwapDirectionsInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.TranslateTextInteractor;
 import org.berendeev.roma.yandexmobilization2017.presentation.view.TranslatorView;
@@ -39,6 +40,7 @@ public class TranslatorPresenter {
     @Inject SaveInFavouriteInteractor saveInFavouriteInteractor;
     @Inject SaveLastWordInHistoryInteractor saveLastWordInHistoryInteractor;
     @Inject GetDictionaryInteractor getDictionaryInteractor;
+    @Inject SaveLastWordInteractor saveLastWordInteractor;
     private Router router;
     private final CompositeDisposable disposable;
     private Word lastWord;
@@ -57,6 +59,7 @@ public class TranslatorPresenter {
 
     public void stop() {
         disposable.clear();
+
         router = null;
     }
 
@@ -71,7 +74,6 @@ public class TranslatorPresenter {
         disposable.add(view.getTextObservable()
                 .debounce(500, TimeUnit.MILLISECONDS)
                 .subscribe(text -> {
-                    disposable.add(getDictionaryInteractor.execute(new DictionaryObserver(), text));
                     disposable.add(translateTextInteractor.execute(new TranslationObserver(), text));
                 }));
     }
@@ -129,7 +131,9 @@ public class TranslatorPresenter {
     }
 
     public void onDeleteTextButtonClick() {
+        lastWord = Word.EMPTY;
         view.setPreviousWord(Word.EMPTY);
+        view.hideImageButtons();
     }
 
     private void setImages(String text){
@@ -151,7 +155,7 @@ public class TranslatorPresenter {
         }
 
         @Override public void onError(Throwable e) {
-            view.showConnectionError();
+            view.showLanguagesLoadError();
             Timber.d(e, ERROR);
         }
 
@@ -163,10 +167,10 @@ public class TranslatorPresenter {
     private class TranslationObserver extends DisposableObserver<Word> {
 
         @Override public void onNext(Word word) {
-            setImages(word.word());
-            view.setTranslation(word);
-            lastWord = word;
-            view.hideConnectionError();
+//            setImages(word.word());
+//            view.setTranslation(word);
+//            lastWord = word;
+//            view.hideConnectionError();
         }
 
         @Override public void onError(Throwable e) {
@@ -182,31 +186,17 @@ public class TranslatorPresenter {
     private class LastWordObserver extends DisposableObserver<Word> {
 
         @Override public void onNext(Word word) {
-            setImages(word.word());
-            view.setPreviousWord(word);
-            lastWord = word;
-        }
-
-        @Override public void onError(Throwable e) {
-        }
-
-        @Override public void onComplete() {
-        }
-
-    }
-
-    private class DictionaryObserver extends DisposableObserver<Dictionary> {
-
-        @Override public void onNext(Dictionary dictionary) {
-            view.showDictionary(dictionary);
             view.hideConnectionError();
+            setImages(word.word());
+            lastWord = word;
+            view.setPreviousWord(word);
         }
+
         @Override public void onError(Throwable e) {
-            view.showConnectionError();
-            Timber.d(e, ERROR);
         }
 
         @Override public void onComplete() {
         }
+
     }
 }

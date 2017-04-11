@@ -13,6 +13,7 @@ import org.berendeev.roma.yandexmobilization2017.data.HistoryAndFavouritesReposi
 import org.berendeev.roma.yandexmobilization2017.data.PreferencesRepositoryImpl;
 import org.berendeev.roma.yandexmobilization2017.data.TranslationRepositoryImpl;
 import org.berendeev.roma.yandexmobilization2017.data.deserializer.LanguageMapDeserializer;
+import org.berendeev.roma.yandexmobilization2017.data.deserializer.MyAdapterFactory;
 import org.berendeev.roma.yandexmobilization2017.data.deserializer.TranslateDirectionsDeserializer;
 import org.berendeev.roma.yandexmobilization2017.data.entity.TranslateDirection;
 import org.berendeev.roma.yandexmobilization2017.data.http.CacheInterceptor;
@@ -25,6 +26,8 @@ import org.berendeev.roma.yandexmobilization2017.domain.DictionaryRepository;
 import org.berendeev.roma.yandexmobilization2017.domain.HistoryAndFavouritesRepository;
 import org.berendeev.roma.yandexmobilization2017.domain.PreferencesRepository;
 import org.berendeev.roma.yandexmobilization2017.domain.TranslationRepository;
+import org.berendeev.roma.yandexmobilization2017.domain.entity.Definition;
+import org.berendeev.roma.yandexmobilization2017.domain.entity.Dictionary;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.LanguageMap;
 
 import java.io.File;
@@ -83,14 +86,14 @@ public class MainModule {
 
     @Provides
     @Singleton
-    public PreferencesRepository providePreferencesRepository(Context context){
-        return new PreferencesRepositoryImpl(context);
+    public PreferencesRepository providePreferencesRepository(Context context, Gson gson){
+        return new PreferencesRepositoryImpl(context, gson);
     }
 
     @Provides
     @Singleton
-    public TranslationRepository provideTranslationRepository(TranslateApi translateApi){
-        return new TranslationRepositoryImpl(translateApi);
+    public TranslationRepository provideTranslationRepository(TranslateApi translateApi, Context context){
+        return new TranslationRepositoryImpl(translateApi, context);
     }
 
     @Provides
@@ -123,9 +126,11 @@ public class MainModule {
     public Gson provideGson(){
         Type dirType = new TypeToken<List<TranslateDirection>>() {}.getType();
         Type mapType = new TypeToken<List<LanguageMap>>() {}.getType();
+        Type defType = new TypeToken<List<Definition>>() {}.getType();
         return new GsonBuilder()
                 .registerTypeAdapter(mapType, new LanguageMapDeserializer())
                 .registerTypeAdapter(dirType, new TranslateDirectionsDeserializer())
+                .registerTypeAdapterFactory(MyAdapterFactory.create())
                 .create();
     }
 
@@ -169,8 +174,8 @@ public class MainModule {
 
     @Provides
     @Singleton
-    public HistoryDataSource provideHistoryDataSource(DatabaseOpenHelper openHelper){
-        return new DatabaseHistoryDataSource(openHelper);
+    public HistoryDataSource provideHistoryDataSource(DatabaseOpenHelper openHelper, Gson gson){
+        return new DatabaseHistoryDataSource(openHelper, gson);
     }
 
     @Provides

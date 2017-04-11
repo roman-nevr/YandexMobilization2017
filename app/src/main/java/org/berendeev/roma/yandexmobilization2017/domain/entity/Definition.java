@@ -1,6 +1,8 @@
 package org.berendeev.roma.yandexmobilization2017.domain.entity;
 
 import com.google.auto.value.AutoValue;
+import com.google.gson.Gson;
+import com.google.gson.TypeAdapter;
 
 import java.util.List;
 
@@ -21,5 +23,9 @@ public abstract class Definition {
         public abstract Builder speechPart(String speechPart);
 
         public abstract Definition build();
+    }
+
+    public static TypeAdapter<Definition> typeAdapter(Gson gson) {
+        return new AutoValue_Definition.GsonTypeAdapter(gson);
     }
 }

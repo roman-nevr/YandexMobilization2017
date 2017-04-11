@@ -1,5 +1,6 @@
 package org.berendeev.roma.yandexmobilization2017.presentation.fragment;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
@@ -14,6 +15,8 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -44,7 +47,7 @@ import static android.view.KeyEvent.KEYCODE_BACK;
 import static android.view.inputmethod.EditorInfo.IME_ACTION_DONE;
 
 
-public class TranslatorFragment extends Fragment implements TranslatorView, TranslatorView.Router{
+public class TranslatorFragment extends Fragment implements TranslatorView, TranslatorView.Router {
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.word_to_translate) SoftEditText wordToTranslate;
     @BindView(R.id.translation) TextView translation;
@@ -83,12 +86,20 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
         wordToTranslate.setHorizontallyScrolling(false);
         wordToTranslate.setLines(3);
         deleteTextButton.setOnClickListener(v -> {
+            wordToTranslate.requestFocus();
+            showKeyboard();
             presenter.onDeleteTextButtonClick();
         });
     }
 
+    private void showKeyboard() {
+        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.showSoftInput(wordToTranslate, InputMethodManager.SHOW_IMPLICIT);
+    }
+
     private void initErrorUi() {
         repeatButton.setOnClickListener(v -> {
+            translationLayout.setVisibility(View.INVISIBLE);
             presenter.onRepeat();
         });
     }
@@ -101,7 +112,7 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
         recyclerView.getItemAnimator().setMoveDuration(0);
     }
 
-    private void initHeaderView(){
+    private void initHeaderView() {
         btnLanguageTo.setOnClickListener(v -> {
             presenter.onTargetButtonClick();
         });
@@ -113,7 +124,7 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
         });
     }
 
-    private void initFavouritesMarker(){
+    private void initFavouritesMarker() {
         colorFavourite = ContextCompat.getColor(getContext(), R.color.colorPrimary);
         colorNotFavourite = ContextCompat.getColor(getContext(), R.color.grey);
         favButton.setOnClickListener(v -> {
@@ -145,10 +156,11 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
     @Override public void setPreviousWord(Word word) {
         setTextToTranslate(word.word());
         setTranslation(word);
+        showDictionary(word.dictionary());
     }
 
     @Override public void setTranslation(Word word) {
-        if(!word.translation().equals(translation.getText().toString())){
+        if (!word.translation().equals(translation.getText().toString())) {
             translation.setText(word.translation());
         }
         setFavouritesLabel(word.isFavourite());
@@ -164,8 +176,8 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
         favButton.setColorFilter(isFavourite ? colorFavourite : colorNotFavourite);
     }
 
-    private void setTextToTranslate(String text){
-        if(!text.equals(wordToTranslate.getText().toString())){
+    private void setTextToTranslate(String text) {
+        if (!text.equals(wordToTranslate.getText().toString())) {
             wordToTranslate.setText(text);
             wordToTranslate.setSelection(text.length());
         }
@@ -173,19 +185,35 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
     }
 
     @Override public Observable<String> getTextObservable() {
-        return RxTextView.textChanges(wordToTranslate)
-                .map(charSequence -> charSequence.toString());
+//        return RxTextView.textChanges(wordToTranslate)
+//                .map(charSequence -> charSequence.toString());
+        return Observable.create(emitter -> wordToTranslate
+                .addTextChangedListener(new TextWatcher() {
+                    @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                    }
+
+                    @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+                        if (wordToTranslate.hasFocus()) {
+                            emitter.onNext(s.toString());
+                        }
+                    }
+
+                    @Override public void afterTextChanged(Editable s) {
+
+                    }
+                }));
     }
 
-    private void initEditorActionListener(){
+    private void initEditorActionListener() {
         wordToTranslate.setKeyImeChangeListener((keyCode, event) -> {
-            if(keyCode == KEYCODE_BACK){
+            if (keyCode == KEYCODE_BACK) {
                 presenter.onInputDone();
                 wordToTranslate.clearFocus();
             }
         });
         wordToTranslate.setOnEditorActionListener((v, actionId, event) -> {
-            if(actionId == IME_ACTION_DONE){
+            if (actionId == IME_ACTION_DONE) {
                 hideKeyboard();
                 presenter.onInputDone();
                 wordToTranslate.clearFocus();
@@ -201,15 +229,6 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
 
     @Override public void switchOffFavButton() {
         Utils.animateImageButtonColor(favButton, colorFavourite, colorNotFavourite);
-    }
-
-    @Override public void showDictionary(Dictionary dictionary) {
-        if(adapter == null){
-            adapter = new DictionaryAdapter(dictionary);
-            recyclerView.setAdapter(adapter);
-        }else {
-            adapter.changeItems(dictionary);
-        }
     }
 
     @Override public void showConnectionError() {
@@ -232,6 +251,18 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
         favButton.setVisibility(View.VISIBLE);
     }
 
+    @Override public void showLanguagesLoadError() {
+        toolbar.setVisibility(View.INVISIBLE);
+        wordToTranslate.setVisibility(View.INVISIBLE);
+        showConnectionError();
+    }
+
+    @Override public void hideLanguagesLoadError() {
+        toolbar.setVisibility(View.VISIBLE);
+        wordToTranslate.setVisibility(View.VISIBLE);
+        hideConnectionError();
+    }
+
     @Override public void showSourceLanguageSelector() {
         LanguageSelectorActivity.start(this.getActivity(), R.id.language_from_type);
 
@@ -242,13 +273,24 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
     }
 
     @Override public void onHiddenChanged(boolean hidden) {
-        if(!hidden){
+        if (!hidden) {
             presenter.onShow();
+        } else {
+            presenter.onInputDone();
         }
     }
 
     private void hideKeyboard() {
         Utils.hideKeyboard(getContext(), wordToTranslate);
+    }
+
+    private void showDictionary(Dictionary dictionary) {
+        if (adapter == null) {
+            adapter = new DictionaryAdapter(dictionary);
+            recyclerView.setAdapter(adapter);
+        } else {
+            adapter.changeItems(dictionary);
+        }
     }
 
 }

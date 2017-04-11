@@ -6,13 +6,18 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Pair;
 
+import com.google.gson.Gson;
+
 import org.berendeev.roma.yandexmobilization2017.R;
+import org.berendeev.roma.yandexmobilization2017.domain.entity.Dictionary;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.TranslationQuery;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.Word;
 import org.berendeev.roma.yandexmobilization2017.domain.exception.HistoryException;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.inject.Inject;
 
 import io.reactivex.Completable;
 import io.reactivex.Observable;
@@ -21,6 +26,7 @@ import io.reactivex.subjects.PublishSubject;
 import timber.log.Timber;
 
 import static org.berendeev.roma.yandexmobilization2017.data.sqlite.DatabaseOpenHelper.ADD_DATE;
+import static org.berendeev.roma.yandexmobilization2017.data.sqlite.DatabaseOpenHelper.DICTIONARY;
 import static org.berendeev.roma.yandexmobilization2017.data.sqlite.DatabaseOpenHelper.IS_IN_FAVOURITES;
 import static org.berendeev.roma.yandexmobilization2017.data.sqlite.DatabaseOpenHelper.IS_IN_HISTORY;
 import static org.berendeev.roma.yandexmobilization2017.data.sqlite.DatabaseOpenHelper.LANGUAGE_FROM;
@@ -37,10 +43,14 @@ public class DatabaseHistoryDataSource implements HistoryDataSource {
     private final ContentValues contentValues;
     private PublishSubject<Integer> publishSubject;
 
-    public DatabaseHistoryDataSource(DatabaseOpenHelper openHelper) {
+    private Gson gson;
+
+    public DatabaseHistoryDataSource(DatabaseOpenHelper openHelper, Gson gson) {
         this.database = openHelper.getWritableDatabase();
         contentValues = new ContentValues();
         publishSubject = PublishSubject.create();
+        this.gson = gson;
+
     }
 
     @Override public Observable<List<Word>> getHistory() {
@@ -226,12 +236,14 @@ public class DatabaseHistoryDataSource implements HistoryDataSource {
         int translationIndex = cursor.getColumnIndex(TRANSLATION);
         int toIndex = cursor.getColumnIndex(LANGUAGE_TO);
         int fromIndex = cursor.getColumnIndex(LANGUAGE_FROM);
+        int dictionaryIndex = cursor.getColumnIndex(DICTIONARY);
         int isFavouriteIndex = cursor.getColumnIndex(IS_IN_FAVOURITES);
         return Word.builder()
                 .word(cursor.getString(wordIndex))
                 .translation(cursor.getString(translationIndex))
                 .languageFrom(cursor.getString(fromIndex))
                 .languageTo(cursor.getString(toIndex))
+                .dictionary(gson.fromJson(cursor.getString(dictionaryIndex), Dictionary.class))
                 .isFavourite(getJavaBooleanFromSqlBoolean(cursor.getInt(isFavouriteIndex)))
                 .build();
     }
@@ -250,6 +262,7 @@ public class DatabaseHistoryDataSource implements HistoryDataSource {
         contentValues.put(TRANSLATION, word.translation());
         contentValues.put(LANGUAGE_FROM, word.languageFrom());
         contentValues.put(LANGUAGE_TO, word.languageTo());
+        contentValues.put(DICTIONARY, gson.toJson(word.dictionary()));
         contentValues.put(IS_IN_HISTORY, getSqlBooleanFromJavaBoolean(isSaveInHistory));
         contentValues.put(IS_IN_FAVOURITES, getSqlBooleanFromJavaBoolean(word.isFavourite()));
         contentValues.put(ADD_DATE, System.currentTimeMillis());

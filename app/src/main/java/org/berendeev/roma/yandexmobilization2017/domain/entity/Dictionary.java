@@ -1,11 +1,18 @@
 package org.berendeev.roma.yandexmobilization2017.domain.entity;
 
 import com.google.auto.value.AutoValue;
+import com.google.gson.Gson;
+import com.google.gson.TypeAdapter;
+import com.ryanharter.auto.value.gson.GsonTypeAdapter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @AutoValue
 public abstract class Dictionary {
+
+    public static Dictionary EMPTY = builder().text("").transcription("").definitions(new ArrayList<>()).build();
+
     public abstract String text();
 
     public abstract String transcription();
@@ -25,5 +32,9 @@ public abstract class Dictionary {
         public abstract Builder definitions(List<Definition> definitions);
 
         public abstract Dictionary build();
+    }
+
+    public static TypeAdapter<Dictionary> typeAdapter(Gson gson) {
+        return new AutoValue_Dictionary.GsonTypeAdapter(gson);
     }
 }

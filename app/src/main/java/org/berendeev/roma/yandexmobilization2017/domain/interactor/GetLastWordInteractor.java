@@ -23,6 +23,7 @@ public class GetLastWordInteractor extends Interactor<Word, Void> {
     @Override public Observable<Word> buildObservable(Void param) {
         Observable<Word> observable = repository
                 .getLastWord()
+                .distinctUntilChanged()
                 .flatMap(word -> historyAndFavouritesRepository
                         .checkIfInFavourites(word)
                         .toObservable());

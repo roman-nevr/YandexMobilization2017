@@ -3,13 +3,21 @@ package org.berendeev.roma.yandexmobilization2017;
 import android.content.Context;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 
+import org.berendeev.roma.yandexmobilization2017.data.deserializer.LanguageMapDeserializer;
+import org.berendeev.roma.yandexmobilization2017.data.deserializer.MyAdapterFactory;
+import org.berendeev.roma.yandexmobilization2017.data.deserializer.TranslateDirectionsDeserializer;
 import org.berendeev.roma.yandexmobilization2017.data.entity.HttpDictionary;
+import org.berendeev.roma.yandexmobilization2017.data.entity.TranslateDirection;
 import org.berendeev.roma.yandexmobilization2017.data.http.CacheInterceptor;
 import org.berendeev.roma.yandexmobilization2017.data.http.DictionaryApi;
 import org.berendeev.roma.yandexmobilization2017.data.mapper.DictionaryMapper;
 import org.berendeev.roma.yandexmobilization2017.di.MainModule;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.Dictionary;
+import org.berendeev.roma.yandexmobilization2017.domain.entity.LanguageMap;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,6 +26,8 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 
+import java.lang.reflect.Type;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
@@ -33,6 +43,7 @@ import retrofit2.Retrofit;
 public class HttpDictionaryTest {
 
     private DictionaryApi api;
+    private Gson gson;
 
     @Before
     public void before() {
@@ -42,7 +53,9 @@ public class HttpDictionaryTest {
         CacheControl cacheControl = mainModule.provideCacheControl();
         CacheInterceptor cacheInterceptor = mainModule.provideCacheInterceptor(cacheControl);
         OkHttpClient httpClient = mainModule.provideOkHttpClient(cacheInterceptor, context);
-        Gson gson = mainModule.provideGson();
+        Type dirType = new TypeToken<List<TranslateDirection>>() {}.getType();
+        Type mapType = new TypeToken<List<LanguageMap>>() {}.getType();
+        gson = mainModule.provideGson();
         Retrofit retrofit = mainModule.provideRetrofit(httpClient, gson);
         api = mainModule.provideDictionaryApi(retrofit);
         System.out.println("");
@@ -60,12 +73,20 @@ public class HttpDictionaryTest {
         });
         Disposable disposable = objectObservable
                 .subscribeOn(Schedulers.io())
-                .observeOn(new TestScheduler())
                 .subscribe(httpDictionary -> {
                     Dictionary dictionary = DictionaryMapper.map(httpDictionary);
+                    String json = gson.toJson(dictionary, Dictionary.class);
+                    Dictionary dictionary2 = gson.fromJson(json, Dictionary.class);
                     System.out.println(dictionary);
+                    Assert.assertTrue(dictionary2.equals(dictionary));
                 });
-        disposable.dispose();
-        Thread.sleep(1000);
+        //disposable.dispose();
+        Thread.sleep(100000);
+    }
+
+    @Test
+    public void gsonTest(){
+        System.out.println(gson.toJson(Dictionary.EMPTY, Dictionary.class));
+        System.out.println(gson.fromJson("{\"text\":\"\",\"transcription\":\"\",\"definitions\":[]}", Dictionary.class));
     }
 }

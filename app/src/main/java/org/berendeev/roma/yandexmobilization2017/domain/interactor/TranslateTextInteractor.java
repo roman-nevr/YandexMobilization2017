@@ -2,6 +2,8 @@ package org.berendeev.roma.yandexmobilization2017.domain.interactor;
 
 import android.util.Pair;
 
+import org.berendeev.roma.yandexmobilization2017.data.mapper.TranslateMapper;
+import org.berendeev.roma.yandexmobilization2017.domain.DictionaryRepository;
 import org.berendeev.roma.yandexmobilization2017.domain.HistoryAndFavouritesRepository;
 import org.berendeev.roma.yandexmobilization2017.domain.PreferencesRepository;
 import org.berendeev.roma.yandexmobilization2017.domain.TranslationRepository;
@@ -11,12 +13,14 @@ import org.berendeev.roma.yandexmobilization2017.domain.entity.Word;
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
+import io.reactivex.Single;
 
 public class TranslateTextInteractor extends Interactor<Word, String> {
 
     @Inject TranslationRepository translationRepository;
     @Inject HistoryAndFavouritesRepository historyAndFavouritesRepository;
     @Inject PreferencesRepository preferencesRepository;
+    @Inject DictionaryRepository dictionaryRepository;
 
     @Inject
     public TranslateTextInteractor() {
@@ -30,17 +34,25 @@ public class TranslateTextInteractor extends Interactor<Word, String> {
                 .andThen(preferencesRepository
                         .getTranslateDirection()
                         .map(dirs -> TranslationQuery.create(param, dirs.first, dirs.second))
-                        .flatMap(query -> Observable.concat(
-                                historyAndFavouritesRepository
-                                        .getWord(query)
-                                        .toObservable(),
-                                translationRepository
-                                        .translate(query)
-                                        .toObservable()
-                        ))
-                        .firstElement()
-                        .flatMapCompletable(word ->
-                                preferencesRepository.saveLastWord(word)
-                        ).toObservable());
+                        .flatMap(query -> {
+                            if(query.text().equals("")){
+                                return Observable.just(Word.EMPTY);
+                            }
+                            return Observable
+                                .concat(
+                                        historyAndFavouritesRepository
+                                                .getWord(query)
+                                                .toObservable(),
+                                        Single.zip(
+                                                translationRepository.translate(query),
+                                                dictionaryRepository.lookup(query),
+                                                (translation, dictionary) ->
+                                                        TranslateMapper.map(query, translation, dictionary))
+                                                .toObservable());
+                        }))
+                .firstElement()
+                .flatMapCompletable(word ->
+                        preferencesRepository.saveLastWord(word)
+                ).toObservable();
     }
 }

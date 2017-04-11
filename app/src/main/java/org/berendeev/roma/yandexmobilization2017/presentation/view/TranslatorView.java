@@ -21,14 +21,17 @@ public interface TranslatorView {
 
     void switchOffFavButton();
 
-    void showDictionary(Dictionary dictionary);
-
     void showConnectionError();
 
     void hideConnectionError();
 
     void hideImageButtons();
+
     void showImageButtons();
+
+    void showLanguagesLoadError();
+
+    void hideLanguagesLoadError();
 
     interface Router {
         void showSourceLanguageSelector();

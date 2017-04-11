@@ -7,6 +7,7 @@ import org.berendeev.roma.yandexmobilization2017.data.sqlite.DatabaseHistoryData
 import org.berendeev.roma.yandexmobilization2017.data.sqlite.DatabaseOpenHelper;
 import org.berendeev.roma.yandexmobilization2017.di.MainModule;
 import org.berendeev.roma.yandexmobilization2017.domain.HistoryAndFavouritesRepository;
+import org.berendeev.roma.yandexmobilization2017.domain.entity.Dictionary;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.Word;
 import org.junit.Assert;
 import org.junit.Before;
@@ -118,7 +119,7 @@ public class HistoryRepoTest{
     }
 
     private Word buildWord(String word, String translation, boolean isFavourite){
-        return Word.create(word, translation, "en", "ru", isFavourite);
+        return Word.create(word, translation, "en", "ru", isFavourite, Dictionary.EMPTY);
     }
 
     private void printHistory(){

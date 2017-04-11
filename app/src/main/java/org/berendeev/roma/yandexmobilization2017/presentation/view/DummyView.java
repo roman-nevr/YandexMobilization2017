@@ -1,8 +1,5 @@
 package org.berendeev.roma.yandexmobilization2017.presentation.view;
 
-import com.jakewharton.rxbinding2.widget.TextViewEditorActionEvent;
-
-import org.berendeev.roma.yandexmobilization2017.domain.entity.Dictionary;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.LanguageMap;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.TranslateDirection;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.Word;
@@ -58,10 +55,6 @@ public class DummyView implements LanguageSelectorView, TranslatorView, WordList
 
     }
 
-    @Override public void showDictionary(Dictionary dictionary) {
-
-    }
-
     @Override public void showConnectionError() {
 
     }
@@ -75,6 +68,14 @@ public class DummyView implements LanguageSelectorView, TranslatorView, WordList
     }
 
     @Override public void showImageButtons() {
+
+    }
+
+    @Override public void showLanguagesLoadError() {
+
+    }
+
+    @Override public void hideLanguagesLoadError() {
 
     }
 

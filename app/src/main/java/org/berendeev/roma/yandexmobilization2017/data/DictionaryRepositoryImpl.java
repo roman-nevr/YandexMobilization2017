@@ -30,11 +30,7 @@ public class DictionaryRepositoryImpl implements DictionaryRepository {
 
     @Override public Single<Dictionary> lookup(TranslationQuery query) {
         if (query.text().equals("")) {
-            return Single.just(Dictionary.builder()
-                    .text("")
-                    .transcription("")
-                    .definitions(new ArrayList<>())
-                    .build());
+            return Single.just(Dictionary.EMPTY);
         }
         String url = String.format("%slookup?key=%s&text=%s&lang=%s&ui=%s", DictionaryApi.BASE_URL,
                 BuildConfig.DICTIONARY_API_KEY, query.text(), query.langFrom() + "-" + query.langTo(),
