@@ -4,11 +4,13 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
+import com.google.gson.Gson;
 import com.jakewharton.retrofit2.adapter.rxjava2.HttpException;
 
 import org.berendeev.roma.yandexmobilization2017.BuildConfig;
 import org.berendeev.roma.yandexmobilization2017.data.entity.Languages;
 import org.berendeev.roma.yandexmobilization2017.data.entity.Translation;
+import org.berendeev.roma.yandexmobilization2017.data.http.OfflineLanguages;
 import org.berendeev.roma.yandexmobilization2017.data.http.TranslateApi;
 import org.berendeev.roma.yandexmobilization2017.data.mapper.LanguageMapper;
 import org.berendeev.roma.yandexmobilization2017.data.mapper.TranslateMapper;
@@ -33,11 +35,13 @@ public class TranslationRepositoryImpl implements TranslationRepository {
 
 
     private final Context context;
+    private final Gson gson;
     private TranslateApi translateApi;
 
-    public TranslationRepositoryImpl(TranslateApi translateApi, Context context) {
+    public TranslationRepositoryImpl(TranslateApi translateApi, Context context, Gson gson) {
         this.context = context;
         this.translateApi = translateApi;
+        this.gson = gson;
     }
 
     @Override public Single<Translation> translate(TranslationQuery query) {
@@ -70,11 +74,12 @@ public class TranslationRepositoryImpl implements TranslationRepository {
     @Override public Observable<LanguageMap> getLanguages(Locale locale) {
         return Observable.fromCallable(() -> {
             if (!isNetworkAvailable()) {
-                throw new ConnectionException();
+                return LanguageMapper.map(getOfflineLanguages(locale), locale);
             }
             try {
                 Languages languages = translateApi
                         .getLanguages(BuildConfig.TRANSLATE_API_KEY, locale.getLanguage())
+                        .onErrorReturn(throwable -> getOfflineLanguages(locale))
                         .blockingGet();
                 return LanguageMapper.map(languages, locale);
             } catch (Throwable throwable) {
@@ -88,6 +93,16 @@ public class TranslationRepositoryImpl implements TranslationRepository {
                 = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+
+    private Languages getOfflineLanguages(Locale locale){
+        String lang;
+        if(OfflineLanguages.offlineLanguages.containsKey(locale.getLanguage())){
+            lang = locale.getLanguage();
+        }else {
+            lang = OfflineLanguages.EN;
+        }
+        return gson.fromJson(OfflineLanguages.offlineLanguages.get(lang), Languages.class);
     }
 
 }

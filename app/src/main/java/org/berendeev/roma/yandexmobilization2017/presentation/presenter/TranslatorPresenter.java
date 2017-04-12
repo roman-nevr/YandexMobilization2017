@@ -51,10 +51,14 @@ public class TranslatorPresenter {
     }
 
     public void start() {
-        loadLastWord();
         subscribeOnTranslateDirections();
         subscribeOnLastWord();
         subscribeOnTextInput();
+        subscribeOnTranslation();
+    }
+
+    private void subscribeOnTranslation() {
+
     }
 
     public void stop() {
@@ -155,7 +159,7 @@ public class TranslatorPresenter {
         }
 
         @Override public void onError(Throwable e) {
-            view.showLanguagesLoadError();
+//            view.showLanguagesLoadError();
             Timber.d(e, ERROR);
         }
 

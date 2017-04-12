@@ -92,8 +92,8 @@ public class MainModule {
 
     @Provides
     @Singleton
-    public TranslationRepository provideTranslationRepository(TranslateApi translateApi, Context context){
-        return new TranslationRepositoryImpl(translateApi, context);
+    public TranslationRepository provideTranslationRepository(TranslateApi translateApi, Context context, Gson gson){
+        return new TranslationRepositoryImpl(translateApi, context, gson);
     }
 
     @Provides

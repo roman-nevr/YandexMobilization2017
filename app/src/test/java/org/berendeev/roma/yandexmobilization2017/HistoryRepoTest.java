@@ -3,6 +3,8 @@ package org.berendeev.roma.yandexmobilization2017;
 import android.content.Context;
 import android.util.Pair;
 
+import com.google.gson.Gson;
+
 import org.berendeev.roma.yandexmobilization2017.data.sqlite.DatabaseHistoryDataSource;
 import org.berendeev.roma.yandexmobilization2017.data.sqlite.DatabaseOpenHelper;
 import org.berendeev.roma.yandexmobilization2017.di.MainModule;
@@ -30,9 +32,9 @@ public class HistoryRepoTest{
     public void before(){
         Context context = RuntimeEnvironment.application.getApplicationContext();
         MainModule mainModule = new MainModule(context.getApplicationContext());
-
+        Gson gson = mainModule.provideGson();
         DatabaseOpenHelper openHelper = mainModule.provideDatabaseOpenHelper(mainModule.provideContext());
-        historyDataSource = (DatabaseHistoryDataSource) mainModule.provideHistoryDataSource(openHelper);
+        historyDataSource = (DatabaseHistoryDataSource) mainModule.provideHistoryDataSource(openHelper, gson);
         repository = mainModule.provideHistoryAndFavouritesRepository(historyDataSource);
         System.out.println("");
     }
@@ -119,7 +121,7 @@ public class HistoryRepoTest{
     }
 
     private Word buildWord(String word, String translation, boolean isFavourite){
-        return Word.create(word, translation, "en", "ru", isFavourite, Dictionary.EMPTY);
+        return Word.create(word, translation, "en", "ru", isFavourite, Dictionary.EMPTY, Word.TranslationState.received);
     }
 
     private void printHistory(){

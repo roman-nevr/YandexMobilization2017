@@ -10,10 +10,13 @@ import org.berendeev.roma.yandexmobilization2017.data.deserializer.LanguageMapDe
 import org.berendeev.roma.yandexmobilization2017.data.deserializer.MyAdapterFactory;
 import org.berendeev.roma.yandexmobilization2017.data.deserializer.TranslateDirectionsDeserializer;
 import org.berendeev.roma.yandexmobilization2017.data.entity.HttpDictionary;
+import org.berendeev.roma.yandexmobilization2017.data.entity.Languages;
 import org.berendeev.roma.yandexmobilization2017.data.entity.TranslateDirection;
 import org.berendeev.roma.yandexmobilization2017.data.http.CacheInterceptor;
 import org.berendeev.roma.yandexmobilization2017.data.http.DictionaryApi;
+import org.berendeev.roma.yandexmobilization2017.data.http.OfflineLanguages;
 import org.berendeev.roma.yandexmobilization2017.data.mapper.DictionaryMapper;
+import org.berendeev.roma.yandexmobilization2017.data.mapper.LanguageMapper;
 import org.berendeev.roma.yandexmobilization2017.di.MainModule;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.Dictionary;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.LanguageMap;
@@ -28,6 +31,7 @@ import org.robolectric.annotation.Config;
 
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
@@ -44,6 +48,7 @@ public class HttpDictionaryTest {
 
     private DictionaryApi api;
     private Gson gson;
+    private Type mapType;
 
     @Before
     public void before() {
@@ -54,7 +59,7 @@ public class HttpDictionaryTest {
         CacheInterceptor cacheInterceptor = mainModule.provideCacheInterceptor(cacheControl);
         OkHttpClient httpClient = mainModule.provideOkHttpClient(cacheInterceptor, context);
         Type dirType = new TypeToken<List<TranslateDirection>>() {}.getType();
-        Type mapType = new TypeToken<List<LanguageMap>>() {}.getType();
+        mapType = new TypeToken<LanguageMap>() {}.getType();
         gson = mainModule.provideGson();
         Retrofit retrofit = mainModule.provideRetrofit(httpClient, gson);
         api = mainModule.provideDictionaryApi(retrofit);
@@ -86,7 +91,9 @@ public class HttpDictionaryTest {
 
     @Test
     public void gsonTest(){
-        System.out.println(gson.toJson(Dictionary.EMPTY, Dictionary.class));
-        System.out.println(gson.fromJson("{\"text\":\"\",\"transcription\":\"\",\"definitions\":[]}", Dictionary.class));
+        Locale locale = Locale.getDefault();
+        Languages languages = gson.fromJson(OfflineLanguages.offlineLanguages.get(locale.getLanguage()), Languages.class);
+        LanguageMap map = LanguageMapper.map(languages, locale);
+        System.out.println(gson.fromJson(OfflineLanguages.offlineLanguages.get("ru"), Languages.class));
     }
 }

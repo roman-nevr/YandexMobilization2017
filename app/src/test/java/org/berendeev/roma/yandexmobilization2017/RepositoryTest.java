@@ -2,6 +2,8 @@ package org.berendeev.roma.yandexmobilization2017;
 
 import android.content.Context;
 
+import com.google.gson.Gson;
+
 import org.berendeev.roma.yandexmobilization2017.data.TranslationRepositoryImpl;
 import org.berendeev.roma.yandexmobilization2017.data.http.CacheInterceptor;
 import org.berendeev.roma.yandexmobilization2017.data.http.TranslateApi;
@@ -31,11 +33,12 @@ public class RepositoryTest {
         context = RuntimeEnvironment.application.getApplicationContext();
         MainModule mainModule = new MainModule(context.getApplicationContext());
         CacheControl cacheControl = mainModule.provideCacheControl();
+        Gson gson = mainModule.provideGson();
         CacheInterceptor interceptor = mainModule.provideCacheInterceptor(cacheControl);
         OkHttpClient httpClient = mainModule.provideOkHttpClient(interceptor, mainModule.provideContext());
         Retrofit retrofit = mainModule.provideRetrofit(httpClient, mainModule.provideGson());
         TranslateApi translateApi = mainModule.provideTranslateAPI(retrofit);
-        repository = new TranslationRepositoryImpl(translateApi);
+        repository = new TranslationRepositoryImpl(translateApi, context, gson);
     }
 
     @Test

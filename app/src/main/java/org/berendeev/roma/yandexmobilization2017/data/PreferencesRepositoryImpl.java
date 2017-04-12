@@ -8,7 +8,6 @@ import com.google.gson.Gson;
 
 import org.berendeev.roma.yandexmobilization2017.domain.PreferencesRepository;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.Dictionary;
-import org.berendeev.roma.yandexmobilization2017.domain.entity.TranslateDirection;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.Word;
 
 import java.util.Locale;
@@ -17,8 +16,6 @@ import javax.inject.Inject;
 
 import io.reactivex.Completable;
 import io.reactivex.Observable;
-import io.reactivex.Single;
-import io.reactivex.internal.operators.completable.CompletableFromAction;
 import io.reactivex.subjects.BehaviorSubject;
 
 
@@ -31,6 +28,7 @@ public class PreferencesRepositoryImpl implements PreferencesRepository {
     private static final String DIRECTION_TO = "to";
     private static final String DIRECTION_FROM = "from";
     private static final String DICTIONARY = "dictionary";
+    private static final String TRANSLATION_STATE = "state";
 
     Context context;
     private final SharedPreferences wordPreferences, dirsPreferences;
@@ -51,15 +49,13 @@ public class PreferencesRepositoryImpl implements PreferencesRepository {
 
     @Override public Completable saveLastWord(Word word) {
         return Completable.fromAction(() -> {
-            Word savedWord = lastWordSubject.getValue();
-            if(!word.word().equals(savedWord.word()) && word.languageFrom().equals(savedWord.languageFrom()) && word.languageTo().equals(savedWord.languageTo())){
-                lastWordSubject.onNext(word);
-                wordPreferences.edit()
-                        .putString(TEXT, word.word())
-                        .putString(TRANSLATION, word.translation())
-                        .putString(DICTIONARY, gson.toJson(word.dictionary()))
-                        .apply();
-            }
+            lastWordSubject.onNext(word);
+            wordPreferences.edit()
+                    .putString(TEXT, word.word())
+                    .putString(TRANSLATION, word.translation())
+                    .putString(TRANSLATION_STATE, word.translationState().name())
+                    .putString(DICTIONARY, gson.toJson(word.dictionary()))
+                    .apply();
         });
     }
 
@@ -145,6 +141,7 @@ public class PreferencesRepositoryImpl implements PreferencesRepository {
                 .languageFrom(dirsPreferences.getString(DIRECTION_FROM, ""))
                 .languageTo(dirsPreferences.getString(DIRECTION_TO, ""))
                 .dictionary(gson.fromJson(wordPreferences.getString(DICTIONARY, "{\"text\":\"\",\"transcription\":\"\",\"definitions\":[]}"), Dictionary.class))
+                .translationState(Word.TranslationState.valueOf(wordPreferences.getString(TRANSLATION_STATE, Word.TranslationState.received.name())))
                 .isFavourite(false)
                 .build();
         lastWordSubject = BehaviorSubject.createDefault(word);

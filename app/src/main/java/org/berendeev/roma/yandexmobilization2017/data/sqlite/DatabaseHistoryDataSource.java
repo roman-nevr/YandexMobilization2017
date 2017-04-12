@@ -34,6 +34,7 @@ import static org.berendeev.roma.yandexmobilization2017.data.sqlite.DatabaseOpen
 import static org.berendeev.roma.yandexmobilization2017.data.sqlite.DatabaseOpenHelper.TRANSLATION;
 import static org.berendeev.roma.yandexmobilization2017.data.sqlite.DatabaseOpenHelper.WORD;
 import static org.berendeev.roma.yandexmobilization2017.data.sqlite.DatabaseOpenHelper.WORDS_TABLE;
+import static org.berendeev.roma.yandexmobilization2017.domain.entity.Word.TranslationState.received;
 
 public class DatabaseHistoryDataSource implements HistoryDataSource {
 
@@ -245,6 +246,7 @@ public class DatabaseHistoryDataSource implements HistoryDataSource {
                 .languageTo(cursor.getString(toIndex))
                 .dictionary(gson.fromJson(cursor.getString(dictionaryIndex), Dictionary.class))
                 .isFavourite(getJavaBooleanFromSqlBoolean(cursor.getInt(isFavouriteIndex)))
+                .translationState(received)
                 .build();
     }
 
