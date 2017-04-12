@@ -132,16 +132,18 @@ public class PreferencesRepositoryImpl implements PreferencesRepository {
         }
         String directionFrom = dirsPreferences.getString(DIRECTION_FROM, defaultDirectionFrom);
         directionsSubject.onNext(new Pair<>(directionFrom, directionTo));
+        saveDirection(DIRECTION_FROM, directionFrom);
+        saveDirection(DIRECTION_TO, directionTo);
     }
 
     private void initLastWord() {
         Word word = Word.builder()
                 .word(wordPreferences.getString(TEXT, ""))
                 .translation(wordPreferences.getString(TRANSLATION, ""))
-                .languageFrom(dirsPreferences.getString(DIRECTION_FROM, ""))
-                .languageTo(dirsPreferences.getString(DIRECTION_TO, ""))
+                .languageFrom(dirsPreferences.getString(DIRECTION_FROM, directionsSubject.getValue().first))
+                .languageTo(dirsPreferences.getString(DIRECTION_TO, directionsSubject.getValue().second))
                 .dictionary(gson.fromJson(wordPreferences.getString(DICTIONARY, "{\"text\":\"\",\"transcription\":\"\",\"definitions\":[]}"), Dictionary.class))
-                .translationState(Word.TranslationState.valueOf(wordPreferences.getString(TRANSLATION_STATE, Word.TranslationState.received.name())))
+                .translationState(Word.TranslationState.valueOf(wordPreferences.getString(TRANSLATION_STATE, Word.TranslationState.ok.name())))
                 .isFavourite(false)
                 .build();
         lastWordSubject = BehaviorSubject.createDefault(word);

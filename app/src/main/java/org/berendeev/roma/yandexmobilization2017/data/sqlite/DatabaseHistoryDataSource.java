@@ -17,11 +17,8 @@ import org.berendeev.roma.yandexmobilization2017.domain.exception.HistoryExcepti
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
-
 import io.reactivex.Completable;
 import io.reactivex.Observable;
-import io.reactivex.Single;
 import io.reactivex.subjects.PublishSubject;
 import timber.log.Timber;
 
@@ -34,7 +31,7 @@ import static org.berendeev.roma.yandexmobilization2017.data.sqlite.DatabaseOpen
 import static org.berendeev.roma.yandexmobilization2017.data.sqlite.DatabaseOpenHelper.TRANSLATION;
 import static org.berendeev.roma.yandexmobilization2017.data.sqlite.DatabaseOpenHelper.WORD;
 import static org.berendeev.roma.yandexmobilization2017.data.sqlite.DatabaseOpenHelper.WORDS_TABLE;
-import static org.berendeev.roma.yandexmobilization2017.domain.entity.Word.TranslationState.received;
+import static org.berendeev.roma.yandexmobilization2017.domain.entity.Word.TranslationState.ok;
 
 public class DatabaseHistoryDataSource implements HistoryDataSource {
 
@@ -246,7 +243,7 @@ public class DatabaseHistoryDataSource implements HistoryDataSource {
                 .languageTo(cursor.getString(toIndex))
                 .dictionary(gson.fromJson(cursor.getString(dictionaryIndex), Dictionary.class))
                 .isFavourite(getJavaBooleanFromSqlBoolean(cursor.getInt(isFavouriteIndex)))
-                .translationState(received)
+                .translationState(ok)
                 .build();
     }
 

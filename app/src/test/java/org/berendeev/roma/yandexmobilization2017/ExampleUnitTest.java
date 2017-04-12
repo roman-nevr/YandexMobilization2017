@@ -17,8 +17,10 @@ import java.util.Set;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadPoolExecutor;
 
+import io.reactivex.Completable;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableObserver;
@@ -94,6 +96,27 @@ public class ExampleUnitTest {
         StyleSpan boldSpan = new StyleSpan( Typeface.BOLD );
         builder.setSpan(boldSpan, 0, builder.length(), Spannable.SPAN_COMPOSING);
 //        Spannable spannable = new S
+    }
+
+    @Test
+    public void complete(){
+        Observable<Integer> observable = Observable.create(e -> {
+            e.onNext(1);
+        });
+        observable
+                .map(integer -> "" + integer)
+                .flatMap(s -> {
+                    if (s.equals("1")){
+                        return Observable.just(2);
+                    }else {
+                        return Observable.just(3);
+                    }
+                })
+                .subscribe(integer -> {
+                    System.out.println(integer);
+                }, throwable -> {}, () -> {
+                    System.out.println("complete");
+                });
     }
 
 }

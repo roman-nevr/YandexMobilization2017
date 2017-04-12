@@ -8,6 +8,6 @@ import org.berendeev.roma.yandexmobilization2017.domain.entity.Word;
 public class TranslateMapper {
     public static Word map(TranslationQuery query, Translation translation, Dictionary dictionary){
         String[] langs = translation.lang.split("-");
-        return Word.create(query.text(), translation.translation.get(0), langs[0], langs[1], false, dictionary, Word.TranslationState.received);
+        return Word.create(query.text(), translation.translation.get(0), langs[0], langs[1], false, dictionary, Word.TranslationState.ok);
     }
 }

@@ -12,10 +12,13 @@ import org.berendeev.roma.yandexmobilization2017.domain.entity.Word;
 
 import javax.inject.Inject;
 
+import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 
-public class TranslateTextInteractor extends Interactor<Word, String> {
+import static org.berendeev.roma.yandexmobilization2017.domain.entity.Word.TranslationState.requested;
+
+public class TranslateTextInteractor extends Interactor<Void, String> {
 
     @Inject TranslationRepository translationRepository;
     @Inject HistoryAndFavouritesRepository historyAndFavouritesRepository;
@@ -26,33 +29,23 @@ public class TranslateTextInteractor extends Interactor<Word, String> {
     public TranslateTextInteractor() {
     }
 
-    @Override public Observable<Word> buildObservable(String param) {
+    @Override public Observable<Void> buildObservable(String param) {
         return preferencesRepository
-                .saveLastWord(Word.EMPTY.toBuilder()
-                        .word(param)
-                        .build())
-                .andThen(preferencesRepository
-                        .getTranslateDirection()
-                        .map(dirs -> TranslationQuery.create(param, dirs.first, dirs.second))
-                        .flatMap(query -> {
-                            if(query.text().equals("")){
-                                return Observable.just(Word.EMPTY);
-                            }
-                            return Observable
-                                .concat(
-                                        historyAndFavouritesRepository
-                                                .getWord(query)
-                                                .toObservable(),
-                                        Single.zip(
-                                                translationRepository.translate(query),
-                                                dictionaryRepository.lookup(query),
-                                                (translation, dictionary) ->
-                                                        TranslateMapper.map(query, translation, dictionary))
-                                                .toObservable());
-                        }))
-                .firstElement()
-                .flatMapCompletable(word ->
-                        preferencesRepository.saveLastWord(word)
-                ).toObservable();
+                .getTranslateDirection()
+                .map(dirs -> TranslationQuery.create(param, dirs.first, dirs.second))
+                .flatMap(query -> preferencesRepository
+                        .getLastWord()
+                        .firstElement()
+                        .map(word -> word.toBuilder()
+                                .word(param)
+                                .languageFrom(query.langFrom())
+                                .languageTo(query.langTo())
+                                .translationState(requested)
+                                .build())
+                        .flatMapCompletable(word -> preferencesRepository
+                                .saveLastWord(word))
+                        .toObservable());
     }
+
+
 }

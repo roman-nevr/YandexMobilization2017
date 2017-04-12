@@ -15,7 +15,7 @@ import javax.inject.Inject;
 
 import io.reactivex.Observable;
 
-public class GetTranslateDirectionInteractor extends Interactor<Pair<TranslateDirection, TranslateDirection>, Locale> {
+public class GetTranslateDirectionInteractor extends Interactor<Pair<TranslateDirection, TranslateDirection>, Void> {
 
     @Inject PreferencesRepository preferencesRepository;
     @Inject TranslationRepository translationRepository;
@@ -23,14 +23,14 @@ public class GetTranslateDirectionInteractor extends Interactor<Pair<TranslateDi
     @Inject
     public GetTranslateDirectionInteractor() {}
 
-    @Override public Observable<Pair<TranslateDirection, TranslateDirection>> buildObservable(Locale locale) {
+    @Override public Observable<Pair<TranslateDirection, TranslateDirection>> buildObservable(Void param) {
         return Observable.combineLatest(
-                translationRepository.getLanguages(locale),
+                translationRepository.getLanguages(Locale.getDefault()),
                 preferencesRepository.getTranslateDirection(),
                 (map, stringStringPair) -> {
                     TranslateDirection directionFrom = buildTranslateDirection(stringStringPair.first, map.map());
                     TranslateDirection directionTo = buildTranslateDirection(stringStringPair.second, map.map());
-                    Pair<TranslateDirection, TranslateDirection> pair = new Pair(directionFrom, directionTo);
+                    Pair<TranslateDirection, TranslateDirection> pair = new Pair<>(directionFrom, directionTo);
                     return pair;
                 }
         );

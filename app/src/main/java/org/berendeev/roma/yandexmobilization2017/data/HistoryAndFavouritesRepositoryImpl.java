@@ -11,9 +11,8 @@ import io.reactivex.Completable;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.Single;
-import io.reactivex.subjects.PublishSubject;
 
-import static org.berendeev.roma.yandexmobilization2017.domain.entity.Word.TranslationState.received;
+import static org.berendeev.roma.yandexmobilization2017.domain.entity.Word.TranslationState.ok;
 
 
 public class HistoryAndFavouritesRepositoryImpl implements HistoryAndFavouritesRepository {
@@ -48,7 +47,7 @@ public class HistoryAndFavouritesRepositoryImpl implements HistoryAndFavouritesR
     }
 
     @Override public Completable saveInHistory(Word word) {
-        if (word.word().isEmpty() || word.translationState() == received) {
+        if (word.word().isEmpty() || word.translationState() == ok) {
             return Completable.complete();
         } else {
             return historyDataSource.saveInHistory(word);
@@ -56,7 +55,7 @@ public class HistoryAndFavouritesRepositoryImpl implements HistoryAndFavouritesR
     }
 
     @Override public Completable saveInFavourites(Word word) {
-        if (word.word().isEmpty() || word.translationState() == received) {
+        if (word.word().isEmpty() || word.translationState() == ok) {
             return Completable.complete();
         } else {
             return historyDataSource.saveInFavourites(word);

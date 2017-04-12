@@ -1,7 +1,5 @@
 package org.berendeev.roma.yandexmobilization2017.domain.entity;
 
-import android.os.Parcelable;
-
 import com.google.auto.value.AutoValue;
 import com.google.gson.Gson;
 import com.google.gson.TypeAdapter;
@@ -9,7 +7,7 @@ import com.google.gson.TypeAdapter;
 @AutoValue
 public abstract class Word {
 
-    public static Word EMPTY = create("", "", "", "", false, Dictionary.EMPTY, TranslationState.received);
+    public static Word EMPTY = create("", "", "", "", false, Dictionary.EMPTY, TranslationState.ok);
 
     public abstract String word();
 
@@ -26,7 +24,7 @@ public abstract class Word {
     public abstract TranslationState translationState();
 
     public enum TranslationState {
-        requested, received, error
+        requested, ok, error
     }
 
     public static Word create(String word, String translation, String languageFrom, String languageTo, boolean isFavourite, Dictionary dictionary, TranslationState translationState) {

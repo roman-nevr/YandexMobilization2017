@@ -32,7 +32,7 @@ public abstract class Interactor<Response, Request> {
             observer = new EmptyObserver();
         }
         Observable<Response> observable = buildObservable(param)
-                .subscribeOn(Schedulers.io())
+                .subscribeOn(Schedulers.from(workExecutor))
                 .observeOn(mainExecutor);
        return observable.subscribeWith(observer);
     }
