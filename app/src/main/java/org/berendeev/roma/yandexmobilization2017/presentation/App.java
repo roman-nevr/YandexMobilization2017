@@ -38,6 +38,9 @@ public class App extends Application {
     }
 
     private void initStetho(){
+        if(!BuildConfig.DEBUG){
+            return;
+        }
         // Create an InitializerBuilder
         Stetho.InitializerBuilder initializerBuilder =
                 Stetho.newInitializerBuilder(this);

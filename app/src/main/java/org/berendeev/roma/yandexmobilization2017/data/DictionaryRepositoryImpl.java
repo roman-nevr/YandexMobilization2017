@@ -1,5 +1,7 @@
 package org.berendeev.roma.yandexmobilization2017.data;
 
+import com.jakewharton.retrofit2.adapter.rxjava2.HttpException;
+
 import org.berendeev.roma.yandexmobilization2017.BuildConfig;
 import org.berendeev.roma.yandexmobilization2017.data.entity.HttpDictionary;
 import org.berendeev.roma.yandexmobilization2017.data.http.DictionaryApi;
@@ -43,6 +45,9 @@ public class DictionaryRepositoryImpl implements DictionaryRepository {
                         .blockingGet();
                 return DictionaryMapper.map(httpDictionary);
             }catch (Throwable throwable){
+                if(throwable.getCause() instanceof HttpException){
+                    return Dictionary.EMPTY;
+                }
                 Timber.wtf(throwable, "wft");
                 throw new ConnectionException(throwable);
             }

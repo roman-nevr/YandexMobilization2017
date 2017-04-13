@@ -24,7 +24,7 @@ public abstract class Word {
     public abstract TranslationState translationState();
 
     public enum TranslationState {
-        requested, ok, error
+        requested, ok, connectionError, translationError
     }
 
     public static Word create(String word, String translation, String languageFrom, String languageTo, boolean isFavourite, Dictionary dictionary, TranslationState translationState) {

@@ -32,6 +32,8 @@ public class TranslateTextInteractor extends Interactor<Void, String> {
     @Override public Observable<Void> buildObservable(String param) {
         return preferencesRepository
                 .getTranslateDirection()
+                .firstElement()
+                .toObservable()
                 .map(dirs -> TranslationQuery.create(param, dirs.first, dirs.second))
                 .flatMap(query -> preferencesRepository
                         .getLastWord()

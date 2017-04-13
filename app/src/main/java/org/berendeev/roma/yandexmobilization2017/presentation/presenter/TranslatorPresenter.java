@@ -5,6 +5,7 @@ import android.util.Pair;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.TranslateDirection;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.Word;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.GetDictionaryInteractor;
+import org.berendeev.roma.yandexmobilization2017.domain.interactor.GetFavouriteStateInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.GetLastWordInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.GetTranslateDirectionInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.GetTranslationInteractor;
@@ -13,6 +14,7 @@ import org.berendeev.roma.yandexmobilization2017.domain.interactor.SaveInFavouri
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.SaveLastWordInHistoryInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.SaveLastWordInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.SwapDirectionsInteractor;
+import org.berendeev.roma.yandexmobilization2017.domain.interactor.ToggleFavouriteStateInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.TranslateTextInteractor;
 import org.berendeev.roma.yandexmobilization2017.presentation.view.TranslatorView;
 import org.berendeev.roma.yandexmobilization2017.presentation.view.TranslatorView.Router;
@@ -26,7 +28,7 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableObserver;
 import timber.log.Timber;
 
-import static org.berendeev.roma.yandexmobilization2017.domain.entity.Word.TranslationState.error;
+import static org.berendeev.roma.yandexmobilization2017.domain.entity.Word.TranslationState.connectionError;
 import static org.berendeev.roma.yandexmobilization2017.domain.entity.Word.TranslationState.ok;
 
 public class TranslatorPresenter {
@@ -44,6 +46,8 @@ public class TranslatorPresenter {
     @Inject GetDictionaryInteractor getDictionaryInteractor;
     @Inject SaveLastWordInteractor saveLastWordInteractor;
     @Inject GetTranslationInteractor getTranslationInteractor;
+    @Inject GetFavouriteStateInteractor getFavouriteStateInteractor;
+    @Inject ToggleFavouriteStateInteractor toggleFavouriteStateInteractor;
     private Router router;
     private final CompositeDisposable disposable;
     private Word lastWord;
@@ -57,10 +61,15 @@ public class TranslatorPresenter {
         subscribeOnTranslateDirections();
         subscribeOnTextInput();
         subscribeOnTranslation();
+        subscribeOnFavouriteState();
+    }
+
+    private void subscribeOnFavouriteState() {
+        disposable.add(getFavouriteStateInteractor.execute(new FavouriteObserver(), null));
     }
 
     private void subscribeOnTranslation() {
-        disposable.add(getTranslationInteractor.execute(new LastWordObserver(), null));
+        disposable.add(getTranslationInteractor.execute(new ResultObserver(), null));
     }
 
     public void stop() {
@@ -106,14 +115,8 @@ public class TranslatorPresenter {
     }
 
     public void onFavButtonClick() {
-        //TODO get rid of lastWord
-        if (lastWord.isFavourite()) {
-            view.switchOffFavButton();
-            removeFromFavouritesInteractor.execute(null, lastWord);
-        } else {
-            view.switchOnFavButton();
-            saveInFavouriteInteractor.execute(null, lastWord);
-        }
+        toggleFavouriteStateInteractor.execute(null, null);
+
     }
 
     public void onInputDone() {
@@ -146,12 +149,10 @@ public class TranslatorPresenter {
 
         @Override public void onNext(Pair<TranslateDirection, TranslateDirection> pair) {
             view.setTranslateDirection(pair.first, pair.second);
-            view.hideConnectionError();
         }
 
         @Override public void onError(Throwable e) {
-//            view.showLanguagesLoadError();
-            Timber.d(e, ERROR);
+            Timber.wtf(e, ERROR);
         }
 
         @Override public void onComplete() {
@@ -159,10 +160,10 @@ public class TranslatorPresenter {
 
     }
 
-    private class LastWordObserver extends DisposableObserver<Word> {
-
+    private class ResultObserver extends DisposableObserver<Word> {
         @Override public void onNext(Word word) {
-            if(word.translationState() == error){
+            if(word.translationState() == connectionError){
+                view.setPreviousWord(word);
                 view.showConnectionError();
             }
             if (word.translationState() == ok){
@@ -174,11 +175,27 @@ public class TranslatorPresenter {
         }
 
         @Override public void onError(Throwable e) {
-            view.showConnectionError();
         }
 
         @Override public void onComplete() {
         }
+    }
 
+    private class FavouriteObserver extends DisposableObserver<Boolean> {
+        @Override public void onNext(Boolean favourite) {
+            if(favourite){
+                view.switchOnFavButton();
+            }else {
+                view.switchOffFavButton();
+            }
+        }
+
+        @Override public void onError(Throwable e) {
+
+        }
+
+        @Override public void onComplete() {
+
+        }
     }
 }

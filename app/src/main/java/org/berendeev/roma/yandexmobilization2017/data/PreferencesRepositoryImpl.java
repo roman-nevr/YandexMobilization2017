@@ -18,6 +18,9 @@ import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.subjects.BehaviorSubject;
 
+import static org.berendeev.roma.yandexmobilization2017.domain.entity.Word.TranslationState.ok;
+import static org.berendeev.roma.yandexmobilization2017.domain.entity.Word.TranslationState.requested;
+
 
 public class PreferencesRepositoryImpl implements PreferencesRepository {
 
@@ -137,13 +140,17 @@ public class PreferencesRepositoryImpl implements PreferencesRepository {
     }
 
     private void initLastWord() {
+        Word.TranslationState state = Word.TranslationState.valueOf(wordPreferences.getString(TRANSLATION_STATE, ok.name()));
+        if (state != ok){
+            state = requested;
+        }
         Word word = Word.builder()
                 .word(wordPreferences.getString(TEXT, ""))
                 .translation(wordPreferences.getString(TRANSLATION, ""))
                 .languageFrom(dirsPreferences.getString(DIRECTION_FROM, directionsSubject.getValue().first))
                 .languageTo(dirsPreferences.getString(DIRECTION_TO, directionsSubject.getValue().second))
                 .dictionary(gson.fromJson(wordPreferences.getString(DICTIONARY, "{\"text\":\"\",\"transcription\":\"\",\"definitions\":[]}"), Dictionary.class))
-                .translationState(Word.TranslationState.valueOf(wordPreferences.getString(TRANSLATION_STATE, Word.TranslationState.ok.name())))
+                .translationState(state)
                 .isFavourite(false)
                 .build();
         lastWordSubject = BehaviorSubject.createDefault(word);

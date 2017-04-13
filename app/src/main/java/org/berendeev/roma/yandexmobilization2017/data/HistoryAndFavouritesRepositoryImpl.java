@@ -47,7 +47,7 @@ public class HistoryAndFavouritesRepositoryImpl implements HistoryAndFavouritesR
     }
 
     @Override public Completable saveInHistory(Word word) {
-        if (word.word().isEmpty() || word.translationState() == ok) {
+        if (word.word().isEmpty() || word.translationState() != ok) {
             return Completable.complete();
         } else {
             return historyDataSource.saveInHistory(word);
@@ -55,7 +55,7 @@ public class HistoryAndFavouritesRepositoryImpl implements HistoryAndFavouritesR
     }
 
     @Override public Completable saveInFavourites(Word word) {
-        if (word.word().isEmpty() || word.translationState() == ok) {
+        if (word.word().isEmpty() || word.translationState() != ok) {
             return Completable.complete();
         } else {
             return historyDataSource.saveInFavourites(word);

@@ -1,6 +1,5 @@
 package org.berendeev.roma.yandexmobilization2017.domain.interactor;
 
-import org.berendeev.roma.yandexmobilization2017.data.entity.Translation;
 import org.berendeev.roma.yandexmobilization2017.data.mapper.TranslateMapper;
 import org.berendeev.roma.yandexmobilization2017.domain.DictionaryRepository;
 import org.berendeev.roma.yandexmobilization2017.domain.HistoryAndFavouritesRepository;
@@ -8,17 +7,16 @@ import org.berendeev.roma.yandexmobilization2017.domain.PreferencesRepository;
 import org.berendeev.roma.yandexmobilization2017.domain.TranslationRepository;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.TranslationQuery;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.Word;
-
-import java.util.ArrayList;
+import org.berendeev.roma.yandexmobilization2017.domain.exception.TranslationException;
 
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
 import io.reactivex.Single;
 
-import static org.berendeev.roma.yandexmobilization2017.domain.entity.Word.TranslationState.error;
-import static org.berendeev.roma.yandexmobilization2017.domain.entity.Word.TranslationState.ok;
+import static org.berendeev.roma.yandexmobilization2017.domain.entity.Word.TranslationState.connectionError;
 import static org.berendeev.roma.yandexmobilization2017.domain.entity.Word.TranslationState.requested;
+import static org.berendeev.roma.yandexmobilization2017.domain.entity.Word.TranslationState.translationError;
 
 public class GetTranslationInteractor extends Interactor<Word, Void> {
 
@@ -34,6 +32,9 @@ public class GetTranslationInteractor extends Interactor<Word, Void> {
     @Override public Observable<Word> buildObservable(Void param) {
         return preferencesRepository
                 .getLastWord()
+                .flatMap(word -> historyAndFavouritesRepository
+                        .checkIfInFavourites(word)
+                        .toObservable())
                 .flatMap(lastWord -> {
                     if (lastWord.word().equals("")) {
                         return Observable.just(Word.EMPTY);
@@ -49,17 +50,20 @@ public class GetTranslationInteractor extends Interactor<Word, Void> {
                                                     .lookup(query),
                                             (translation, dictionary) ->
                                                     TranslateMapper.map(query, translation, dictionary))
-                                            .toObservable();
+                                            .toObservable()
+                                            .flatMap(receivedWord ->
+                                                    preferencesRepository
+                                                            .saveLastWord(receivedWord)
+                                                            .andThen(historyAndFavouritesRepository
+                                                                    .checkIfInFavourites(receivedWord)
+                                                                    .toObservable()));
                                 })
                                 .onErrorResumeNext(throwable -> {
-                                    return Observable.just(lastWord.toBuilder().translationState(error).build());
-                                })
-                                .flatMap(word -> preferencesRepository
-                                        .saveLastWord(word).toObservable());
-//                        return translationRepository.translate(TranslationQuery.create(word.word(), word.languageFrom(), word.languageTo()))
-//                                .map(translation -> word.toBuilder().translation(translation.translation.get(0)).translationState(ok).build())
-//                                .flatMapObservable(word1 -> preferencesRepository
-//                                        .saveLastWord(word1).toObservable());
+                                    if (throwable instanceof TranslationException) {
+                                        return Observable.just(lastWord.toBuilder().translationState(translationError).build());
+                                    }
+                                    return Observable.just(lastWord.toBuilder().translationState(connectionError).build());
+                                });
                     } else {
                         return Observable.just(lastWord);
                     }

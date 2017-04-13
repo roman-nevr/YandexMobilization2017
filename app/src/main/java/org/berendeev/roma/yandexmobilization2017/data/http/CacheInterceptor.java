@@ -1,9 +1,6 @@
 package org.berendeev.roma.yandexmobilization2017.data.http;
 
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
-
-import javax.inject.Inject;
 
 import okhttp3.CacheControl;
 import okhttp3.Interceptor;
