@@ -1,12 +1,11 @@
 package org.berendeev.roma.yandexmobilization2017.domain.interactor;
 
 import org.berendeev.roma.yandexmobilization2017.domain.HistoryAndFavouritesRepository;
-import org.berendeev.roma.yandexmobilization2017.domain.PreferencesRepository;
+import org.berendeev.roma.yandexmobilization2017.domain.ResultRepository;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.Word;
 
 import javax.inject.Inject;
 
-import io.reactivex.Maybe;
 import io.reactivex.Observable;
 
 import static org.berendeev.roma.yandexmobilization2017.domain.entity.Word.TranslationState.ok;
@@ -14,7 +13,7 @@ import static org.berendeev.roma.yandexmobilization2017.domain.entity.Word.Trans
 
 public class SwapDirectionsInteractor extends Interactor<Void, Void> {
 
-    @Inject PreferencesRepository preferencesRepository;
+    @Inject ResultRepository resultRepository;
     @Inject HistoryAndFavouritesRepository historyAndFavouritesRepository;
 
     @Inject
@@ -24,8 +23,8 @@ public class SwapDirectionsInteractor extends Interactor<Void, Void> {
     @Override public Observable<Void> buildObservable(Void param) {
 
 
-        return preferencesRepository
-                .getLastWord()
+        return resultRepository
+                .getResultObservable()
                 .firstElement()
                 .toObservable()
                 .map(word -> swapMap(word))
@@ -33,11 +32,11 @@ public class SwapDirectionsInteractor extends Interactor<Void, Void> {
                         historyAndFavouritesRepository
                                 .saveInHistory(word)
                                 .toObservable(),
-                        preferencesRepository
+                        resultRepository
                                 .swapDirections()
                                 .toObservable(),
-                        preferencesRepository
-                                .saveLastWord(word.toBuilder().translationState(requested).build())
+                        resultRepository
+                                .saveResult(word.toBuilder().translationState(requested).build())
                                 .toObservable()));
     }
 

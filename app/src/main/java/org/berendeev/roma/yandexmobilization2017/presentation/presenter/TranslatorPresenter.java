@@ -7,6 +7,7 @@ import org.berendeev.roma.yandexmobilization2017.domain.entity.Word;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.GetDictionaryInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.GetFavouriteStateInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.GetLastWordInteractor;
+import org.berendeev.roma.yandexmobilization2017.domain.interactor.GetQueryInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.GetTranslateDirectionInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.GetTranslationInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.RemoveFromFavouritesInteractor;
@@ -48,6 +49,7 @@ public class TranslatorPresenter {
     @Inject GetTranslationInteractor getTranslationInteractor;
     @Inject GetFavouriteStateInteractor getFavouriteStateInteractor;
     @Inject ToggleFavouriteStateInteractor toggleFavouriteStateInteractor;
+    @Inject GetQueryInteractor getQueryInteractor;
     private Router router;
     private final CompositeDisposable disposable;
     private Word lastWord;
@@ -62,6 +64,11 @@ public class TranslatorPresenter {
         subscribeOnTextInput();
         subscribeOnTranslation();
         subscribeOnFavouriteState();
+        subscribeOnQuery();
+    }
+
+    private void subscribeOnQuery() {
+        disposable.add(getQueryInteractor.execute(new QueryObserver(), null));
     }
 
     private void subscribeOnFavouriteState() {
@@ -163,14 +170,14 @@ public class TranslatorPresenter {
     private class ResultObserver extends DisposableObserver<Word> {
         @Override public void onNext(Word word) {
             if(word.translationState() == connectionError){
-                view.setPreviousWord(word);
+//                view.setTranslation(word);
                 view.showConnectionError();
             }
             if (word.translationState() == ok){
                 view.hideConnectionError();
                 setImages(word.word());
                 lastWord = word;
-                view.setPreviousWord(word);
+                view.setTranslation(word);
             }
         }
 
@@ -188,6 +195,20 @@ public class TranslatorPresenter {
             }else {
                 view.switchOffFavButton();
             }
+        }
+
+        @Override public void onError(Throwable e) {
+
+        }
+
+        @Override public void onComplete() {
+
+        }
+    }
+
+    private class QueryObserver extends DisposableObserver<String> {
+        @Override public void onNext(String text) {
+            view.setTextToTranslate(text);
         }
 
         @Override public void onError(Throwable e) {

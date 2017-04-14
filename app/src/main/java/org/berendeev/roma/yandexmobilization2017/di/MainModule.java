@@ -10,7 +10,7 @@ import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
 import org.berendeev.roma.yandexmobilization2017.data.DictionaryRepositoryImpl;
 import org.berendeev.roma.yandexmobilization2017.data.HistoryAndFavouritesRepositoryImpl;
-import org.berendeev.roma.yandexmobilization2017.data.PreferencesRepositoryImpl;
+import org.berendeev.roma.yandexmobilization2017.data.ResultRepositoryImpl;
 import org.berendeev.roma.yandexmobilization2017.data.TranslationRepositoryImpl;
 import org.berendeev.roma.yandexmobilization2017.data.deserializer.LanguageMapDeserializer;
 import org.berendeev.roma.yandexmobilization2017.data.deserializer.MyAdapterFactory;
@@ -24,10 +24,9 @@ import org.berendeev.roma.yandexmobilization2017.data.sqlite.DatabaseOpenHelper;
 import org.berendeev.roma.yandexmobilization2017.data.sqlite.HistoryDataSource;
 import org.berendeev.roma.yandexmobilization2017.domain.DictionaryRepository;
 import org.berendeev.roma.yandexmobilization2017.domain.HistoryAndFavouritesRepository;
-import org.berendeev.roma.yandexmobilization2017.domain.PreferencesRepository;
+import org.berendeev.roma.yandexmobilization2017.domain.ResultRepository;
 import org.berendeev.roma.yandexmobilization2017.domain.TranslationRepository;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.Definition;
-import org.berendeev.roma.yandexmobilization2017.domain.entity.Dictionary;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.LanguageMap;
 
 import java.io.File;
@@ -86,8 +85,8 @@ public class MainModule {
 
     @Provides
     @Singleton
-    public PreferencesRepository providePreferencesRepository(Context context, Gson gson){
-        return new PreferencesRepositoryImpl(context, gson);
+    public ResultRepository providePreferencesRepository(Context context, Gson gson){
+        return new ResultRepositoryImpl(context, gson);
     }
 
     @Provides

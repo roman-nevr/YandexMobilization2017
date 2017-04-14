@@ -1,8 +1,7 @@
 package org.berendeev.roma.yandexmobilization2017.domain.interactor;
 
-import org.berendeev.roma.yandexmobilization2017.data.entity.Translation;
 import org.berendeev.roma.yandexmobilization2017.domain.DictionaryRepository;
-import org.berendeev.roma.yandexmobilization2017.domain.PreferencesRepository;
+import org.berendeev.roma.yandexmobilization2017.domain.ResultRepository;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.Dictionary;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.TranslationQuery;
 
@@ -13,14 +12,14 @@ import io.reactivex.Observable;
 public class GetDictionaryInteractor extends Interactor<Dictionary, String> {
 
     @Inject DictionaryRepository repository;
-    @Inject PreferencesRepository preferencesRepository;
+    @Inject ResultRepository resultRepository;
 
     @Inject
     public GetDictionaryInteractor() {
     }
 
     @Override public Observable<Dictionary> buildObservable(String param) {
-        return preferencesRepository
+        return resultRepository
                 .getTranslateDirection()
                 .firstElement()
                 .map(stringStringPair -> TranslationQuery.create(param, stringStringPair.first, stringStringPair.second))

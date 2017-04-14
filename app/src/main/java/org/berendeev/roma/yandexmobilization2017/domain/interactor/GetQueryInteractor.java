@@ -6,14 +6,14 @@ import javax.inject.Inject;
 
 import io.reactivex.Observable;
 
-public class SetDirectionFromInteractor extends Interactor<Void, String> {
+public class GetQueryInteractor extends Interactor<String, Void> {
 
     @Inject ResultRepository repository;
 
     @Inject
-    public SetDirectionFromInteractor() {}
+    public GetQueryInteractor() {}
 
-    @Override public Observable<Void> buildObservable(String param) {
-        return repository.setDirectionFrom(param).toObservable();
+    @Override public Observable<String> buildObservable(Void param) {
+        return repository.getQueryObservable();
     }
 }

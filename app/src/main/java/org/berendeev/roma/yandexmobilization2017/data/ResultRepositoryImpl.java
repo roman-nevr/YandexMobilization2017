@@ -6,7 +6,7 @@ import android.util.Pair;
 
 import com.google.gson.Gson;
 
-import org.berendeev.roma.yandexmobilization2017.domain.PreferencesRepository;
+import org.berendeev.roma.yandexmobilization2017.domain.ResultRepository;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.Dictionary;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.Word;
 
@@ -22,7 +22,7 @@ import static org.berendeev.roma.yandexmobilization2017.domain.entity.Word.Trans
 import static org.berendeev.roma.yandexmobilization2017.domain.entity.Word.TranslationState.requested;
 
 
-public class PreferencesRepositoryImpl implements PreferencesRepository {
+public class ResultRepositoryImpl implements ResultRepository {
 
     private static final String WORD = "word";
     private static final String TEXT = "text";
@@ -36,23 +36,24 @@ public class PreferencesRepositoryImpl implements PreferencesRepository {
     Context context;
     private final SharedPreferences wordPreferences, dirsPreferences;
     private BehaviorSubject<Pair<String, String>> directionsSubject;//FROM - TO
-    private BehaviorSubject<Word> lastWordSubject;
-
+    private BehaviorSubject<Word> resultSubject;
+    private BehaviorSubject<String> lastQuerySubject;
     private Gson gson;
 
     @Inject
-    public PreferencesRepositoryImpl(Context context, Gson gson) {
+    public ResultRepositoryImpl(Context context, Gson gson) {
         this.context = context;
         this.wordPreferences = context.getSharedPreferences(WORD, Context.MODE_PRIVATE);
         this.dirsPreferences = context.getSharedPreferences(DIRECTIONS, Context.MODE_PRIVATE);
         this.gson = gson;
         initDirections();
         initLastWord();
+        initLastQuery();
     }
 
-    @Override public Completable saveLastWord(Word word) {
+    @Override public Completable saveResult(Word word) {
         return Completable.fromAction(() -> {
-            lastWordSubject.onNext(word);
+            resultSubject.onNext(word);
             wordPreferences.edit()
                     .putString(TEXT, word.word())
                     .putString(TRANSLATION, word.translation())
@@ -62,9 +63,36 @@ public class PreferencesRepositoryImpl implements PreferencesRepository {
         });
     }
 
-    @Override public Observable<Word> getLastWord() {
-        return lastWordSubject;
+    @Override public Observable<Word> getResultObservable() {
+        return resultSubject;
 
+    }
+
+    @Override public Completable saveLastQuery(String query) {
+        return Completable.fromAction(() -> {
+            saveQuery(query);
+            invalidateResult();
+            lastQuerySubject.onNext(query);
+        });
+    }
+
+    @Override public Completable invalidateResult() {
+        return Completable.fromAction(() -> {
+            Word word = resultSubject.getValue().toBuilder()
+                    .translationState(requested)
+                    .build();
+            resultSubject.onNext(word);
+        });
+    }
+
+    private void saveQuery(String query) {
+        wordPreferences.edit()
+                .putString(TEXT, query)
+                .apply();
+    }
+
+    @Override public Observable<String> getQueryObservable() {
+        return lastQuerySubject;
     }
 
     @Override public Observable<Pair<String, String>> getTranslateDirection() {
@@ -83,7 +111,6 @@ public class PreferencesRepositoryImpl implements PreferencesRepository {
         });
     }
 
-
     @Override public Completable setDirectionFrom(String from) {
         return Completable.fromAction(() -> {
             String to;
@@ -95,6 +122,7 @@ public class PreferencesRepositoryImpl implements PreferencesRepository {
             changeDirections(from, to);
         });
     }
+
 
     @Override public Completable swapDirections() {
         return Completable.fromAction(() -> {
@@ -153,7 +181,13 @@ public class PreferencesRepositoryImpl implements PreferencesRepository {
                 .translationState(state)
                 .isFavourite(false)
                 .build();
-        lastWordSubject = BehaviorSubject.createDefault(word);
+        resultSubject = BehaviorSubject.createDefault(word);
 
+    }
+
+    private void initLastQuery() {
+        String query = wordPreferences.getString(TEXT, "");
+
+        lastQuerySubject = BehaviorSubject.createDefault(query);
     }
 }

@@ -162,9 +162,9 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
     @Override public void setTranslation(Word word) {
         if (!word.translation().equals(translation.getText().toString())) {
             translation.setText(word.translation());
+            showDictionary(word.dictionary());
         }
         setFavouritesLabel(word.isFavourite());
-        hideConnectionError();
     }
 
     @Override public void setTranslateDirection(TranslateDirection directionFrom, TranslateDirection directionTo) {
@@ -176,7 +176,7 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
         favButton.setColorFilter(isFavourite ? colorFavourite : colorNotFavourite);
     }
 
-    private void setTextToTranslate(String text) {
+    @Override public void setTextToTranslate(String text) {
         if (!text.equals(wordToTranslate.getText().toString())) {
             wordToTranslate.setText(text);
             wordToTranslate.setSelection(text.length());

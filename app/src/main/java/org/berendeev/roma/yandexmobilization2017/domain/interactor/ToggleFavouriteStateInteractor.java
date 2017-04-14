@@ -1,8 +1,7 @@
 package org.berendeev.roma.yandexmobilization2017.domain.interactor;
 
 import org.berendeev.roma.yandexmobilization2017.domain.HistoryAndFavouritesRepository;
-import org.berendeev.roma.yandexmobilization2017.domain.PreferencesRepository;
-import org.berendeev.roma.yandexmobilization2017.domain.entity.Word;
+import org.berendeev.roma.yandexmobilization2017.domain.ResultRepository;
 
 import javax.inject.Inject;
 
@@ -10,7 +9,7 @@ import io.reactivex.Observable;
 
 public class ToggleFavouriteStateInteractor extends Interactor<Void, Void> {
 
-    @Inject PreferencesRepository preferencesRepository;
+    @Inject ResultRepository resultRepository;
     @Inject HistoryAndFavouritesRepository historyAndFavouritesRepository;
     @Inject OnFavouritesChangedInteractor onFavouritesChangedInteractor;
     @Inject RemoveFromFavouritesInteractor removeFromFavouritesInteractor;
@@ -21,7 +20,7 @@ public class ToggleFavouriteStateInteractor extends Interactor<Void, Void> {
     }
 
     @Override public Observable<Void> buildObservable(Void param) {
-        return preferencesRepository.getLastWord()
+        return resultRepository.getResultObservable()
                 .firstOrError()
                 .flatMap(word -> historyAndFavouritesRepository.checkIfInFavourites(word))
                 .toObservable()

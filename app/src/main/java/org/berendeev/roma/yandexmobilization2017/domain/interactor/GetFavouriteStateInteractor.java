@@ -1,9 +1,7 @@
 package org.berendeev.roma.yandexmobilization2017.domain.interactor;
 
 import org.berendeev.roma.yandexmobilization2017.domain.HistoryAndFavouritesRepository;
-import org.berendeev.roma.yandexmobilization2017.domain.PreferencesRepository;
-import org.berendeev.roma.yandexmobilization2017.domain.entity.Word;
-import org.berendeev.roma.yandexmobilization2017.domain.entity.Word.TranslationState;
+import org.berendeev.roma.yandexmobilization2017.domain.ResultRepository;
 
 import javax.inject.Inject;
 
@@ -13,7 +11,7 @@ import static org.berendeev.roma.yandexmobilization2017.domain.entity.Word.Trans
 
 public class GetFavouriteStateInteractor extends Interactor<Boolean, Void> {
 
-    @Inject PreferencesRepository preferencesRepository;
+    @Inject ResultRepository resultRepository;
     @Inject HistoryAndFavouritesRepository historyAndFavouritesRepository;
     @Inject OnFavouritesChangedInteractor onFavouritesChangedInteractor;
 
@@ -23,8 +21,8 @@ public class GetFavouriteStateInteractor extends Interactor<Boolean, Void> {
 
     @Override public Observable<Boolean> buildObservable(Void param) {
         return Observable.combineLatest(
-                preferencesRepository
-                        .getLastWord()
+                resultRepository
+                        .getResultObservable()
                         .filter(word -> word.translationState() == ok),
                 onFavouritesChangedInteractor
                         .execute(null), (word, event) -> word)

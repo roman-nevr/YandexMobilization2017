@@ -2,16 +2,23 @@ package org.berendeev.roma.yandexmobilization2017.domain;
 
 import android.util.Pair;
 
+import org.berendeev.roma.yandexmobilization2017.domain.entity.TranslationQuery;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.Word;
 
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 
-public interface PreferencesRepository {
-    Completable saveLastWord(Word word);
+public interface ResultRepository {
+    Completable saveResult(Word word);
 
-    Observable<Word> getLastWord();
+    Observable<Word> getResultObservable();
+
+    Completable saveLastQuery(String query);
+
+    Completable invalidateResult();
+
+    Observable<String> getQueryObservable();
 
     Observable<Pair<String, String>> getTranslateDirection();
 

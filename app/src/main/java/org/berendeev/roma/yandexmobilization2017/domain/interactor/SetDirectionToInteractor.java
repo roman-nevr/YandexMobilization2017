@@ -1,6 +1,6 @@
 package org.berendeev.roma.yandexmobilization2017.domain.interactor;
 
-import org.berendeev.roma.yandexmobilization2017.domain.PreferencesRepository;
+import org.berendeev.roma.yandexmobilization2017.domain.ResultRepository;
 
 import javax.inject.Inject;
 
@@ -8,7 +8,7 @@ import io.reactivex.Observable;
 
 public class SetDirectionToInteractor extends Interactor<Void, String> {
 
-    @Inject PreferencesRepository repository;
+    @Inject ResultRepository repository;
 
     @Inject
     public SetDirectionToInteractor() {}

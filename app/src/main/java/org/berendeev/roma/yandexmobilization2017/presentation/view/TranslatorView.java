@@ -9,6 +9,9 @@ import org.berendeev.roma.yandexmobilization2017.domain.entity.Word;
 import io.reactivex.Observable;
 
 public interface TranslatorView {
+
+    void setTextToTranslate(String text);
+
     void setPreviousWord(Word word);
 
     void setTranslation(Word word);

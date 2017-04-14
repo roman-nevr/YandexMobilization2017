@@ -30,6 +30,10 @@ public class DummyView implements LanguageSelectorView, TranslatorView, WordList
 
     }
 
+    @Override public void setTextToTranslate(String text) {
+
+    }
+
     @Override public void setPreviousWord(Word word) {
 
     }
