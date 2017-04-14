@@ -7,7 +7,7 @@ import javax.inject.Inject;
 
 import io.reactivex.Observable;
 
-public class ToggleFavouriteStateInteractor extends Interactor<Void, Void> {
+public class ToggleFavouriteStateInteractor extends Interactor<Boolean, Void> {
 
     @Inject ResultRepository resultRepository;
     @Inject HistoryAndFavouritesRepository historyAndFavouritesRepository;
@@ -19,16 +19,20 @@ public class ToggleFavouriteStateInteractor extends Interactor<Void, Void> {
     public ToggleFavouriteStateInteractor() {
     }
 
-    @Override public Observable<Void> buildObservable(Void param) {
+    @Override public Observable<Boolean> buildObservable(Void param) {
         return resultRepository.getResultObservable()
                 .firstOrError()
                 .flatMap(word -> historyAndFavouritesRepository.checkIfInFavourites(word))
                 .toObservable()
                 .flatMap(word -> {
                     if (word.isFavourite()){
-                        return removeFromFavouritesInteractor.execute(word);
+                        return historyAndFavouritesRepository
+                                .removeFromFavourites(word)
+                                .andThen(Observable.just(false));
                     }else {
-                        return saveInFavouriteInteractor.execute(word);
+                        return historyAndFavouritesRepository
+                                .saveInFavourites(word)
+                                .andThen(Observable.just(true));
                     }
                 });
     }

@@ -17,7 +17,6 @@ import javax.inject.Inject;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.observers.DisposableObserver;
 
-import static org.berendeev.roma.yandexmobilization2017.presentation.view.DummyView.DUMMY_VIEW;
 
 public class LanguageSelectorPresenter {
 

@@ -32,10 +32,6 @@ public interface TranslatorView {
 
     void showImageButtons();
 
-    void showLanguagesLoadError();
-
-    void hideLanguagesLoadError();
-
     interface Router {
         void showSourceLanguageSelector();
 

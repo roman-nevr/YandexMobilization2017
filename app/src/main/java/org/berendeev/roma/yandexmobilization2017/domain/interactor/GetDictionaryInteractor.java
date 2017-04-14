@@ -19,12 +19,6 @@ public class GetDictionaryInteractor extends Interactor<Dictionary, String> {
     }
 
     @Override public Observable<Dictionary> buildObservable(String param) {
-        return resultRepository
-                .getTranslateDirection()
-                .firstElement()
-                .map(stringStringPair -> TranslationQuery.create(param, stringStringPair.first, stringStringPair.second))
-                .flatMapSingle(query -> repository
-                        .lookup(query))
-                .toObservable();
+        return null;
     }
 }

@@ -14,6 +14,6 @@ public class GetQueryInteractor extends Interactor<String, Void> {
     public GetQueryInteractor() {}
 
     @Override public Observable<String> buildObservable(Void param) {
-        return repository.getQueryObservable();
+        return repository.getQueryObservable().map(query -> query.text());
     }
 }

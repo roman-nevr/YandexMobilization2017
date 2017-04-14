@@ -15,7 +15,6 @@ import org.berendeev.roma.yandexmobilization2017.domain.interactor.SaveLastWordI
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.SetDirectionFromInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.SetDirectionToInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.SetWordInTranslatorInteractor;
-import org.berendeev.roma.yandexmobilization2017.presentation.view.DummyView;
 import org.berendeev.roma.yandexmobilization2017.presentation.view.WordListView;
 
 import java.util.List;

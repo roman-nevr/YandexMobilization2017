@@ -7,6 +7,7 @@ import android.util.Pair;
 import org.berendeev.roma.yandexmobilization2017.domain.ResultRepository;
 import org.berendeev.roma.yandexmobilization2017.domain.TranslationRepository;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.TranslateDirection;
+import org.berendeev.roma.yandexmobilization2017.domain.entity.TranslationQuery;
 
 import java.util.Locale;
 import java.util.Map;
@@ -26,12 +27,11 @@ public class GetTranslateDirectionInteractor extends Interactor<Pair<TranslateDi
     @Override public Observable<Pair<TranslateDirection, TranslateDirection>> buildObservable(Void param) {
         return Observable.combineLatest(
                 translationRepository.getLanguages(Locale.getDefault()),
-                resultRepository.getTranslateDirection(),
-                (map, stringStringPair) -> {
-                    TranslateDirection directionFrom = buildTranslateDirection(stringStringPair.first, map.map());
-                    TranslateDirection directionTo = buildTranslateDirection(stringStringPair.second, map.map());
-                    Pair<TranslateDirection, TranslateDirection> pair = new Pair<>(directionFrom, directionTo);
-                    return pair;
+                resultRepository.getQueryObservable(),
+                (map, query) -> {
+                    TranslateDirection directionFrom = buildTranslateDirection(query.langFrom(), map.map());
+                    TranslateDirection directionTo = buildTranslateDirection(query.langTo(), map.map());
+                    return new Pair<>(directionFrom, directionTo);
                 }
         );
     }

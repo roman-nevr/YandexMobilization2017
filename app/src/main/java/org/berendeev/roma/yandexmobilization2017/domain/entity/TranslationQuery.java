@@ -16,6 +16,8 @@ public abstract class TranslationQuery {
                 .build();
     }
 
+    public abstract Builder toBuilder();
+
     public static Builder builder() {
         return new AutoValue_TranslationQuery.Builder();
     }

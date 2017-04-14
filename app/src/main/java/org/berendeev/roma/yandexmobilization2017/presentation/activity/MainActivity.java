@@ -104,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements WordListView.Rout
     private void showEnterFragment(String tag) {
         Fragment fragment = fragmentManager.findFragmentByTag(tag);
         if (fragment != null){
-            transaction.show(fragment);
+            transaction.replace(R.id.container, fragment, tag);
         }else {
             fragment = getFragment(tag);
             transaction.add(R.id.container, fragment, tag);
@@ -127,7 +127,7 @@ public class MainActivity extends AppCompatActivity implements WordListView.Rout
     private void hideFragment(FragmentTransaction transaction, String tag){
         Fragment fragment = fragmentManager.findFragmentByTag(tag);
         if (fragment != null && fragment.isVisible()){
-            transaction.hide(fragment);
+            transaction.remove(fragment);
         }
     }
 

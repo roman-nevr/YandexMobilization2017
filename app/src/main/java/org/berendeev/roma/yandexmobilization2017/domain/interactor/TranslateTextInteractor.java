@@ -22,9 +22,11 @@ public class TranslateTextInteractor extends Interactor<Void, String> {
 
     @Override public Observable<Void> buildObservable(String param) {
         return resultRepository
-                .saveLastQuery(param)
-                .andThen(resultRepository
-                .invalidateResult())
+                .getQueryObservable()
+                .firstElement()
+                .map(query -> query.toBuilder().text(param).build())
+                .flatMapCompletable(query -> resultRepository.saveLastQuery(query))
+                .andThen(resultRepository.invalidateResult())
                 .toObservable();
     }
 

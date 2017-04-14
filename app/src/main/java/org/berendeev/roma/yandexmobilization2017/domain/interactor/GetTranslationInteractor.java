@@ -57,7 +57,10 @@ public class GetTranslationInteractor extends Interactor<Word, Void> {
     private Observable<Word> onValidResultObservable() {
         return resultRepository
                 .getResultObservable()
-                .filter(word -> word.translationState() == ok || word.translationState() == connectionError);
+                .filter(word -> word.translationState() == ok || word.translationState() == connectionError)
+                .flatMap(word -> historyAndFavouritesRepository
+                        .checkIfInFavourites(word)
+                        .toObservable());
     }
 
     private Observable<Word> translateWord(TranslationQuery query) {
@@ -87,19 +90,10 @@ public class GetTranslationInteractor extends Interactor<Word, Void> {
     }
 
     private Observable<TranslationQuery> getQueryObservable() {
-        Observable<String> queryObservable = resultRepository
+        return resultRepository
                 .getResultObservable()
                 .filter(word -> word.translationState() == requested)
-                .flatMap(word -> resultRepository
-                        .getQueryObservable());
-        return Observable.combineLatest(
-                queryObservable
-                        .debounce(50, TimeUnit.MILLISECONDS),
-                resultRepository
-                        .getTranslateDirection(),
-//                        .debounce(50, TimeUnit.MILLISECONDS),
-                (text, dirs) ->
-                        TranslationQuery.create(text, dirs.first, dirs.second));
+                .flatMap(word -> resultRepository.getQueryObservable().firstElement().toObservable());
     }
 //        return resultRepository
 //                .getResultObservable()

@@ -31,6 +31,7 @@ import org.berendeev.roma.yandexmobilization2017.presentation.App;
 import org.berendeev.roma.yandexmobilization2017.presentation.Utils;
 import org.berendeev.roma.yandexmobilization2017.presentation.activity.LanguageSelectorActivity;
 import org.berendeev.roma.yandexmobilization2017.presentation.adapter.DictionaryAdapter;
+import org.berendeev.roma.yandexmobilization2017.presentation.adapter.DictionaryViewMapper;
 import org.berendeev.roma.yandexmobilization2017.presentation.presenter.TranslatorPresenter;
 import org.berendeev.roma.yandexmobilization2017.presentation.view.KeyImeChangeListener;
 import org.berendeev.roma.yandexmobilization2017.presentation.view.SoftEditText;
@@ -251,17 +252,17 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
         favButton.setVisibility(View.VISIBLE);
     }
 
-    @Override public void showLanguagesLoadError() {
-        toolbar.setVisibility(View.INVISIBLE);
-        wordToTranslate.setVisibility(View.INVISIBLE);
-        showConnectionError();
-    }
-
-    @Override public void hideLanguagesLoadError() {
-        toolbar.setVisibility(View.VISIBLE);
-        wordToTranslate.setVisibility(View.VISIBLE);
-        hideConnectionError();
-    }
+//    @Override public void showLanguagesLoadError() {
+//        toolbar.setVisibility(View.INVISIBLE);
+//        wordToTranslate.setVisibility(View.INVISIBLE);
+//        showConnectionError();
+//    }
+//
+//    @Override public void hideLanguagesLoadError() {
+//        toolbar.setVisibility(View.VISIBLE);
+//        wordToTranslate.setVisibility(View.VISIBLE);
+//        hideConnectionError();
+//    }
 
     @Override public void showSourceLanguageSelector() {
         LanguageSelectorActivity.start(this.getActivity(), R.id.language_from_type);
@@ -274,7 +275,6 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
 
     @Override public void onHiddenChanged(boolean hidden) {
         if (!hidden) {
-            presenter.onShow();
         } else {
             presenter.onInputDone();
         }
@@ -285,12 +285,13 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
     }
 
     private void showDictionary(Dictionary dictionary) {
-        if (adapter == null) {
-            adapter = new DictionaryAdapter(dictionary);
-            recyclerView.setAdapter(adapter);
-        } else {
-            adapter.changeItems(dictionary);
-        }
+//        if (adapter == null) {
+//            adapter = new DictionaryAdapter(dictionary);
+//            recyclerView.setAdapter(adapter);
+//        } else {
+//            adapter.changeItems(dictionary);
+//        }
+        translation.setText(DictionaryViewMapper.map(dictionary));
     }
 
 }

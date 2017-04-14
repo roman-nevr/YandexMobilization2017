@@ -14,13 +14,11 @@ public interface ResultRepository {
 
     Observable<Word> getResultObservable();
 
-    Completable saveLastQuery(String query);
+    Completable saveLastQuery(TranslationQuery query);
 
     Completable invalidateResult();
 
-    Observable<String> getQueryObservable();
-
-    Observable<Pair<String, String>> getTranslateDirection();
+    Observable<TranslationQuery> getQueryObservable();
 
     Completable setDirectionTo(String to);
 

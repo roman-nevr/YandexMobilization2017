@@ -8,6 +8,7 @@ import com.google.gson.Gson;
 
 import org.berendeev.roma.yandexmobilization2017.domain.ResultRepository;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.Dictionary;
+import org.berendeev.roma.yandexmobilization2017.domain.entity.TranslationQuery;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.Word;
 
 import java.util.Locale;
@@ -35,9 +36,8 @@ public class ResultRepositoryImpl implements ResultRepository {
 
     Context context;
     private final SharedPreferences wordPreferences, dirsPreferences;
-    private BehaviorSubject<Pair<String, String>> directionsSubject;//FROM - TO
     private BehaviorSubject<Word> resultSubject;
-    private BehaviorSubject<String> lastQuerySubject;
+    private BehaviorSubject<TranslationQuery> lastQuerySubject;
     private Gson gson;
 
     @Inject
@@ -46,9 +46,8 @@ public class ResultRepositoryImpl implements ResultRepository {
         this.wordPreferences = context.getSharedPreferences(WORD, Context.MODE_PRIVATE);
         this.dirsPreferences = context.getSharedPreferences(DIRECTIONS, Context.MODE_PRIVATE);
         this.gson = gson;
-        initDirections();
-        initLastWord();
         initLastQuery();
+        initLastWord();
     }
 
     @Override public Completable saveResult(Word word) {
@@ -68,10 +67,11 @@ public class ResultRepositoryImpl implements ResultRepository {
 
     }
 
-    @Override public Completable saveLastQuery(String query) {
+    @Override public Completable saveLastQuery(TranslationQuery query) {
         return Completable.fromAction(() -> {
-            saveQuery(query);
-            invalidateResult();
+            saveQuery(query.text());
+            saveDirection(DIRECTION_FROM, query.langFrom());
+            saveDirection(DIRECTION_TO, query.langTo());
             lastQuerySubject.onNext(query);
         });
     }
@@ -91,12 +91,8 @@ public class ResultRepositoryImpl implements ResultRepository {
                 .apply();
     }
 
-    @Override public Observable<String> getQueryObservable() {
+    @Override public Observable<TranslationQuery> getQueryObservable() {
         return lastQuerySubject;
-    }
-
-    @Override public Observable<Pair<String, String>> getTranslateDirection() {
-        return directionsSubject;
     }
 
     @Override public Completable setDirectionTo(String to) {
@@ -107,7 +103,7 @@ public class ResultRepositoryImpl implements ResultRepository {
             }else {
                 from = getFrom();
             }
-            changeDirections(from, to);
+            saveDirections(from, to);
         });
     }
 
@@ -119,7 +115,7 @@ public class ResultRepositoryImpl implements ResultRepository {
             }else {
                 to = getTo();
             }
-            changeDirections(from, to);
+            saveDirections(from, to);
         });
     }
 
@@ -128,43 +124,31 @@ public class ResultRepositoryImpl implements ResultRepository {
         return Completable.fromAction(() -> {
             String from = getFrom();
             String to = getTo();
-            changeDirections(to, from);
+            saveDirections(to, from);
         });
     }
 
-    private void changeDirections(String from, String to){
+    private String getTo() {
+        return lastQuerySubject.getValue().langTo();
+    }
+
+    private String getFrom() {
+        return lastQuerySubject.getValue().langFrom();
+    }
+
+    private void saveDirections(String from, String to){
         saveDirection(DIRECTION_FROM, from);
         saveDirection(DIRECTION_TO, to);
-        directionsSubject.onNext(new Pair<>(from, to));
+        lastQuerySubject.onNext(lastQuerySubject.getValue().toBuilder()
+                .langFrom(from)
+                .langTo(to)
+                .build());
     }
 
     private void saveDirection(String direction, String value){
         dirsPreferences.edit()
                 .putString(direction, value)
                 .apply();
-    }
-
-    private String getFrom(){
-        return directionsSubject.getValue().first;
-    }
-
-    private String getTo(){
-        return directionsSubject.getValue().second;
-    }
-
-    private void initDirections(){
-        directionsSubject = BehaviorSubject.create();
-        String directionTo = dirsPreferences.getString(DIRECTION_TO, Locale.getDefault().getLanguage());
-        String defaultDirectionFrom;
-        if(Locale.getDefault().getLanguage().equals("en")){
-            defaultDirectionFrom = "ru";
-        }else {
-            defaultDirectionFrom = "en";
-        }
-        String directionFrom = dirsPreferences.getString(DIRECTION_FROM, defaultDirectionFrom);
-        directionsSubject.onNext(new Pair<>(directionFrom, directionTo));
-        saveDirection(DIRECTION_FROM, directionFrom);
-        saveDirection(DIRECTION_TO, directionTo);
     }
 
     private void initLastWord() {
@@ -175,8 +159,8 @@ public class ResultRepositoryImpl implements ResultRepository {
         Word word = Word.builder()
                 .word(wordPreferences.getString(TEXT, ""))
                 .translation(wordPreferences.getString(TRANSLATION, ""))
-                .languageFrom(dirsPreferences.getString(DIRECTION_FROM, directionsSubject.getValue().first))
-                .languageTo(dirsPreferences.getString(DIRECTION_TO, directionsSubject.getValue().second))
+                .languageFrom(dirsPreferences.getString(DIRECTION_FROM, lastQuerySubject.getValue().langFrom()))
+                .languageTo(dirsPreferences.getString(DIRECTION_TO, lastQuerySubject.getValue().langTo()))
                 .dictionary(gson.fromJson(wordPreferences.getString(DICTIONARY, "{\"text\":\"\",\"transcription\":\"\",\"definitions\":[]}"), Dictionary.class))
                 .translationState(state)
                 .isFavourite(false)
@@ -187,7 +171,16 @@ public class ResultRepositoryImpl implements ResultRepository {
 
     private void initLastQuery() {
         String query = wordPreferences.getString(TEXT, "");
-
-        lastQuerySubject = BehaviorSubject.createDefault(query);
+        String directionTo = dirsPreferences.getString(DIRECTION_TO, Locale.getDefault().getLanguage());
+        String defaultDirectionFrom;
+        if(Locale.getDefault().getLanguage().equals("en")){
+            defaultDirectionFrom = "ru";
+        }else {
+            defaultDirectionFrom = "en";
+        }
+        String directionFrom = dirsPreferences.getString(DIRECTION_FROM, defaultDirectionFrom);
+        lastQuerySubject = BehaviorSubject.createDefault(TranslationQuery.create(query, directionFrom, directionTo));
+        saveDirection(DIRECTION_FROM, directionFrom);
+        saveDirection(DIRECTION_TO, directionTo);
     }
 }

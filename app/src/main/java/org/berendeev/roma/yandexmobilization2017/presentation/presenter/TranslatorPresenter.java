@@ -52,7 +52,6 @@ public class TranslatorPresenter {
     @Inject GetQueryInteractor getQueryInteractor;
     private Router router;
     private final CompositeDisposable disposable;
-    private Word lastWord;
 
     @Inject
     public TranslatorPresenter() {
@@ -63,16 +62,11 @@ public class TranslatorPresenter {
         subscribeOnTranslateDirections();
         subscribeOnTextInput();
         subscribeOnTranslation();
-        subscribeOnFavouriteState();
         subscribeOnQuery();
     }
 
     private void subscribeOnQuery() {
         disposable.add(getQueryInteractor.execute(new QueryObserver(), null));
-    }
-
-    private void subscribeOnFavouriteState() {
-        disposable.add(getFavouriteStateInteractor.execute(new FavouriteObserver(), null));
     }
 
     private void subscribeOnTranslation() {
@@ -122,7 +116,7 @@ public class TranslatorPresenter {
     }
 
     public void onFavButtonClick() {
-        toggleFavouriteStateInteractor.execute(null, null);
+        toggleFavouriteStateInteractor.execute(new FavouriteObserver(), null);
 
     }
 
@@ -136,7 +130,6 @@ public class TranslatorPresenter {
     }
 
     public void onDeleteTextButtonClick() {
-        lastWord = Word.EMPTY;
         view.setPreviousWord(Word.EMPTY);
         view.hideImageButtons();
     }
@@ -147,9 +140,6 @@ public class TranslatorPresenter {
         }else {
             view.showImageButtons();
         }
-    }
-
-    public void onShow() {
     }
 
     private class DirectionsObserver extends DisposableObserver<Pair<TranslateDirection, TranslateDirection>> {
@@ -176,7 +166,6 @@ public class TranslatorPresenter {
             if (word.translationState() == ok){
                 view.hideConnectionError();
                 setImages(word.word());
-                lastWord = word;
                 view.setTranslation(word);
             }
         }
