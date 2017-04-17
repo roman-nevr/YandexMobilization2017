@@ -78,6 +78,7 @@
         android:gravity="top"
         android:imeOptions="actionDone|flagNoExtractUi|flagNoFullscreen"
         android:inputType="text"
+        android:textSize="@dimen/text_regular_size"
         android:layout_marginLeft="8dp"
         app:layout_constraintLeft_toLeftOf="parent"
         android:layout_marginRight="8dp"
@@ -99,13 +100,13 @@
         app:layout_constraintBottom_toBottomOf="parent"
         android:id="@+id/translation_layout"
         android:visibility="invisible"
-        tools:visibility="gone"
+        tools:visibility="visible"
         >
         <TextView
             android:id="@+id/translation"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:textSize="18sp"
+            android:textSize="@dimen/text_regular_size"
             android:textStyle="bold"
             android:padding="4dp"
             android:gravity="center_vertical"
@@ -139,8 +140,8 @@
             tools:tint="@color/colorPrimary"
             />
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/recycler_view"
+        <TextView
+            android:id="@+id/dictionary"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginTop="8dp"
@@ -152,10 +153,10 @@
             app:layout_constraintBottom_toBottomOf="parent"
             android:layout_marginBottom="8dp"
             app:layout_constraintHorizontal_bias="0.503"
-            app:layoutManager="LinearLayoutManager"
-            tools:listitem = "@layout/translator_list_item"
             android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"/>
+            android:layout_marginEnd="8dp"
+            tools:text = "text [tэkst]"
+            />
 
     </android.support.constraint.ConstraintLayout>
 
@@ -169,7 +170,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         android:id="@+id/error_layout"
         android:visibility="gone"
-        tools:visibility="visible"
+        tools:visibility="invisible"
         >
 
         <TextView

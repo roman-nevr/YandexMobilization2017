@@ -30,7 +30,7 @@ public class LanguageSelectorActivity extends AppCompatActivity implements Langu
 
     public static final String TYPE = "type";
     @BindView(R.id.toolbar) Toolbar toolbar;
-    @BindView(R.id.recycler_view) RecyclerView recyclerView;
+    @BindView(R.id.dictionary) RecyclerView recyclerView;
 
     @Inject LanguageSelectorPresenter presenter;
 

@@ -6,22 +6,17 @@ import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.KeyEvent;
+import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
-
-import com.jakewharton.rxbinding2.widget.RxTextView;
 
 import org.berendeev.roma.yandexmobilization2017.R;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.Dictionary;
@@ -30,10 +25,8 @@ import org.berendeev.roma.yandexmobilization2017.domain.entity.Word;
 import org.berendeev.roma.yandexmobilization2017.presentation.App;
 import org.berendeev.roma.yandexmobilization2017.presentation.Utils;
 import org.berendeev.roma.yandexmobilization2017.presentation.activity.LanguageSelectorActivity;
-import org.berendeev.roma.yandexmobilization2017.presentation.adapter.DictionaryAdapter;
-import org.berendeev.roma.yandexmobilization2017.presentation.adapter.DictionaryViewMapper;
+import org.berendeev.roma.yandexmobilization2017.presentation.adapter.DictionaryViewWrapper;
 import org.berendeev.roma.yandexmobilization2017.presentation.presenter.TranslatorPresenter;
-import org.berendeev.roma.yandexmobilization2017.presentation.view.KeyImeChangeListener;
 import org.berendeev.roma.yandexmobilization2017.presentation.view.SoftEditText;
 import org.berendeev.roma.yandexmobilization2017.presentation.view.TranslatorView;
 
@@ -42,7 +35,6 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.Observable;
-import okhttp3.Response;
 
 import static android.view.KeyEvent.KEYCODE_BACK;
 import static android.view.inputmethod.EditorInfo.IME_ACTION_DONE;
@@ -56,7 +48,7 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
     @BindView(R.id.language_from) Button btnLanguageFrom;
     @BindView(R.id.language_to) Button btnLanguageTo;
     @BindView(R.id.swap_button) ImageButton swapButton;
-    @BindView(R.id.recycler_view) RecyclerView recyclerView;
+    @BindView(R.id.dictionary) TextView tvDictionary;
     @BindView(R.id.translation_layout) ConstraintLayout translationLayout;
     @BindView(R.id.error_layout) ConstraintLayout errorLayout;
     @BindView(R.id.repeat_button) Button repeatButton;
@@ -64,8 +56,11 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
 
     @Inject TranslatorPresenter presenter;
     private int colorFavourite;
+    private int colorAccent;
     private int colorNotFavourite;
-    private DictionaryAdapter adapter;
+    private int dictionaryHeaderSize;
+    private int dictionaryTextSize;
+    private DictionaryViewWrapper wrapper;
 
     @Nullable @Override public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.translator, container, false);
@@ -106,11 +101,10 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
     }
 
     private void initDictionary() {
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.getItemAnimator().setChangeDuration(0);
-        recyclerView.getItemAnimator().setAddDuration(0);
-        recyclerView.getItemAnimator().setRemoveDuration(0);
-        recyclerView.getItemAnimator().setMoveDuration(0);
+        dictionaryHeaderSize = getResources().getDimensionPixelSize(R.dimen.text_regular_size);
+        dictionaryTextSize = getResources().getDimensionPixelSize(R.dimen.text_medium_size);
+        wrapper = new DictionaryViewWrapper(colorAccent, colorFavourite, dictionaryHeaderSize, dictionaryTextSize);
+        tvDictionary.setMovementMethod(LinkMovementMethod.getInstance());
     }
 
     private void initHeaderView() {
@@ -127,6 +121,7 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
 
     private void initFavouritesMarker() {
         colorFavourite = ContextCompat.getColor(getContext(), R.color.colorPrimary);
+        colorAccent = ContextCompat.getColor(getContext(), R.color.colorAccent);
         colorNotFavourite = ContextCompat.getColor(getContext(), R.color.grey);
         favButton.setOnClickListener(v -> {
             presenter.onFavButtonClick();
@@ -186,8 +181,6 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
     }
 
     @Override public Observable<String> getTextObservable() {
-//        return RxTextView.textChanges(wordToTranslate)
-//                .map(charSequence -> charSequence.toString());
         return Observable.create(emitter -> wordToTranslate
                 .addTextChangedListener(new TextWatcher() {
                     @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -252,18 +245,6 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
         favButton.setVisibility(View.VISIBLE);
     }
 
-//    @Override public void showLanguagesLoadError() {
-//        toolbar.setVisibility(View.INVISIBLE);
-//        wordToTranslate.setVisibility(View.INVISIBLE);
-//        showConnectionError();
-//    }
-//
-//    @Override public void hideLanguagesLoadError() {
-//        toolbar.setVisibility(View.VISIBLE);
-//        wordToTranslate.setVisibility(View.VISIBLE);
-//        hideConnectionError();
-//    }
-
     @Override public void showSourceLanguageSelector() {
         LanguageSelectorActivity.start(this.getActivity(), R.id.language_from_type);
 
@@ -285,13 +266,8 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
     }
 
     private void showDictionary(Dictionary dictionary) {
-//        if (adapter == null) {
-//            adapter = new DictionaryAdapter(dictionary);
-//            recyclerView.setAdapter(adapter);
-//        } else {
-//            adapter.changeItems(dictionary);
-//        }
-        translation.setText(DictionaryViewMapper.map(dictionary));
+
+        tvDictionary.setText(wrapper.getText(dictionary));
     }
 
 }

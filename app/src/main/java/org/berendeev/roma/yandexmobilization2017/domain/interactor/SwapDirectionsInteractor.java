@@ -9,6 +9,8 @@ import javax.inject.Inject;
 
 import io.reactivex.Observable;
 
+import static org.berendeev.roma.yandexmobilization2017.domain.entity.Word.TranslationState.ok;
+
 public class SwapDirectionsInteractor extends Interactor<Void, Void> {
 
     @Inject ResultRepository resultRepository;
@@ -23,6 +25,15 @@ public class SwapDirectionsInteractor extends Interactor<Void, Void> {
                 .getResultObservable()
                 .firstElement()
                 .toObservable()
+                .flatMap(word -> {
+                    if(word.translationState() == ok){
+                        return historyAndFavouritesRepository
+                                .saveInHistory(word)
+                                .andThen(Observable.just(word));
+                    }else {
+                        return Observable.just(word);
+                    }
+                })
                 .flatMap(word -> Observable.concat(
                         resultRepository
                                 .saveLastQuery(buildQuery(word))
@@ -33,7 +44,13 @@ public class SwapDirectionsInteractor extends Interactor<Void, Void> {
     }
 
     private TranslationQuery buildQuery(Word word) {
-        return TranslationQuery.create(word.translation(), word.languageTo(), word.languageFrom());
+        String query;
+        if (word.translationState() == ok){
+            query = word.translation();
+        }else {
+            query = word.word();
+        }
+        return TranslationQuery.create(query, word.languageTo(), word.languageFrom());
     }
 
 

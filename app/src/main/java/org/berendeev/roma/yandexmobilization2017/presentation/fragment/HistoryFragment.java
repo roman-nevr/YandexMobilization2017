@@ -37,7 +37,7 @@ public class HistoryFragment extends Fragment implements WordListView {
     @Inject HistoryPresenter presenter;
 
     @BindView(R.id.toolbar) Toolbar toolbar;
-    @BindView(R.id.recycler_view) RecyclerView recyclerView;
+    @BindView(R.id.dictionary) RecyclerView recyclerView;
     @BindView(R.id.title) TextView title;
     @BindView(R.id.delete_all_button) ImageButton deleteButton;
 

@@ -114,7 +114,7 @@ public class GetTranslationInteractor extends Interactor<Word, Void> {
 //                                            dictionaryRepository
 //                                                    .lookup(query),
 //                                            (translation, dictionary) ->
-//                                                    TranslateMapper.map(query, translation, dictionary))
+//                                                    TranslateMapper.getText(query, translation, dictionary))
 //                                            .toObservable()
 //                                            .flatMap(receivedWord ->
 //                                                    resultRepository
