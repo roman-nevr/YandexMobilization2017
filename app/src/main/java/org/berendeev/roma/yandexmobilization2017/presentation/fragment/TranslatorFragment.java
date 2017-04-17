@@ -1,6 +1,8 @@
 package org.berendeev.roma.yandexmobilization2017.presentation.fragment;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
@@ -38,6 +40,8 @@ import butterknife.ButterKnife;
 import io.reactivex.Observable;
 
 import static android.view.KeyEvent.KEYCODE_BACK;
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
 import static android.view.inputmethod.EditorInfo.IME_ACTION_DONE;
 
 
@@ -51,10 +55,13 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
     @BindView(R.id.swap_button) ImageButton swapButton;
     @BindView(R.id.dictionary) TextView tvDictionary;
     @BindView(R.id.translation_layout) ConstraintLayout translationLayout;
+    @BindView(R.id.dictionary_layout) ConstraintLayout dictionaryLayout;
     @BindView(R.id.error_layout) ConstraintLayout errorLayout;
     @BindView(R.id.repeat_button) Button repeatButton;
     @BindView(R.id.delete_text_button) ImageButton deleteTextButton;
     @BindView(R.id.progress_bar) ProgressBar progressBar;
+    @BindView(R.id.translator_ua) TextView translatorUa;
+    @BindView(R.id.dictionary_ua) TextView dictionaryUa;
 
     @Inject TranslatorPresenter presenter;
     private int colorFavourite;
@@ -78,6 +85,18 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
         initEditorActionListener();
         initDictionary();
         initErrorUi();
+        initLinks();
+    }
+
+    private void initLinks() {
+        translatorUa.setOnClickListener(v -> {
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://translate.yandex.ru/"));
+            startActivity(browserIntent);
+        });
+        dictionaryUa.setOnClickListener(v -> {
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://api.yandex.ru/dictionary/"));
+            startActivity(browserIntent);
+        });
     }
 
     private void initEditor() {
@@ -97,7 +116,6 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
 
     private void initErrorUi() {
         repeatButton.setOnClickListener(v -> {
-            translationLayout.setVisibility(View.INVISIBLE);
             presenter.onRepeat();
         });
     }
@@ -228,35 +246,37 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
     }
 
     @Override public void showConnectionError() {
-        errorLayout.setVisibility(View.VISIBLE);
-        translationLayout.setVisibility(View.GONE);
+        errorLayout.setVisibility(VISIBLE);
+        translationLayout.setVisibility(GONE);
+        dictionaryLayout.setVisibility(GONE);
     }
 
     @Override public void hideConnectionError() {
-        errorLayout.setVisibility(View.GONE);
-        translationLayout.setVisibility(View.VISIBLE);
+        errorLayout.setVisibility(GONE);
+        translationLayout.setVisibility(VISIBLE);
+        dictionaryLayout.setVisibility(VISIBLE);
     }
 
     @Override public void hideImageButtons() {
-        deleteTextButton.setVisibility(View.GONE);
-        favButton.setVisibility(View.GONE);
+        deleteTextButton.setVisibility(GONE);
+        favButton.setVisibility(GONE);
     }
 
     @Override public void showImageButtons() {
-        deleteTextButton.setVisibility(View.VISIBLE);
-        favButton.setVisibility(View.VISIBLE);
+        deleteTextButton.setVisibility(VISIBLE);
+        favButton.setVisibility(VISIBLE);
     }
 
     @Override public void showProgress() {
-        progressBar.setVisibility(View.VISIBLE);
+        progressBar.setVisibility(VISIBLE);
         translation.setVisibility(View.INVISIBLE);
-        tvDictionary.setVisibility(View.INVISIBLE);
+        dictionaryLayout.setVisibility(View.INVISIBLE);
     }
 
     @Override public void hideProgress() {
-        progressBar.setVisibility(View.GONE);
-        translation.setVisibility(View.VISIBLE);
-        tvDictionary.setVisibility(View.VISIBLE);
+        progressBar.setVisibility(GONE);
+        translation.setVisibility(VISIBLE);
+        dictionaryLayout.setVisibility(VISIBLE);
     }
 
     @Override public void showSourceLanguageSelector() {
@@ -280,8 +300,12 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
     }
 
     private void showDictionary(Dictionary dictionary) {
-
         tvDictionary.setText(wrapper.getText(dictionary));
+        if(dictionary.equals(Dictionary.EMPTY)){
+            dictionaryUa.setVisibility(View.INVISIBLE);
+        }else {
+            dictionaryUa.setVisibility(VISIBLE);
+        }
     }
 
 }

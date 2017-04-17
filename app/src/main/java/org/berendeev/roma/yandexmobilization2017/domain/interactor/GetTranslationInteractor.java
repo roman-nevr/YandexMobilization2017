@@ -35,8 +35,7 @@ public class GetTranslationInteractor extends Interactor<Word, Void> {
         return Observable.merge(
                 onQueryChangedObservable(),
                 onValidResultObservable())
-                .distinctUntilChanged()
-                .map(word -> word);
+                .distinctUntilChanged();
     }
 
     private Observable<Word> onQueryChangedObservable() {
@@ -87,7 +86,6 @@ public class GetTranslationInteractor extends Interactor<Word, Void> {
         } else {
             return Observable.just(Word.EMPTY);
         }
-
     }
 
     private Observable<TranslationQuery> getQueryObservable() {
@@ -95,24 +93,5 @@ public class GetTranslationInteractor extends Interactor<Word, Void> {
                 .getResultObservable()
                 .filter(word -> word.translationState() == requested)
                 .flatMap(word -> resultRepository.getQueryObservable().firstElement().toObservable());
-    }
-
-    private Observable<Word> tooLongWaiting(){
-        return resultRepository
-                .getResultObservable()
-                .filter(word -> word.translationState() == requested)
-                .debounce(1000, TimeUnit.MILLISECONDS)
-                .flatMap(word -> resultRepository
-                        .getResultObservable()
-                        .firstElement()
-                        .filter(word1 -> word1.translationState() == requested)
-                        .toObservable()
-                ).debounce(100,TimeUnit.MILLISECONDS)
-                .flatMap(word -> resultRepository
-                        .getResultObservable()
-                        .firstElement()
-                        .filter(word1 -> word1.translationState() == requested)
-                        .toObservable())
-                .map(word -> word);
     }
 }

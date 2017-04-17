@@ -11,9 +11,6 @@ public class ToggleFavouriteStateInteractor extends Interactor<Boolean, Void> {
 
     @Inject ResultRepository resultRepository;
     @Inject HistoryAndFavouritesRepository historyAndFavouritesRepository;
-    @Inject OnFavouritesChangedInteractor onFavouritesChangedInteractor;
-    @Inject RemoveFromFavouritesInteractor removeFromFavouritesInteractor;
-    @Inject SaveInFavouriteInteractor saveInFavouriteInteractor;
 
     @Inject
     public ToggleFavouriteStateInteractor() {

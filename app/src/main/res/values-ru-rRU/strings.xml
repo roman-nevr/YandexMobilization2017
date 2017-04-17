@@ -5,4 +5,5 @@
     <string name="title_history">История</string>
     <string name="title_language_selector_source">Выберите исходный язык</string>
     <string name="title_language_selector_target">Выберите язык перевода</string>
+
 </resources>

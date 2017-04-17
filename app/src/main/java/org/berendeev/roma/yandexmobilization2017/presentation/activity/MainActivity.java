@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity implements WordListView.Rout
 
         if (savedInstanceState == null){
             beginTransaction();
-            showEnterFragment(TRANSLATOR);
+            showFirstFragment(TRANSLATOR);
             commitTransaction();
         }
 
@@ -80,7 +80,7 @@ public class MainActivity extends AppCompatActivity implements WordListView.Rout
         }
         beginTransaction();
         setAnimation(from, to);
-        hidePreviousFragment(from);
+        //hidePreviousFragment(from);
         showEnterFragment(tag);
         commitTransaction();
     }
@@ -107,8 +107,15 @@ public class MainActivity extends AppCompatActivity implements WordListView.Rout
             transaction.replace(R.id.container, fragment, tag);
         }else {
             fragment = getFragment(tag);
-            transaction.add(R.id.container, fragment, tag);
+            transaction.replace(R.id.container, fragment, tag);
+//            transaction.add(R.id.container, fragment, tag);
         }
+    }
+
+    private void showFirstFragment(String tag){
+        Fragment fragment = getFragment(tag);
+        transaction.add(R.id.container, fragment, tag);
+
     }
 
     @NonNull private Fragment getFragment(String tag) {

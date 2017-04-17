@@ -32,9 +32,6 @@ public class HistoryPresenter {
     @Inject RemoveAllFromHistoryInteractor removeAllFromHistoryInteractor;
     @Inject SaveInFavouriteInteractor saveInFavouriteInteractor;
     @Inject RemoveFromFavouritesInteractor removeFromFavouritesInteractor;
-    @Inject SaveLastWordInteractor saveLastWordInteractor;
-    @Inject SetDirectionToInteractor setDirectionToInteractor;
-    @Inject SetDirectionFromInteractor setDirectionFromInteractor;
     @Inject OnHistoryChangedInteractor onHistoryChangedInteractor;
     @Inject OnFavouritesChangedInteractor onFavouritesChangedInteractor;
     @Inject SetWordInTranslatorInteractor setWordInTranslatorInteractor;

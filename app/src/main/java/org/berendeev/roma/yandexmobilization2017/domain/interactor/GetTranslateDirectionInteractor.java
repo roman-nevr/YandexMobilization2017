@@ -1,7 +1,5 @@
 package org.berendeev.roma.yandexmobilization2017.domain.interactor;
 
-
-
 import android.util.Pair;
 
 import org.berendeev.roma.yandexmobilization2017.domain.ResultRepository;

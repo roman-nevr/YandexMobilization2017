@@ -20,6 +20,7 @@ public class SwapDirectionsInteractor extends Interactor<Void, Void> {
     public SwapDirectionsInteractor() {
     }
 
+    //меняем местами языки ввода и перевода
     @Override public Observable<Void> buildObservable(Void param) {
         return resultRepository
                 .getResultObservable()

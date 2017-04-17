@@ -88,12 +88,4 @@ public class HttpDictionaryTest {
         //disposable.dispose();
         Thread.sleep(100000);
     }
-
-    @Test
-    public void gsonTest(){
-        Locale locale = Locale.getDefault();
-        Languages languages = gson.fromJson(OfflineLanguages.offlineLanguages.get(locale.getLanguage()), Languages.class);
-        LanguageMap map = LanguageMapper.map(languages, locale);
-        System.out.println(gson.fromJson(OfflineLanguages.offlineLanguages.get("ru"), Languages.class));
-    }
 }

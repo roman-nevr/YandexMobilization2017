@@ -48,7 +48,7 @@
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/dictionary"
-        android:layout_width="0dp"
+        android:layout_width="600dp"
         android:layout_height="0dp"
         android:maxWidth="100dp"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -60,7 +60,7 @@
 
     <TextView
         android:id="@+id/translator_ua"
-        android:layout_width="0dp"
+        android:layout_width="600dp"
         android:layout_height="wrap_content"
         android:textSize="@dimen/text_medium_size"
         android:text="@string/translate_api_ua_text"

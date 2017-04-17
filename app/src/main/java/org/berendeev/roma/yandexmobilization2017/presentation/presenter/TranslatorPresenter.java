@@ -4,13 +4,13 @@ import android.util.Pair;
 
 import org.berendeev.roma.yandexmobilization2017.domain.entity.TranslateDirection;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.Word;
-import org.berendeev.roma.yandexmobilization2017.domain.interactor.GetDictionaryInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.GetFavouriteStateInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.GetLastWordInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.GetQueryInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.GetTranslateDirectionInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.GetTranslationInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.RemoveFromFavouritesInteractor;
+import org.berendeev.roma.yandexmobilization2017.domain.interactor.RepeatInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.SaveInFavouriteInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.SaveLastWordInHistoryInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.SaveLastWordInteractor;
@@ -41,16 +41,11 @@ public class TranslatorPresenter {
     @Inject GetTranslateDirectionInteractor getTranslateDirectionInteractor;
     @Inject SwapDirectionsInteractor swapDirectionsInteractor;
     @Inject TranslateTextInteractor translateTextInteractor;
-    @Inject GetLastWordInteractor getLastWordInteractor;
-    @Inject RemoveFromFavouritesInteractor removeFromFavouritesInteractor;
-    @Inject SaveInFavouriteInteractor saveInFavouriteInteractor;
     @Inject SaveLastWordInHistoryInteractor saveLastWordInHistoryInteractor;
-    @Inject GetDictionaryInteractor getDictionaryInteractor;
-    @Inject SaveLastWordInteractor saveLastWordInteractor;
     @Inject GetTranslationInteractor getTranslationInteractor;
-    @Inject GetFavouriteStateInteractor getFavouriteStateInteractor;
     @Inject ToggleFavouriteStateInteractor toggleFavouriteStateInteractor;
     @Inject GetQueryInteractor getQueryInteractor;
+    @Inject RepeatInteractor repeatInteractor;
     private Router router;
     private final CompositeDisposable disposable;
 
@@ -118,7 +113,6 @@ public class TranslatorPresenter {
 
     public void onFavButtonClick() {
         toggleFavouriteStateInteractor.execute(new FavouriteObserver(), null);
-
     }
 
     public void onInputDone() {
@@ -126,9 +120,7 @@ public class TranslatorPresenter {
     }
 
     public void onRepeat() {
-        //ToDo remake
-        disposable.clear();
-        start();
+        repeatInteractor.execute(null, null);
     }
 
     public void onDeleteTextButtonClick() {
@@ -162,7 +154,6 @@ public class TranslatorPresenter {
     private class ResultObserver extends DisposableObserver<Word> {
         @Override public void onNext(Word word) {
             if(word.translationState() == connectionError){
-//                view.setTranslation(word);
                 view.showConnectionError();
             }
             if (word.translationState() == ok){
@@ -193,11 +184,9 @@ public class TranslatorPresenter {
         }
 
         @Override public void onError(Throwable e) {
-
         }
 
         @Override public void onComplete() {
-
         }
     }
 
@@ -207,11 +196,9 @@ public class TranslatorPresenter {
         }
 
         @Override public void onError(Throwable e) {
-
         }
 
         @Override public void onComplete() {
-
         }
     }
 }

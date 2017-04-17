@@ -1,5 +1,7 @@
 package org.berendeev.roma.yandexmobilization2017.presentation.fragment;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
@@ -40,6 +42,7 @@ public class HistoryFragment extends Fragment implements WordListView {
     @BindView(R.id.dictionary) RecyclerView recyclerView;
     @BindView(R.id.title) TextView title;
     @BindView(R.id.delete_all_button) ImageButton deleteButton;
+    @BindView(R.id.translator_ua) TextView translateUa;
 
     private WordListAdapter adapter;
     private int colorFavourite;
@@ -49,7 +52,15 @@ public class HistoryFragment extends Fragment implements WordListView {
         View view = inflater.inflate(R.layout.history_layout, container, false);
         initDi();
         initUi(view);
+        initUaLink();
         return view;
+    }
+
+    private void initUaLink() {
+        translateUa.setOnClickListener(v -> {
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://translate.yandex.ru/"));
+            startActivity(browserIntent);
+        });
     }
 
     @Override public void onStart() {
@@ -57,8 +68,8 @@ public class HistoryFragment extends Fragment implements WordListView {
         int type = getArguments().getInt(TYPE);
         presenter.setType(type);
         presenter.setView(this);
-        if(getActivity() instanceof WordListView.Router){
-            presenter.setRouter((WordListView.Router)getActivity());
+        if (getActivity() instanceof WordListView.Router) {
+            presenter.setRouter((WordListView.Router) getActivity());
         }
         presenter.start();
     }
@@ -69,9 +80,9 @@ public class HistoryFragment extends Fragment implements WordListView {
     }
 
     @Override public void onHiddenChanged(boolean hidden) {
-        if(!hidden){
+        if (!hidden) {
             presenter.onShow();
-        }else {
+        } else {
             presenter.onHide();
         }
     }
@@ -98,11 +109,17 @@ public class HistoryFragment extends Fragment implements WordListView {
     }
 
     @Override public void showList(List<Word> wordList) {
-        if (adapter == null){
+        if (adapter == null) {
             adapter = new WordListAdapter(wordList, presenter, colorFavourite, colorNotFavourite);
             recyclerView.setAdapter(adapter);
-        }else {
+        } else {
             adapter.updateList(wordList);
+        }
+
+        if (wordList.isEmpty()){
+            translateUa.setVisibility(View.INVISIBLE);
+        }else {
+            translateUa.setVisibility(View.VISIBLE);
         }
     }
 
@@ -111,22 +128,22 @@ public class HistoryFragment extends Fragment implements WordListView {
     }
 
     @Override public void switchOffFavButtonAt(int index) {
-        ((WordListAdapter.WordHolder)recyclerView.getChildViewHolder(recyclerView.getChildAt(index))).switchOffFavButton();
+        ((WordListAdapter.WordHolder) recyclerView.getChildViewHolder(recyclerView.getChildAt(index))).switchOffFavButton();
     }
 
     @Override public void switchOnFavButtonAt(int index) {
-        ((WordListAdapter.WordHolder)recyclerView.getChildViewHolder(recyclerView.getChildAt(index))).switchOnFavButton();
+        ((WordListAdapter.WordHolder) recyclerView.getChildViewHolder(recyclerView.getChildAt(index))).switchOnFavButton();
     }
 
-    public static Fragment getHistoryFragment(){
+    public static Fragment getHistoryFragment() {
         return getInstance(R.id.history_type);
     }
 
-    public static Fragment getFavouriteFragment(){
+    public static Fragment getFavouriteFragment() {
         return getInstance(R.id.favourites_type);
     }
 
-    private static Fragment getInstance(int type){
+    private static Fragment getInstance(int type) {
         Fragment fragment = new HistoryFragment();
         Bundle bundle = new Bundle();
         bundle.putInt(TYPE, type);

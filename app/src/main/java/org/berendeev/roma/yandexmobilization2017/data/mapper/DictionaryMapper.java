@@ -39,11 +39,7 @@ public class DictionaryMapper {
             if(BuildConfig.DEBUG){
                 throw new IllegalArgumentException("DictionaryMapper exception");
             }
-            return Dictionary.builder()  //если что-то непредвиденное
-                    .definitions(new ArrayList<>())
-                    .text("")
-                    .transcription("")
-                    .build();
+            return Dictionary.EMPTY;
         }
     }
 
