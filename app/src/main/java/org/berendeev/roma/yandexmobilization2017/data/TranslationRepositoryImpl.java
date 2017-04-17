@@ -8,6 +8,7 @@ import com.google.gson.Gson;
 import com.jakewharton.retrofit2.adapter.rxjava2.HttpException;
 
 import org.berendeev.roma.yandexmobilization2017.BuildConfig;
+import org.berendeev.roma.yandexmobilization2017.R;
 import org.berendeev.roma.yandexmobilization2017.data.entity.Languages;
 import org.berendeev.roma.yandexmobilization2017.data.entity.Translation;
 import org.berendeev.roma.yandexmobilization2017.data.http.OfflineLanguages;
@@ -22,6 +23,8 @@ import org.berendeev.roma.yandexmobilization2017.domain.entity.Word;
 import org.berendeev.roma.yandexmobilization2017.domain.exception.ConnectionException;
 import org.berendeev.roma.yandexmobilization2017.domain.exception.TranslationException;
 
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -54,6 +57,7 @@ public class TranslationRepositoryImpl implements TranslationRepository {
         }
         return Single.fromCallable(() -> {
             try {
+//                Thread.sleep(10000);
                 Translation translation = translateApi
                         .translate(BuildConfig.TRANSLATE_API_KEY, query.text(), query.langFrom() + "-" + query.langTo())
                         .blockingGet();
@@ -96,13 +100,7 @@ public class TranslationRepositoryImpl implements TranslationRepository {
     }
 
     private Languages getOfflineLanguages(Locale locale){
-        String lang;
-        if(OfflineLanguages.offlineLanguages.containsKey(locale.getLanguage())){
-            lang = locale.getLanguage();
-        }else {
-            lang = OfflineLanguages.EN;
-        }
-        return gson.fromJson(OfflineLanguages.offlineLanguages.get(lang), Languages.class);
+        return OfflineLanguages.getLanguage(context, locale.getLanguage(), gson);
     }
 
 }

@@ -4,7 +4,9 @@ import android.content.Context;
 import android.util.Pair;
 
 import com.google.gson.Gson;
+import com.google.gson.stream.JsonReader;
 
+import org.berendeev.roma.yandexmobilization2017.data.entity.Languages;
 import org.berendeev.roma.yandexmobilization2017.data.sqlite.DatabaseHistoryDataSource;
 import org.berendeev.roma.yandexmobilization2017.data.sqlite.DatabaseOpenHelper;
 import org.berendeev.roma.yandexmobilization2017.di.MainModule;
@@ -19,6 +21,8 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.List;
 
 @RunWith(RobolectricTestRunner.class)
@@ -27,12 +31,14 @@ public class HistoryRepoTest{
 
     private HistoryAndFavouritesRepository repository;
     private DatabaseHistoryDataSource historyDataSource;
+    private Context context;
+    private Gson gson;
 
     @Before
     public void before(){
-        Context context = RuntimeEnvironment.application.getApplicationContext();
+        context = RuntimeEnvironment.application.getApplicationContext();
         MainModule mainModule = new MainModule(context.getApplicationContext());
-        Gson gson = mainModule.provideGson();
+        gson = mainModule.provideGson();
         DatabaseOpenHelper openHelper = mainModule.provideDatabaseOpenHelper(mainModule.provideContext());
         historyDataSource = (DatabaseHistoryDataSource) mainModule.provideHistoryDataSource(openHelper, gson);
         repository = mainModule.provideHistoryAndFavouritesRepository(historyDataSource);
@@ -149,4 +155,5 @@ public class HistoryRepoTest{
             System.out.println(word.first.toString() + " in history " + word.second + " | " );
         }
     }
+
 }

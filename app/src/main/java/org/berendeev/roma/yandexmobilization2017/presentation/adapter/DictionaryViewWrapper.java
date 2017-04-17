@@ -66,19 +66,20 @@ public class DictionaryViewWrapper {
         builder.append("\n");
         builder.setSpan(new RelativeSizeSpan(1.5f), builder.length() - 1, builder.length(), exactly);
 
-        for (String translation : definition.translations()) {
-            spanTranslation(builder, translation);
+        for (int number = 0; number < definition.translations().size(); number++) {
+            spanTranslation(builder, definition.translations().get(number), number);
         }
     }
 
-    private void spanTranslation(SpannableStringBuilder builder, String translation) {
+    private void spanTranslation(SpannableStringBuilder builder, String translation, int number) {
+        String numberString = "" + (number + 1) + " ";
+        builder.append(numberString);
+        builder.setSpan(new RelativeSizeSpan(0.9f), builder.length() - numberString.length(), builder.length(), exactly);
         builder.append(translation);
         builder.setSpan(new ForegroundColorSpan(textColor),
-                builder.length() - translation.length(), builder.length(),
-                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                builder.length() - translation.length(), builder.length(), exactly);
         builder.setSpan(new AbsoluteSizeSpan(textPixelSize),
-                builder.length() - translation.length(), builder.length(),
-                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                builder.length() - translation.length(), builder.length(), exactly);
         builder.append("\n");
     }
 }

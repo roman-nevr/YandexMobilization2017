@@ -31,6 +31,7 @@ import timber.log.Timber;
 
 import static org.berendeev.roma.yandexmobilization2017.domain.entity.Word.TranslationState.connectionError;
 import static org.berendeev.roma.yandexmobilization2017.domain.entity.Word.TranslationState.ok;
+import static org.berendeev.roma.yandexmobilization2017.domain.entity.Word.TranslationState.requested;
 
 public class TranslatorPresenter {
 
@@ -125,6 +126,7 @@ public class TranslatorPresenter {
     }
 
     public void onRepeat() {
+        //ToDo remake
         disposable.clear();
         start();
     }
@@ -167,6 +169,10 @@ public class TranslatorPresenter {
                 view.hideConnectionError();
                 setImages(word.word());
                 view.setTranslation(word);
+                view.hideProgress();
+            }
+            if (word.translationState() == requested){
+                view.showProgress();
             }
         }
 

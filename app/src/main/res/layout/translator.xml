@@ -158,6 +158,19 @@
             tools:text = "text [tэkst]"
             />
 
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            app:layout_constraintTop_toTopOf="@+id/dictionary"
+            android:layout_marginTop="32dp"
+            android:layout_marginRight="8dp"
+            app:layout_constraintRight_toRightOf="@+id/dictionary"
+            android:layout_marginLeft="8dp"
+            app:layout_constraintLeft_toLeftOf="@+id/dictionary"
+            />
+
     </android.support.constraint.ConstraintLayout>
 
     <android.support.constraint.ConstraintLayout

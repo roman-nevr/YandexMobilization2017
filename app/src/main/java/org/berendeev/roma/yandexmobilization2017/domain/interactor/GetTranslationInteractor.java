@@ -35,7 +35,8 @@ public class GetTranslationInteractor extends Interactor<Word, Void> {
         return Observable.merge(
                 onQueryChangedObservable(),
                 onValidResultObservable())
-                .distinctUntilChanged();
+                .distinctUntilChanged()
+                .map(word -> word);
     }
 
     private Observable<Word> onQueryChangedObservable() {
@@ -95,45 +96,23 @@ public class GetTranslationInteractor extends Interactor<Word, Void> {
                 .filter(word -> word.translationState() == requested)
                 .flatMap(word -> resultRepository.getQueryObservable().firstElement().toObservable());
     }
-//        return resultRepository
-//                .getResultObservable()
-//                .flatMap(word -> historyAndFavouritesRepository
-//                        .checkIfInFavourites(word)
-//                        .toObservable())
-//                .flatMap(lastWord -> {
-//                    if (lastWord.word().equals("")) {
-//                        return Observable.just(Word.EMPTY);
-//                    }
-//                    if (lastWord.translationState() == requested) {
-//                        return Observable.just(lastWord)
-//                                .flatMap(word -> {
-//                                    TranslationQuery query = TranslationQuery.create(word.word(), word.languageFrom(), word.languageTo());
-//                                    return Single.zip(
-//                                            translationRepository
-//                                                    .translate(query),
-//                                            dictionaryRepository
-//                                                    .lookup(query),
-//                                            (translation, dictionary) ->
-//                                                    TranslateMapper.getText(query, translation, dictionary))
-//                                            .toObservable()
-//                                            .flatMap(receivedWord ->
-//                                                    resultRepository
-//                                                            .saveResult(receivedWord)
-//                                                            .andThen(historyAndFavouritesRepository
-//                                                                    .checkIfInFavourites(receivedWord)
-//                                                                    .toObservable()));
-//                                })
-//                                .onErrorResumeNext(throwable -> {
-//                                    if (throwable instanceof TranslationException) {
-//                                        return Observable.just(lastWord.toBuilder().translationState(translationError).build());
-//                                    }
-//                                    return Observable.just(lastWord.toBuilder().translationState(connectionError).build());
-//                                });
-//                    } else {
-//                        return Observable.just(lastWord);
-//                    }
-//                })
-//                .filter(word -> word.translationState() != requested)
-//                .distinctUntilChanged();
-//    }
+
+    private Observable<Word> tooLongWaiting(){
+        return resultRepository
+                .getResultObservable()
+                .filter(word -> word.translationState() == requested)
+                .debounce(1000, TimeUnit.MILLISECONDS)
+                .flatMap(word -> resultRepository
+                        .getResultObservable()
+                        .firstElement()
+                        .filter(word1 -> word1.translationState() == requested)
+                        .toObservable()
+                ).debounce(100,TimeUnit.MILLISECONDS)
+                .flatMap(word -> resultRepository
+                        .getResultObservable()
+                        .firstElement()
+                        .filter(word1 -> word1.translationState() == requested)
+                        .toObservable())
+                .map(word -> word);
+    }
 }

@@ -50,7 +50,9 @@ public abstract class Word {
             Word that = (Word) o;
             return (word().equals(that.word()))
                     && (languageFrom().equals(that.languageFrom()))
-                    && (languageTo().equals(that.languageTo()));
+                    && (languageTo().equals(that.languageTo()))
+                    && (translationState().equals(that.translationState()))
+                    ;
         }
         return false;
     }

@@ -32,6 +32,10 @@ public interface TranslatorView {
 
     void showImageButtons();
 
+    void showProgress();
+
+    void hideProgress();
+
     interface Router {
         void showSourceLanguageSelector();
 

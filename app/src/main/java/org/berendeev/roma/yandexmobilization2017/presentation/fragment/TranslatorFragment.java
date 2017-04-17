@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import org.berendeev.roma.yandexmobilization2017.R;
@@ -53,6 +54,7 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
     @BindView(R.id.error_layout) ConstraintLayout errorLayout;
     @BindView(R.id.repeat_button) Button repeatButton;
     @BindView(R.id.delete_text_button) ImageButton deleteTextButton;
+    @BindView(R.id.progress_bar) ProgressBar progressBar;
 
     @Inject TranslatorPresenter presenter;
     private int colorFavourite;
@@ -243,6 +245,18 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
     @Override public void showImageButtons() {
         deleteTextButton.setVisibility(View.VISIBLE);
         favButton.setVisibility(View.VISIBLE);
+    }
+
+    @Override public void showProgress() {
+        progressBar.setVisibility(View.VISIBLE);
+        translation.setVisibility(View.INVISIBLE);
+        tvDictionary.setVisibility(View.INVISIBLE);
+    }
+
+    @Override public void hideProgress() {
+        progressBar.setVisibility(View.GONE);
+        translation.setVisibility(View.VISIBLE);
+        tvDictionary.setVisibility(View.VISIBLE);
     }
 
     @Override public void showSourceLanguageSelector() {
