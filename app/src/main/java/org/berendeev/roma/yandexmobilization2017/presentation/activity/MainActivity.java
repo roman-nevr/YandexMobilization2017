@@ -102,14 +102,14 @@ public class MainActivity extends AppCompatActivity implements WordListView.Rout
     }
 
     private void showEnterFragment(String tag) {
-        Fragment fragment = fragmentManager.findFragmentByTag(tag);
-        if (fragment != null){
-            transaction.replace(R.id.container, fragment, tag);
-        }else {
-            fragment = getFragment(tag);
-            transaction.replace(R.id.container, fragment, tag);
-//            transaction.add(R.id.container, fragment, tag);
-        }
+//        Fragment fragment = fragmentManager.findFragmentByTag(tag);
+//        if (fragment != null){
+//            transaction.replace(R.id.container, fragment, tag);
+//        }else {
+//            fragment = getFragment(tag);
+//            transaction.replace(R.id.container, fragment, tag);
+//        }
+        transaction.replace(R.id.container, getFragment(tag), tag);
     }
 
     private void showFirstFragment(String tag){

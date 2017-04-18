@@ -41,6 +41,7 @@ import io.reactivex.Observable;
 
 import static android.view.KeyEvent.KEYCODE_BACK;
 import static android.view.View.GONE;
+import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
 import static android.view.inputmethod.EditorInfo.IME_ACTION_DONE;
 
@@ -67,8 +68,6 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
     private int colorFavourite;
     private int colorAccent;
     private int colorNotFavourite;
-    private int dictionaryHeaderSize;
-    private int dictionaryTextSize;
     private DictionaryViewWrapper wrapper;
 
     @Nullable @Override public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -121,8 +120,8 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
     }
 
     private void initDictionary() {
-        dictionaryHeaderSize = getResources().getDimensionPixelSize(R.dimen.text_regular_size);
-        dictionaryTextSize = getResources().getDimensionPixelSize(R.dimen.text_medium_size);
+        int dictionaryHeaderSize = getResources().getDimensionPixelSize(R.dimen.text_regular_size);
+        int dictionaryTextSize = getResources().getDimensionPixelSize(R.dimen.text_medium_size);
         wrapper = new DictionaryViewWrapper(colorAccent, colorFavourite, dictionaryHeaderSize, dictionaryTextSize);
         tvDictionary.setMovementMethod(LinkMovementMethod.getInstance());
     }
@@ -260,17 +259,19 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
     @Override public void hideImageButtons() {
         deleteTextButton.setVisibility(GONE);
         favButton.setVisibility(GONE);
+        translatorUa.setVisibility(INVISIBLE);
     }
 
     @Override public void showImageButtons() {
         deleteTextButton.setVisibility(VISIBLE);
         favButton.setVisibility(VISIBLE);
+        translatorUa.setVisibility(VISIBLE);
     }
 
     @Override public void showProgress() {
         progressBar.setVisibility(VISIBLE);
-        translation.setVisibility(View.INVISIBLE);
-        dictionaryLayout.setVisibility(View.INVISIBLE);
+        translation.setVisibility(INVISIBLE);
+        dictionaryLayout.setVisibility(INVISIBLE);
     }
 
     @Override public void hideProgress() {
@@ -302,7 +303,7 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
     private void showDictionary(Dictionary dictionary) {
         tvDictionary.setText(wrapper.getText(dictionary));
         if(dictionary.equals(Dictionary.EMPTY)){
-            dictionaryUa.setVisibility(View.INVISIBLE);
+            dictionaryUa.setVisibility(INVISIBLE);
         }else {
             dictionaryUa.setVisibility(VISIBLE);
         }
