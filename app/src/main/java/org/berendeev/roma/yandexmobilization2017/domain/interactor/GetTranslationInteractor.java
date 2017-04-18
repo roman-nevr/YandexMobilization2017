@@ -1,5 +1,7 @@
 package org.berendeev.roma.yandexmobilization2017.domain.interactor;
 
+import android.util.Log;
+
 import org.berendeev.roma.yandexmobilization2017.data.mapper.TranslateMapper;
 import org.berendeev.roma.yandexmobilization2017.domain.DictionaryRepository;
 import org.berendeev.roma.yandexmobilization2017.domain.HistoryAndFavouritesRepository;
@@ -22,6 +24,8 @@ import static org.berendeev.roma.yandexmobilization2017.domain.entity.Word.Trans
 
 public class GetTranslationInteractor extends Interactor<Word, Void> {
 
+    public static final int WAITING_TIME_MILLIS = 2000;
+    public static final String PROGRESS = "mprogress";
     @Inject TranslationRepository translationRepository;
     @Inject HistoryAndFavouritesRepository historyAndFavouritesRepository;
     @Inject ResultRepository resultRepository;
@@ -33,6 +37,7 @@ public class GetTranslationInteractor extends Interactor<Word, Void> {
 
     @Override public Observable<Word> buildObservable(Void param) {
         return Observable.merge(
+                tooLongWaiting(),
                 onQueryChangedObservable(),
                 onValidResultObservable())
                 .distinctUntilChanged();
@@ -93,5 +98,26 @@ public class GetTranslationInteractor extends Interactor<Word, Void> {
                 .getResultObservable()
                 .filter(word -> word.translationState() == requested)
                 .flatMap(word -> resultRepository.getQueryObservable().firstElement().toObservable());
+    }
+
+    private Observable<Word> tooLongWaiting() {
+        return resultRepository
+                .getResultObservable()
+                .filter(word -> word.translationState() == requested)
+                //if we wait more than WAITING_TIME_MILLIS, then will emmit with state == requested
+                //else delay for WAITING_TIME_MILLIS
+                .flatMap(word -> {
+                    if (word.queryTime() > System.currentTimeMillis() - WAITING_TIME_MILLIS) {
+                        return Observable.just(word)
+                                .delay(WAITING_TIME_MILLIS, TimeUnit.MILLISECONDS)
+                                .flatMap(word1 -> resultRepository
+                                        .getResultObservable()
+                                        .firstElement().toObservable())
+                                .filter(word1 -> word1.translationState() == requested);
+                    } else {
+                        return Observable.just(word);
+                    }
+                })
+                .filter(word -> word.word().equals(""));
     }
 }

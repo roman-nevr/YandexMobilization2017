@@ -27,6 +27,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Locale;
+import java.util.Random;
 
 import io.reactivex.Observable;
 import io.reactivex.Single;
@@ -57,7 +58,9 @@ public class TranslationRepositoryImpl implements TranslationRepository {
         }
         return Single.fromCallable(() -> {
             try {
-//                Thread.sleep(10000);
+                Random random = new Random(System.currentTimeMillis());
+
+                Thread.sleep(3000);
                 Translation translation = translateApi
                         .translate(BuildConfig.TRANSLATE_API_KEY, query.text(), query.langFrom() + "-" + query.langTo())
                         .blockingGet();

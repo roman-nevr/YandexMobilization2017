@@ -127,7 +127,7 @@ public class HistoryRepoTest{
     }
 
     private Word buildWord(String word, String translation, boolean isFavourite){
-        return Word.create(word, translation, "en", "ru", isFavourite, Dictionary.EMPTY, Word.TranslationState.ok);
+        return Word.create(word, translation, "en", "ru", isFavourite, Dictionary.EMPTY, Word.TranslationState.ok, System.currentTimeMillis());
     }
 
     private void printHistory(){

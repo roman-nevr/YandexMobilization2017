@@ -52,13 +52,17 @@ public class ResultRepositoryImpl implements ResultRepository {
 
     @Override public Completable saveResult(Word word) {
         return Completable.fromAction(() -> {
-            resultSubject.onNext(word);
-            wordPreferences.edit()
-                    .putString(TEXT, word.word())
-                    .putString(TRANSLATION, word.translation())
-                    .putString(TRANSLATION_STATE, word.translationState().name())
-                    .putString(DICTIONARY, gson.toJson(word.dictionary()))
-                    .apply();
+            //если результат пришел на последний запрос, то сохраняем
+            //если это опоздавший результат, то не сохраняем
+            if(lastQuerySubject.getValue().equals(TranslationQuery.create(word.word(), word.languageFrom(), word.languageTo()))){
+                resultSubject.onNext(word);
+                wordPreferences.edit()
+                        .putString(TEXT, word.word())
+                        .putString(TRANSLATION, word.translation())
+                        .putString(TRANSLATION_STATE, word.translationState().name())
+                        .putString(DICTIONARY, gson.toJson(word.dictionary()))
+                        .apply();
+            }
         });
     }
 
@@ -80,6 +84,7 @@ public class ResultRepositoryImpl implements ResultRepository {
         return Completable.fromAction(() -> {
             Word word = resultSubject.getValue().toBuilder()
                     .translationState(requested)
+                    .queryTime(System.currentTimeMillis())
                     .build();
             resultSubject.onNext(word);
         });
@@ -164,6 +169,7 @@ public class ResultRepositoryImpl implements ResultRepository {
                 .dictionary(gson.fromJson(wordPreferences.getString(DICTIONARY, "{\"text\":\"\",\"transcription\":\"\",\"definitions\":[]}"), Dictionary.class))
                 .translationState(state)
                 .isFavourite(false)
+                .queryTime(System.currentTimeMillis())
                 .build();
         resultSubject = BehaviorSubject.createDefault(word);
 

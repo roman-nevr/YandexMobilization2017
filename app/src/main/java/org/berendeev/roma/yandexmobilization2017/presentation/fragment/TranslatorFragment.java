@@ -271,12 +271,14 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
     @Override public void showProgress() {
         progressBar.setVisibility(VISIBLE);
         translation.setVisibility(INVISIBLE);
+        translatorUa.setVisibility(INVISIBLE);
         dictionaryLayout.setVisibility(INVISIBLE);
     }
 
     @Override public void hideProgress() {
         progressBar.setVisibility(GONE);
         translation.setVisibility(VISIBLE);
+        translatorUa.setVisibility(VISIBLE);
         dictionaryLayout.setVisibility(VISIBLE);
     }
 

@@ -236,15 +236,25 @@ public class DatabaseHistoryDataSource implements HistoryDataSource {
         int fromIndex = cursor.getColumnIndex(LANGUAGE_FROM);
         int dictionaryIndex = cursor.getColumnIndex(DICTIONARY);
         int isFavouriteIndex = cursor.getColumnIndex(IS_IN_FAVOURITES);
-        return Word.builder()
-                .word(cursor.getString(wordIndex))
-                .translation(cursor.getString(translationIndex))
-                .languageFrom(cursor.getString(fromIndex))
-                .languageTo(cursor.getString(toIndex))
-                .dictionary(gson.fromJson(cursor.getString(dictionaryIndex), Dictionary.class))
-                .isFavourite(getJavaBooleanFromSqlBoolean(cursor.getInt(isFavouriteIndex)))
-                .translationState(ok)
-                .build();
+        return Word.create(cursor.getString(wordIndex),
+                cursor.getString(translationIndex),
+                cursor.getString(fromIndex),
+                cursor.getString(toIndex),
+                getJavaBooleanFromSqlBoolean(cursor.getInt(isFavouriteIndex)),
+                gson.fromJson(cursor.getString(dictionaryIndex), Dictionary.class),
+                ok,
+                System.currentTimeMillis()
+                );
+//        return Word.builder()
+//                .word(cursor.getString(wordIndex))
+//                .translation(cursor.getString(translationIndex))
+//                .languageFrom(cursor.getString(fromIndex))
+//                .languageTo(cursor.getString(toIndex))
+//                .dictionary(gson.fromJson(cursor.getString(dictionaryIndex), Dictionary.class))
+//                .isFavourite(getJavaBooleanFromSqlBoolean(cursor.getInt(isFavouriteIndex)))
+//                .translationState(ok)
+//                .queryTime(System.currentTimeMillis())
+//                .build();
     }
 
     private boolean getJavaBooleanFromSqlBoolean(int anInt) {

@@ -26,32 +26,43 @@ public class SwapDirectionsInteractor extends Interactor<Void, Void> {
                 .getResultObservable()
                 .firstElement()
                 .toObservable()
+                //если последний результат ok, то сохраняем в историю
                 .flatMap(word -> {
-                    if(word.translationState() == ok){
+                    if (word.translationState() == ok) {
                         return historyAndFavouritesRepository
                                 .saveInHistory(word)
                                 .andThen(Observable.just(word));
-                    }else {
+                    } else {
                         return Observable.just(word);
                     }
                 })
-                .flatMap(word -> Observable.concat(
-                        resultRepository
-                                .saveLastQuery(buildQuery(word))
-                                .toObservable(),
-                        resultRepository
-                                .invalidateResult()
-                                .toObservable()));
+                //получаем запрос
+                .flatMap(word -> resultRepository
+                        .getQueryObservable()
+                        .firstElement()
+                        .map(query -> buildQuery(word, query))
+                        .toObservable())
+                //сохраняем запрос и инвалидируем результат
+                .flatMap(query -> resultRepository
+                        .saveLastQuery(query)
+                        .andThen(resultRepository
+                                .invalidateResult())
+                        .toObservable());
     }
 
-    private TranslationQuery buildQuery(Word word) {
-        String query;
-        if (word.translationState() == ok){
-            query = word.translation();
-        }else {
-            query = word.word();
+    private TranslationQuery buildQuery(Word word, TranslationQuery query) {
+        if (word.translationState() == ok) {
+            return query.toBuilder()
+                    .text(word.translation())
+                    .langTo(query.langFrom())
+                    .langFrom(query.langTo())
+                    .build();
+        } else {
+            return query.toBuilder()
+                    .langTo(query.langFrom())
+                    .langFrom(query.langTo())
+                    .build();
         }
-        return TranslationQuery.create(query, word.languageTo(), word.languageFrom());
     }
 
 

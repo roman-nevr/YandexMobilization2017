@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Completable;
 import io.reactivex.Maybe;
@@ -117,6 +118,18 @@ public class ExampleUnitTest {
                 }, throwable -> {}, () -> {
                     System.out.println("complete");
                 });
+    }
+
+    @Test
+    public void debounce() throws InterruptedException {
+        Observable.just(1)
+                .delay(10000, TimeUnit.MILLISECONDS)
+                .subscribe(integer -> System.out.println(integer),
+                        throwable -> {},
+                        () -> {
+                    System.out.println("complete");
+                });
+        Thread.sleep(100000);
     }
 
 }

@@ -30,8 +30,8 @@ public class GetTranslateDirectionInteractor extends Interactor<Pair<TranslateDi
                     TranslateDirection directionFrom = buildTranslateDirection(query.langFrom(), map.map());
                     TranslateDirection directionTo = buildTranslateDirection(query.langTo(), map.map());
                     return new Pair<>(directionFrom, directionTo);
-                }
-        );
+                })
+                .distinctUntilChanged();
     }
 
     private TranslateDirection buildTranslateDirection(String key, Map<String, String> map){

@@ -7,7 +7,7 @@ import com.google.gson.TypeAdapter;
 @AutoValue
 public abstract class Word {
 
-    public static Word EMPTY = create("", "", "", "", false, Dictionary.EMPTY, TranslationState.ok);
+    public static Word EMPTY = create("", "", "", "", false, Dictionary.EMPTY, TranslationState.ok, 0);
 
     public abstract String word();
 
@@ -23,11 +23,13 @@ public abstract class Word {
 
     public abstract TranslationState translationState();
 
+    public abstract long queryTime();
+
     public enum TranslationState {
         requested, ok, connectionError, translationError
     }
 
-    public static Word create(String word, String translation, String languageFrom, String languageTo, boolean isFavourite, Dictionary dictionary, TranslationState translationState) {
+    public static Word create(String word, String translation, String languageFrom, String languageTo, boolean isFavourite, Dictionary dictionary, TranslationState translationState, long queryTime) {
         return builder()
                 .word(word)
                 .translation(translation)
@@ -36,6 +38,7 @@ public abstract class Word {
                 .isFavourite(isFavourite)
                 .dictionary(dictionary)
                 .translationState(translationState)
+                .queryTime(queryTime)
                 .build();
     }
 
@@ -89,6 +92,8 @@ public abstract class Word {
         public abstract Builder dictionary(Dictionary dictionary);
 
         public abstract Builder translationState(TranslationState translationState);
+
+        public abstract Builder queryTime(long queryTime);
 
         public abstract Word build();
     }
