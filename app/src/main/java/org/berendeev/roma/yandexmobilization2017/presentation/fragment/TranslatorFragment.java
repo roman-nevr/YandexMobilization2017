@@ -164,6 +164,11 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
         presenter.start();
     }
 
+    @Override public void onPause() {
+        super.onPause();
+        presenter.onInputDone();
+    }
+
     @Override public void onStop() {
         super.onStop();
         presenter.stop();
@@ -196,7 +201,7 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
     @Override public void setTextToTranslate(String text) {
         if (!text.equals(wordToTranslate.getText().toString())) {
             wordToTranslate.setText(text);
-//            wordToTranslate.setSelection(text.length());
+            wordToTranslate.setSelection(text.length());
         }
 
     }
@@ -284,13 +289,6 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
 
     @Override public void showTargetLanguageSelector() {
         LanguageSelectorActivity.start(this.getActivity(), R.id.language_to_type);
-    }
-
-    @Override public void onHiddenChanged(boolean hidden) {
-        if (!hidden) {
-        } else {
-            presenter.onInputDone();
-        }
     }
 
     private void hideKeyboard() {

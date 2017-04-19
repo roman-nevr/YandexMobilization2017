@@ -98,10 +98,10 @@
         android:visibility="invisible"
         android:background="?attr/selectableItemBackgroundBorderless"
         app:layout_constraintBottom_toBottomOf="@+id/word_to_translate"
-        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
         app:srcCompat="@drawable/ic_clear_black"
         tools:visibility="visible"
-        android:layout_marginStart="8dp"/>
+        android:layout_marginRight="8dp"/>
 
     <android.support.constraint.ConstraintLayout
         android:id="@+id/translation_layout"
