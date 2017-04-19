@@ -70,6 +70,11 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
     private int colorNotFavourite;
     private DictionaryViewWrapper wrapper;
 
+    @Override public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        initDI();
+    }
+
     @Nullable @Override public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.translator, container, false);
         ButterKnife.bind(this, view);
@@ -122,7 +127,8 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
     private void initDictionary() {
         int dictionaryHeaderSize = getResources().getDimensionPixelSize(R.dimen.text_regular_size);
         int dictionaryTextSize = getResources().getDimensionPixelSize(R.dimen.text_medium_size);
-        wrapper = new DictionaryViewWrapper(colorAccent, colorFavourite, dictionaryHeaderSize, dictionaryTextSize);
+        int colorText = ContextCompat.getColor(getContext(), R.color.colorText);
+        wrapper = new DictionaryViewWrapper(colorAccent, colorText, dictionaryHeaderSize, dictionaryTextSize);
         tvDictionary.setMovementMethod(LinkMovementMethod.getInstance());
     }
 
@@ -141,15 +147,10 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
     private void initFavouritesMarker() {
         colorFavourite = ContextCompat.getColor(getContext(), R.color.colorPrimary);
         colorAccent = ContextCompat.getColor(getContext(), R.color.colorAccent);
-        colorNotFavourite = ContextCompat.getColor(getContext(), R.color.grey);
+        colorNotFavourite = ContextCompat.getColor(getContext(), R.color.light_grey);
         favButton.setOnClickListener(v -> {
             presenter.onFavButtonClick();
         });
-    }
-
-    @Override public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        initDI();
     }
 
     private void initDI() {
@@ -168,16 +169,17 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
         presenter.stop();
     }
 
-    @Override public void setPreviousWord(Word word) {
-        setTextToTranslate(word.word());
-        setTranslation(word);
-        showDictionary(word.dictionary());
-    }
-
     @Override public void setTranslation(Word word) {
         if (!word.translation().equals(translation.getText().toString())) {
             translation.setText(word.translation());
             showDictionary(word.dictionary());
+        }
+        if (word.word().equals("")){
+            hideTranslatorUa();
+            favButton.setVisibility(INVISIBLE);
+        }else {
+            showTranslatorUa();
+            favButton.setVisibility(VISIBLE);
         }
         setFavouritesLabel(word.isFavourite());
     }
@@ -194,7 +196,7 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
     @Override public void setTextToTranslate(String text) {
         if (!text.equals(wordToTranslate.getText().toString())) {
             wordToTranslate.setText(text);
-            wordToTranslate.setSelection(text.length());
+//            wordToTranslate.setSelection(text.length());
         }
 
     }
@@ -209,6 +211,11 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
                     @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
                         if (wordToTranslate.hasFocus()) {
                             emitter.onNext(s.toString());
+                        }
+                        if(s.length() == 0){
+                            deleteTextButton.setVisibility(GONE);
+                        }else{
+                            deleteTextButton.setVisibility(VISIBLE);
                         }
                     }
 
@@ -246,40 +253,28 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
 
     @Override public void showConnectionError() {
         errorLayout.setVisibility(VISIBLE);
-        translationLayout.setVisibility(GONE);
-        dictionaryLayout.setVisibility(GONE);
     }
 
     @Override public void hideConnectionError() {
         errorLayout.setVisibility(GONE);
-        translationLayout.setVisibility(VISIBLE);
-        dictionaryLayout.setVisibility(VISIBLE);
-    }
-
-    @Override public void hideImageButtons() {
-        deleteTextButton.setVisibility(GONE);
-        favButton.setVisibility(GONE);
-        translatorUa.setVisibility(INVISIBLE);
-    }
-
-    @Override public void showImageButtons() {
-        deleteTextButton.setVisibility(VISIBLE);
-        favButton.setVisibility(VISIBLE);
-        translatorUa.setVisibility(VISIBLE);
     }
 
     @Override public void showProgress() {
         progressBar.setVisibility(VISIBLE);
-        translation.setVisibility(INVISIBLE);
-        translatorUa.setVisibility(INVISIBLE);
-        dictionaryLayout.setVisibility(INVISIBLE);
     }
 
     @Override public void hideProgress() {
         progressBar.setVisibility(GONE);
-        translation.setVisibility(VISIBLE);
-        translatorUa.setVisibility(VISIBLE);
+    }
+
+    @Override public void showTranslation() {
+        translationLayout.setVisibility(VISIBLE);
         dictionaryLayout.setVisibility(VISIBLE);
+    }
+
+    @Override public void hideTranslation() {
+        translationLayout.setVisibility(INVISIBLE);
+        dictionaryLayout.setVisibility(INVISIBLE);
     }
 
     @Override public void showSourceLanguageSelector() {
@@ -305,10 +300,26 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
     private void showDictionary(Dictionary dictionary) {
         tvDictionary.setText(wrapper.getText(dictionary));
         if(dictionary.equals(Dictionary.EMPTY)){
-            dictionaryUa.setVisibility(INVISIBLE);
+            hideDictionaryUa();
         }else {
-            dictionaryUa.setVisibility(VISIBLE);
+            showDictionaryUa();
         }
+    }
+
+    private void showTranslatorUa(){
+        translatorUa.setVisibility(VISIBLE);
+    }
+
+    private void hideTranslatorUa(){
+        translatorUa.setVisibility(INVISIBLE);
+    }
+
+    private void showDictionaryUa(){
+        dictionaryUa.setVisibility(VISIBLE);
+    }
+
+    private void hideDictionaryUa(){
+        dictionaryUa.setVisibility(INVISIBLE);
     }
 
 }

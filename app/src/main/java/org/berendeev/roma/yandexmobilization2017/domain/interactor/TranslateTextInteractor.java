@@ -5,6 +5,7 @@ import org.berendeev.roma.yandexmobilization2017.domain.ResultRepository;
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
+import io.reactivex.Single;
 
 public class TranslateTextInteractor extends Interactor<Void, String> {
 
@@ -14,6 +15,8 @@ public class TranslateTextInteractor extends Interactor<Void, String> {
     public TranslateTextInteractor() {
     }
 
+    //сохраняем запрос и инвалидируем результат
+    //т.е. отправляем запрос на перевод
     @Override public Observable<Void> buildObservable(String param) {
         return resultRepository
                 .getQueryObservable()

@@ -100,7 +100,7 @@ public class HistoryFragment extends Fragment implements WordListView {
         recyclerView.setLayoutManager(layoutManager);
         deleteButton.setOnClickListener(v -> presenter.deleteAll());
         colorFavourite = ContextCompat.getColor(getContext(), R.color.colorPrimary);
-        colorNotFavourite = ContextCompat.getColor(getContext(), R.color.grey);
+        colorNotFavourite = ContextCompat.getColor(getContext(), R.color.light_grey);
         ((SimpleItemAnimator) recyclerView.getItemAnimator()).setSupportsChangeAnimations(false);
         recyclerView.getItemAnimator().setChangeDuration(0);
         recyclerView.getItemAnimator().setAddDuration(0);

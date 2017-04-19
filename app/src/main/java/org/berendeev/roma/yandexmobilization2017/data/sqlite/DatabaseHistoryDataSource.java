@@ -35,6 +35,11 @@ import static org.berendeev.roma.yandexmobilization2017.domain.entity.Word.Trans
 
 public class DatabaseHistoryDataSource implements HistoryDataSource {
 
+    //источник данных для истории и избранного
+    //здесь реализовано только хранение, никакой логики здесь нет вообще
+    //Для хранения истории выбран SQLite, т.к. нам надо хранить таблицы, делать выборки по таблицам,
+    //модифицировать, удалять. И реляционная база данных для этого - самое то
+
     public static final String TRUE = "1";
     public static final String FALSE = "0";
     private SQLiteDatabase database;
@@ -245,16 +250,6 @@ public class DatabaseHistoryDataSource implements HistoryDataSource {
                 ok,
                 System.currentTimeMillis()
                 );
-//        return Word.builder()
-//                .word(cursor.getString(wordIndex))
-//                .translation(cursor.getString(translationIndex))
-//                .languageFrom(cursor.getString(fromIndex))
-//                .languageTo(cursor.getString(toIndex))
-//                .dictionary(gson.fromJson(cursor.getString(dictionaryIndex), Dictionary.class))
-//                .isFavourite(getJavaBooleanFromSqlBoolean(cursor.getInt(isFavouriteIndex)))
-//                .translationState(ok)
-//                .queryTime(System.currentTimeMillis())
-//                .build();
     }
 
     private boolean getJavaBooleanFromSqlBoolean(int anInt) {

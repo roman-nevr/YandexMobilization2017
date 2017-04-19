@@ -17,6 +17,9 @@ import static org.berendeev.roma.yandexmobilization2017.domain.entity.Word.Trans
 
 public class HistoryAndFavouritesRepositoryImpl implements HistoryAndFavouritesRepository {
 
+    //репозитарий для истории и избранного
+    //Один класс, т.к. хранение истории и избранного почти не отличиается
+    //здесь мы используем источник данных, который инкапсулирует механизм хранения
     private HistoryDataSource historyDataSource;
 
     public HistoryAndFavouritesRepositoryImpl(HistoryDataSource historyDataSource) {

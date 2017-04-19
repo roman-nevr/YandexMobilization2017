@@ -2,7 +2,6 @@ package org.berendeev.roma.yandexmobilization2017.data;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Pair;
 
 import com.google.gson.Gson;
 
@@ -33,18 +32,21 @@ public class ResultRepositoryImpl implements ResultRepository {
     private static final String DIRECTION_FROM = "from";
     private static final String DICTIONARY = "dictionary";
     private static final String TRANSLATION_STATE = "state";
+    public static final String TIME = "time";
 
     Context context;
-    private final SharedPreferences wordPreferences, dirsPreferences;
+    private final SharedPreferences resultPreferences, queryPreferences;
     private BehaviorSubject<Word> resultSubject;
     private BehaviorSubject<TranslationQuery> lastQuerySubject;
     private Gson gson;
 
+    //используем SharedPreferences т.к. храним пары ключ-значение
+
     @Inject
     public ResultRepositoryImpl(Context context, Gson gson) {
         this.context = context;
-        this.wordPreferences = context.getSharedPreferences(WORD, Context.MODE_PRIVATE);
-        this.dirsPreferences = context.getSharedPreferences(DIRECTIONS, Context.MODE_PRIVATE);
+        this.resultPreferences = context.getSharedPreferences(WORD, Context.MODE_PRIVATE);
+        this.queryPreferences = context.getSharedPreferences(DIRECTIONS, Context.MODE_PRIVATE);
         this.gson = gson;
         initLastQuery();
         initLastWord();
@@ -56,12 +58,7 @@ public class ResultRepositoryImpl implements ResultRepository {
             //если это опоздавший результат, то не сохраняем
             if(lastQuerySubject.getValue().equals(TranslationQuery.create(word.word(), word.languageFrom(), word.languageTo()))){
                 resultSubject.onNext(word);
-                wordPreferences.edit()
-                        .putString(TEXT, word.word())
-                        .putString(TRANSLATION, word.translation())
-                        .putString(TRANSLATION_STATE, word.translationState().name())
-                        .putString(DICTIONARY, gson.toJson(word.dictionary()))
-                        .apply();
+                saveWord(word);
             }
         });
     }
@@ -73,9 +70,7 @@ public class ResultRepositoryImpl implements ResultRepository {
 
     @Override public Completable saveLastQuery(TranslationQuery query) {
         return Completable.fromAction(() -> {
-            saveQuery(query.text());
-            saveDirection(DIRECTION_FROM, query.langFrom());
-            saveDirection(DIRECTION_TO, query.langTo());
+            saveQuery(query);
             lastQuerySubject.onNext(query);
         });
     }
@@ -86,13 +81,16 @@ public class ResultRepositoryImpl implements ResultRepository {
                     .translationState(requested)
                     .queryTime(System.currentTimeMillis())
                     .build();
+            saveWord(word);
             resultSubject.onNext(word);
         });
     }
 
-    private void saveQuery(String query) {
-        wordPreferences.edit()
-                .putString(TEXT, query)
+    private void saveQuery(TranslationQuery query) {
+        queryPreferences.edit()
+                .putString(TEXT, query.text())
+                .putString(DIRECTION_FROM, query.langFrom())
+                .putString(DIRECTION_TO, query.langTo())
                 .apply();
     }
 
@@ -124,15 +122,6 @@ public class ResultRepositoryImpl implements ResultRepository {
         });
     }
 
-
-    @Override public Completable swapDirections() {
-        return Completable.fromAction(() -> {
-            String from = getFrom();
-            String to = getTo();
-            saveDirections(to, from);
-        });
-    }
-
     private String getTo() {
         return lastQuerySubject.getValue().langTo();
     }
@@ -142,51 +131,55 @@ public class ResultRepositoryImpl implements ResultRepository {
     }
 
     private void saveDirections(String from, String to){
-        saveDirection(DIRECTION_FROM, from);
-        saveDirection(DIRECTION_TO, to);
-        lastQuerySubject.onNext(lastQuerySubject.getValue().toBuilder()
+        TranslationQuery query = lastQuerySubject.getValue().toBuilder()
                 .langFrom(from)
                 .langTo(to)
-                .build());
-    }
-
-    private void saveDirection(String direction, String value){
-        dirsPreferences.edit()
-                .putString(direction, value)
-                .apply();
+                .build();
+        saveQuery(query);
+        lastQuerySubject.onNext(query);
     }
 
     private void initLastWord() {
-        Word.TranslationState state = Word.TranslationState.valueOf(wordPreferences.getString(TRANSLATION_STATE, ok.name()));
+        Word.TranslationState state = Word.TranslationState.valueOf(resultPreferences.getString(TRANSLATION_STATE, ok.name()));
         if (state != ok){
             state = requested;
         }
         Word word = Word.builder()
-                .word(wordPreferences.getString(TEXT, ""))
-                .translation(wordPreferences.getString(TRANSLATION, ""))
-                .languageFrom(dirsPreferences.getString(DIRECTION_FROM, lastQuerySubject.getValue().langFrom()))
-                .languageTo(dirsPreferences.getString(DIRECTION_TO, lastQuerySubject.getValue().langTo()))
-                .dictionary(gson.fromJson(wordPreferences.getString(DICTIONARY, "{\"text\":\"\",\"transcription\":\"\",\"definitions\":[]}"), Dictionary.class))
+                .word(resultPreferences.getString(TEXT, ""))
+                .translation(resultPreferences.getString(TRANSLATION, ""))
+                .languageFrom(queryPreferences.getString(DIRECTION_FROM, lastQuerySubject.getValue().langFrom()))
+                .languageTo(queryPreferences.getString(DIRECTION_TO, lastQuerySubject.getValue().langTo()))
+                .dictionary(gson.fromJson(resultPreferences.getString(DICTIONARY, "{\"text\":\"\",\"transcription\":\"\",\"definitions\":[]}"), Dictionary.class))
                 .translationState(state)
                 .isFavourite(false)
-                .queryTime(System.currentTimeMillis())
+                .queryTime(resultPreferences.getLong(TIME, System.currentTimeMillis()))
                 .build();
         resultSubject = BehaviorSubject.createDefault(word);
 
     }
 
     private void initLastQuery() {
-        String query = wordPreferences.getString(TEXT, "");
-        String directionTo = dirsPreferences.getString(DIRECTION_TO, Locale.getDefault().getLanguage());
+        String query = queryPreferences.getString(TEXT, "");
+        String directionTo = queryPreferences.getString(DIRECTION_TO, Locale.getDefault().getLanguage());
         String defaultDirectionFrom;
         if(Locale.getDefault().getLanguage().equals("en")){
             defaultDirectionFrom = "ru";
         }else {
             defaultDirectionFrom = "en";
         }
-        String directionFrom = dirsPreferences.getString(DIRECTION_FROM, defaultDirectionFrom);
+        String directionFrom = queryPreferences.getString(DIRECTION_FROM, defaultDirectionFrom);
         lastQuerySubject = BehaviorSubject.createDefault(TranslationQuery.create(query, directionFrom, directionTo));
-        saveDirection(DIRECTION_FROM, directionFrom);
-        saveDirection(DIRECTION_TO, directionTo);
+//        saveDirection(DIRECTION_FROM, directionFrom);
+//        saveDirection(DIRECTION_TO, directionTo);
+    }
+
+    private void saveWord(Word word) {
+        resultPreferences.edit()
+                .putString(TEXT, word.word())
+                .putString(TRANSLATION, word.translation())
+                .putString(TRANSLATION_STATE, word.translationState().name())
+                .putString(DICTIONARY, gson.toJson(word.dictionary()))
+                .putLong(TIME, word.queryTime())
+                .apply();
     }
 }

@@ -20,6 +20,8 @@ import butterknife.ButterKnife;
 
 public class LanguageSelectorAdapter extends RecyclerView.Adapter<LanguageSelectorAdapter.LanguageHolder> {
 
+    //адаптер для списка выбора языка
+
     private List<Map.Entry<String, String>> languages;
     private LanguageSelectorPresenter presenter;
 

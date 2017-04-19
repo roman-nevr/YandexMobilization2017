@@ -124,16 +124,8 @@ public class TranslatorPresenter {
     }
 
     public void onDeleteTextButtonClick() {
-        view.setPreviousWord(Word.EMPTY);
-        view.hideImageButtons();
-    }
-
-    private void setImages(String text){
-        if (text.equals("")){
-            view.hideImageButtons();
-        }else {
-            view.showImageButtons();
-        }
+        view.setTextToTranslate("");
+        view.setTranslation(Word.EMPTY);
     }
 
     private class DirectionsObserver extends DisposableObserver<Pair<TranslateDirection, TranslateDirection>> {
@@ -155,15 +147,19 @@ public class TranslatorPresenter {
         @Override public void onNext(Word word) {
             if(word.translationState() == connectionError){
                 view.showConnectionError();
+                view.hideTranslation();
+                view.hideProgress();
             }
             if (word.translationState() == ok){
                 view.hideConnectionError();
-                setImages(word.word());
-                view.setTranslation(word);
                 view.hideProgress();
+                view.showTranslation();
+                view.setTranslation(word);
             }
             if (word.translationState() == requested){
                 view.showProgress();
+                view.hideConnectionError();
+                view.hideTranslation();
             }
         }
 

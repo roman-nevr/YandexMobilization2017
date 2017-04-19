@@ -14,6 +14,9 @@ import io.reactivex.schedulers.Schedulers;
 
 public abstract class Interactor<Response, Request> {
 
+    //Наследники этого класса являются правилами бизнес-логики
+    //В данном классе
+
     @Inject ThreadPoolExecutor workExecutor;
     @Inject Scheduler mainExecutor;
 
@@ -27,6 +30,7 @@ public abstract class Interactor<Response, Request> {
      * null if don't need listen to events
      * @param param Parameter which need to to {@link #buildObservable(Request)} () method.
      */
+    //запуск интерактора на выполнение асинхронно
     public Disposable execute(@Nullable DisposableObserver<Response> observer, Request param) {
         if(observer == null){
             observer = new EmptyObserver();
@@ -43,11 +47,13 @@ public abstract class Interactor<Response, Request> {
      *
      * @param param Parameter which need to to {@link #buildObservable(Request)} ()} method.
      */
-
+    //можно запустить и синхронно (иногда очень важно выполнить быструю операция синхронно)
     public Observable<Response> execute(Request param){
         return buildObservable(param);
     }
 
+    //Нам не всегда нужен результат выполнения интерактора, а интерактор без обзервера не выполнится
+    //поэтому используем этот пустой обзервер
     private class EmptyObserver extends DisposableObserver<Response>{
 
         @Override public void onNext(Response response) {

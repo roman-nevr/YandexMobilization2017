@@ -11,6 +11,7 @@ import org.berendeev.roma.yandexmobilization2017.domain.entity.Dictionary;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.TranslationQuery;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.Word;
 import org.berendeev.roma.yandexmobilization2017.domain.exception.ConnectionException;
+import org.berendeev.roma.yandexmobilization2017.rx.LongSingle;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,6 +24,9 @@ import timber.log.Timber;
 
 
 public class DictionaryRepositoryImpl implements DictionaryRepository {
+
+    //Реализация интерфейса репозитария для словаря
+    //Точнее это источник данных словаря, хранения здесь нет
 
     private DictionaryApi dictionaryApi;
 
@@ -38,7 +42,7 @@ public class DictionaryRepositoryImpl implements DictionaryRepository {
                 BuildConfig.DICTIONARY_API_KEY, query.text(), query.langFrom() + "-" + query.langTo(),
                 getUiLanguage());
 
-        return Single.fromCallable(() -> {
+        return LongSingle.fromCallable(() -> {
             try {
                 HttpDictionary httpDictionary = dictionaryApi
                         .lookup(url)

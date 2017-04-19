@@ -12,8 +12,6 @@ public interface TranslatorView {
 
     void setTextToTranslate(String text);
 
-    void setPreviousWord(Word word);
-
     void setTranslation(Word word);
 
     void setTranslateDirection(TranslateDirection directionFrom, TranslateDirection directionTo);
@@ -28,13 +26,13 @@ public interface TranslatorView {
 
     void hideConnectionError();
 
-    void hideImageButtons();
-
-    void showImageButtons();
-
     void showProgress();
 
     void hideProgress();
+
+    void showTranslation();
+
+    void hideTranslation();
 
     interface Router {
         void showSourceLanguageSelector();

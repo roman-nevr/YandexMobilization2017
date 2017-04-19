@@ -8,6 +8,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
+import org.berendeev.roma.yandexmobilization2017.BuildConfig;
 import org.berendeev.roma.yandexmobilization2017.data.DictionaryRepositoryImpl;
 import org.berendeev.roma.yandexmobilization2017.data.HistoryAndFavouritesRepositoryImpl;
 import org.berendeev.roma.yandexmobilization2017.data.ResultRepositoryImpl;
@@ -100,13 +101,16 @@ public class MainModule {
     public OkHttpClient provideOkHttpClient(CacheInterceptor cacheInterceptor, Context context) {
         File cacheDir = new File(context.getCacheDir(), "http");
         Cache cache = new Cache(cacheDir, HTTP_CACHE_SIZE);
-        return new OkHttpClient.Builder()
+        OkHttpClient.Builder builder = new OkHttpClient.Builder()
                 .cache(cache)
                 .connectTimeout(15, TimeUnit.SECONDS)
                 .readTimeout(15, TimeUnit.SECONDS)
-                .addInterceptor(cacheInterceptor)
-                .addNetworkInterceptor(new StethoInterceptor())
-                .build();
+                .addInterceptor(cacheInterceptor);
+        if(BuildConfig.DEBUG){
+            builder.addNetworkInterceptor(new StethoInterceptor());
+        }
+
+        return builder.build();
     }
 
     @Provides
@@ -125,7 +129,6 @@ public class MainModule {
     public Gson provideGson(){
         Type dirType = new TypeToken<List<TranslateDirection>>() {}.getType();
         Type mapType = new TypeToken<List<LanguageMap>>() {}.getType();
-        Type defType = new TypeToken<List<Definition>>() {}.getType();
         return new GsonBuilder()
                 .registerTypeAdapter(mapType, new LanguageMapDeserializer())
                 .registerTypeAdapter(dirType, new TranslateDirectionsDeserializer())

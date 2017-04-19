@@ -29,6 +29,8 @@ public class MainActivity extends AppCompatActivity implements WordListView.Rout
     private FragmentTransaction transaction;
     private BottomNavigationView navigation;
 
+    //Активити отвечает только за навигацию между фрагментами
+
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
@@ -80,7 +82,6 @@ public class MainActivity extends AppCompatActivity implements WordListView.Rout
         }
         beginTransaction();
         setAnimation(from, to);
-        //hidePreviousFragment(from);
         showEnterFragment(tag);
         commitTransaction();
     }
@@ -102,13 +103,6 @@ public class MainActivity extends AppCompatActivity implements WordListView.Rout
     }
 
     private void showEnterFragment(String tag) {
-//        Fragment fragment = fragmentManager.findFragmentByTag(tag);
-//        if (fragment != null){
-//            transaction.replace(R.id.container, fragment, tag);
-//        }else {
-//            fragment = getFragment(tag);
-//            transaction.replace(R.id.container, fragment, tag);
-//        }
         transaction.replace(R.id.container, getFragment(tag), tag);
     }
 
@@ -128,30 +122,6 @@ public class MainActivity extends AppCompatActivity implements WordListView.Rout
                 return HistoryFragment.getFavouriteFragment();
             default:
                 throw new IllegalArgumentException();
-        }
-    }
-
-    private void hideFragment(FragmentTransaction transaction, String tag){
-        Fragment fragment = fragmentManager.findFragmentByTag(tag);
-        if (fragment != null && fragment.isVisible()){
-            transaction.remove(fragment);
-        }
-    }
-
-    private void hidePreviousFragment(int from){
-        hideFragment(transaction, getFragmentTag(from));
-    }
-
-    private String getFragmentTag(int id){
-        switch (id){
-            case TRANSLATOR_ID:
-                return TRANSLATOR;
-            case FAVOURITES_ID:
-                return FAVOURITES;
-            case HISTORY_ID:
-                return HISTORY;
-            default:
-                return TRANSLATOR;
         }
     }
 

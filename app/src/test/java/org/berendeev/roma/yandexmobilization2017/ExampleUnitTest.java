@@ -7,6 +7,7 @@ import android.text.style.StyleSpan;
 
 import org.berendeev.roma.yandexmobilization2017.domain.entity.LanguageMap;
 import org.berendeev.roma.yandexmobilization2017.domain.exception.ConnectionException;
+import org.berendeev.roma.yandexmobilization2017.rx.LongSingle;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -121,7 +122,7 @@ public class ExampleUnitTest {
     }
 
     @Test
-    public void debounce() throws InterruptedException {
+    public void delay() throws InterruptedException {
         Observable.just(1)
                 .delay(10000, TimeUnit.MILLISECONDS)
                 .subscribe(integer -> System.out.println(integer),
@@ -129,6 +130,66 @@ public class ExampleUnitTest {
                         () -> {
                     System.out.println("complete");
                 });
+        Thread.sleep(100000);
+    }
+
+    @Test
+    public void singleError() throws Exception {
+        Single<Integer> objectSingle = LongSingle.fromCallable(() -> {
+            try {
+                Thread.sleep(10000);
+                return 1;
+            }catch (Throwable throwable){
+                return 0;
+//                throw new Exception(throwable);
+            }
+            //throw new IllegalArgumentException();
+        });
+//        Observable<Integer> objectSingle = Observable.create(emitter -> {
+//            try {
+//                Thread.sleep(10000);
+//            }catch (Throwable throwable){
+//                emitter.onError(new Exception(throwable));
+//            }
+//            emitter.onNext(1);
+//        });
+
+//        Single<Integer> objectSingle = Single.create(emitter -> {
+//            try {
+//                Thread.sleep(10000);
+//                if (!emitter.isDisposed()){
+//                    emitter.onSuccess(1);
+//                }
+//            }catch (Throwable throwable){
+//                if (!emitter.isDisposed()){
+//                    emitter.onError(new Exception(throwable));
+//                }
+//            }
+//        });
+
+        Disposable subscribe = objectSingle
+//                .onErrorResumeNext(Single.just(2))
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.computation())
+//                .subscribe(o -> {
+//                            System.out.println(o);
+//                        },
+//                        throwable -> {
+//                            throwable.printStackTrace();
+//                        },
+//                        () -> {
+//                            System.out.println("complete");
+//                        });
+        .subscribe((integer, throwable) -> {
+            int a = 0;
+            if (throwable == null){
+                System.out.println(integer);
+            }else {
+                throwable.printStackTrace();
+            }
+        });
+        Thread.sleep(1000);
+        subscribe.dispose();
         Thread.sleep(100000);
     }
 

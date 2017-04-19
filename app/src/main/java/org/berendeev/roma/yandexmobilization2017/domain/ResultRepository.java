@@ -23,6 +23,4 @@ public interface ResultRepository {
     Completable setDirectionTo(String to);
 
     Completable setDirectionFrom(String from);
-
-    Completable swapDirections();
 }

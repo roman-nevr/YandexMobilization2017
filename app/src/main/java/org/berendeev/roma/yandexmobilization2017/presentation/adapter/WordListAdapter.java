@@ -20,6 +20,8 @@ import butterknife.ButterKnife;
 
 public class WordListAdapter extends RecyclerView.Adapter<WordListAdapter.WordHolder> {
 
+    //Адаптер для списка истории и избранного
+
     private List<Word> words;
     private HistoryPresenter presenter;
     private int colorFavourite;

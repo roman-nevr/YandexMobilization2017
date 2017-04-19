@@ -35,23 +35,32 @@ public class GetTranslationInteractor extends Interactor<Word, Void> {
     public GetTranslationInteractor() {
     }
 
+    //Интерактор, предоставляющий перевод
+
     @Override public Observable<Word> buildObservable(Void param) {
         return Observable.merge(
+                //здесь эмитится событие тогда, когда долго нет ответа от сервера, но соединение не разорванно
                 tooLongWaiting(),
+                //здесь запускается цепочка для перевода
                 onQueryChangedObservable(),
+                //здесь эмитится событие тогда, когда результат можно отобразить (все ОК или ошибка)
                 onValidResultObservable())
                 .distinctUntilChanged();
     }
 
     private Observable<Word> onQueryChangedObservable() {
+        //если надо сделать перевод
         return getQueryObservable()
+                //то запускаем цепочку переводчика
                 .flatMap(query -> translateWord(query)
                         .flatMap(translatedWord -> historyAndFavouritesRepository
                                 .checkIfInFavourites(translatedWord)
                                 .toObservable())
+                        //в случае ошибки в переводчике эмитим событие-ошибку
                         .onErrorResumeNext(throwable -> {
                             return getOnErrorObservable(throwable, query);
                         })
+                        //получили результат - сохранили его
                         .flatMap(receivedWord ->
                                 resultRepository
                                         .saveResult(receivedWord)
@@ -89,7 +98,12 @@ public class GetTranslationInteractor extends Interactor<Word, Void> {
                     .translationState(connectionError)
                     .build());
         } else {
-            return Observable.just(Word.EMPTY);
+            return Observable.just(Word.EMPTY.toBuilder()
+                    .word(query.text())
+                    .languageFrom(query.langFrom())
+                    .languageTo(query.langTo())
+                    .translationState(connectionError)
+                    .build());
         }
     }
 
@@ -118,6 +132,6 @@ public class GetTranslationInteractor extends Interactor<Word, Void> {
                         return Observable.just(word);
                     }
                 })
-                .filter(word -> word.word().equals(""));
+                .filter(word -> !word.word().equals(""));
     }
 }

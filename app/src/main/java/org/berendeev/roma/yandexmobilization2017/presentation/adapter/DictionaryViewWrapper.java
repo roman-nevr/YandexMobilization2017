@@ -15,6 +15,8 @@ import java.util.List;
 
 public class DictionaryViewWrapper {
 
+    //Это маппер словаря для отображения в TextView
+
     private int textPixelSize;
     private int headerPixelSize;
     private int speechPartColor, textColor;

@@ -22,6 +22,7 @@ import org.berendeev.roma.yandexmobilization2017.domain.entity.TranslationQuery;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.Word;
 import org.berendeev.roma.yandexmobilization2017.domain.exception.ConnectionException;
 import org.berendeev.roma.yandexmobilization2017.domain.exception.TranslationException;
+import org.berendeev.roma.yandexmobilization2017.rx.LongSingle;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -37,6 +38,7 @@ import static org.berendeev.roma.yandexmobilization2017.data.http.TranslateApi.O
 
 public class TranslationRepositoryImpl implements TranslationRepository {
 
+    //Реализация интерфейса репозитария переводчика
 
     private final Context context;
     private final Gson gson;
@@ -56,11 +58,9 @@ public class TranslationRepositoryImpl implements TranslationRepository {
         if (!isNetworkAvailable()) {
             throw new ConnectionException();
         }
-        return Single.fromCallable(() -> {
+        return LongSingle.fromCallable(() -> {
             try {
-                Random random = new Random(System.currentTimeMillis());
-
-                Thread.sleep(3000);
+//                Thread.sleep(10000);
                 Translation translation = translateApi
                         .translate(BuildConfig.TRANSLATE_API_KEY, query.text(), query.langFrom() + "-" + query.langTo())
                         .blockingGet();
@@ -78,6 +78,8 @@ public class TranslationRepositoryImpl implements TranslationRepository {
         });
     }
 
+    //Языки должны быть доступны всегда, даже если нет сети
+    //Если сети нет, то берем список языков из ресурсов(два языка, но можно и все хранить)
     @Override public Observable<LanguageMap> getLanguages(Locale locale) {
         return Observable.fromCallable(() -> {
             if (!isNetworkAvailable()) {
