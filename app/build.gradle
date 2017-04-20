@@ -57,6 +57,8 @@ dependencies {
     compile 'com.android.support:support-vector-drawable:25.3.1'
     testCompile 'junit:junit:4.12'
     testCompile 'org.robolectric:robolectric:3.3'
+
+    testApt "com.google.dagger:dagger-compiler:2.6"
     //AutoValue
     compile 'javax.annotation:javax.annotation-api:1.2'
     compile 'com.google.auto.value:auto-value:1.3'

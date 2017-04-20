@@ -80,27 +80,6 @@ public class ExampleUnitTest {
     }
 
     @Test
-    public void compositeTest(){
-        CompositeDisposable disposable = new CompositeDisposable();
-        for(int i = 0; i < 1000; i++){
-            Observable<Integer> observable = Observable.just(1, 2);
-            disposable.add(observable.subscribe(integer -> {
-                System.out.println(integer);
-            }));
-        }
-        int a = 0;
-    }
-
-    @Test
-    public void span(){
-        SpannableStringBuilder builder = new SpannableStringBuilder();
-        builder.append("text");
-        StyleSpan boldSpan = new StyleSpan( Typeface.BOLD );
-        builder.setSpan(boldSpan, 0, builder.length(), Spannable.SPAN_COMPOSING);
-//        Spannable spannable = new S
-    }
-
-    @Test
     public void complete(){
         Observable<Integer> observable = Observable.create(e -> {
             e.onNext(1);
@@ -119,18 +98,6 @@ public class ExampleUnitTest {
                 }, throwable -> {}, () -> {
                     System.out.println("complete");
                 });
-    }
-
-    @Test
-    public void delay() throws InterruptedException {
-        Observable.just(1)
-                .delay(10000, TimeUnit.MILLISECONDS)
-                .subscribe(integer -> System.out.println(integer),
-                        throwable -> {},
-                        () -> {
-                    System.out.println("complete");
-                });
-        Thread.sleep(100000);
     }
 
     @Test
@@ -190,7 +157,7 @@ public class ExampleUnitTest {
         });
         Thread.sleep(1000);
         subscribe.dispose();
-        Thread.sleep(100000);
+        Thread.sleep(3000);
     }
 
 }

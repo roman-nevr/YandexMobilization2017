@@ -77,7 +77,6 @@ public class HttpDictionaryTest {
             emitter.onNext(httpDictionary);
         });
         Disposable disposable = objectObservable
-                .subscribeOn(Schedulers.io())
                 .subscribe(httpDictionary -> {
                     Dictionary dictionary = DictionaryMapper.map(httpDictionary);
                     String json = gson.toJson(dictionary, Dictionary.class);
@@ -86,6 +85,6 @@ public class HttpDictionaryTest {
                     Assert.assertTrue(dictionary2.equals(dictionary));
                 });
         //disposable.dispose();
-        Thread.sleep(100000);
+//        Thread.sleep(100000);
     }
 }

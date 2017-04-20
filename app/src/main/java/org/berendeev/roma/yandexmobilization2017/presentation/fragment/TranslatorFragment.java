@@ -175,10 +175,9 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
     }
 
     @Override public void setTranslation(Word word) {
-        if (!word.translation().equals(translation.getText().toString())) {
-            translation.setText(word.translation());
-            showDictionary(word.dictionary());
-        }
+        translation.setText(word.translation());
+        showDictionary(word.dictionary());
+
         if (word.word().equals("")){
             hideTranslatorUa();
             favButton.setVisibility(INVISIBLE);
@@ -203,6 +202,11 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
             wordToTranslate.setText(text);
             wordToTranslate.setSelection(text.length());
         }
+        if(text.isEmpty()){
+            deleteTextButton.setVisibility(GONE);
+        }else {
+            deleteTextButton.setVisibility(VISIBLE);
+        }
 
     }
 
@@ -225,7 +229,6 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
                     }
 
                     @Override public void afterTextChanged(Editable s) {
-
                     }
                 }));
     }

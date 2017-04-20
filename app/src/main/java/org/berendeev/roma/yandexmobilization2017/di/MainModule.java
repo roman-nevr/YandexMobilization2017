@@ -67,11 +67,9 @@ public class MainModule {
         return context;
     }
 
-
-
-    @Singleton
     @Provides
-    ThreadPoolExecutor provideThreadPoolExecutor(){
+    @Singleton
+    public ThreadPoolExecutor provideThreadPoolExecutor(){
         int poolSize = 2;
         int maxPoolSize = 4;
         int timeout = 10;
@@ -79,14 +77,15 @@ public class MainModule {
                 TimeUnit.SECONDS, new LinkedBlockingQueue<>(5));
     }
 
+    @Provides
     @Singleton
-    @Provides Scheduler provideScheduler(){
+    public Scheduler provideScheduler(){
         return AndroidSchedulers.mainThread();
     }
 
     @Provides
     @Singleton
-    public ResultRepository providePreferencesRepository(Context context, Gson gson){
+    public ResultRepository provideResultRepository(Context context, Gson gson){
         return new ResultRepositoryImpl(context, gson);
     }
 

@@ -10,11 +10,13 @@ import org.berendeev.roma.yandexmobilization2017.data.http.TranslateApi;
 import org.berendeev.roma.yandexmobilization2017.di.MainModule;
 import org.berendeev.roma.yandexmobilization2017.domain.TranslationRepository;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.TranslationQuery;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
+import org.robolectric.annotation.Config;
 
 import java.util.Locale;
 
@@ -23,6 +25,7 @@ import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 
 @RunWith(RobolectricTestRunner.class)
+@Config(manifest= Config.NONE)
 public class RepositoryTest {
 
     private Context context;
@@ -57,6 +60,7 @@ public class RepositoryTest {
                 .translate(query)
                 .subscribe(word ->{
                     System.out.println(word);
+                    Assert.assertEquals(word.translation.get(0), "привет, мир");
                 });
     }
 
