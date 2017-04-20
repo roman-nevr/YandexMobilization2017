@@ -5,10 +5,13 @@
     <string name="title_history">History</string>
     <string name="title_language_selector_source">Select source language</string>
     <string name="title_language_selector_target">Select target language</string>
+
+    <string name="translator_hint">Type text here</string>
+
     <string name="connection_error">Please check your internet \n connection and try again</string>
     <string name="repeat_action">Try again</string>
     <string name="connection_error_title">Connection error</string>
 
     <string name="translate_api_ua_text"><u>Переведено сервисом «Яндекс.Переводчик»</u></string>
-    <string name="dictionary_api_ua_text"><u>Реализовано с помощью сервиса «API «Яндекс.Словарь»</u></string>
+    <string name="dictionary_api_ua_text"><u>Реализовано с помощью сервиса\n«API «Яндекс.Словарь»</u></string>
 </resources>

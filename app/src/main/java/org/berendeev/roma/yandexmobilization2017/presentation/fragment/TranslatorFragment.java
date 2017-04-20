@@ -19,6 +19,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import org.berendeev.roma.yandexmobilization2017.R;
@@ -55,6 +56,7 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
     @BindView(R.id.language_to) Button btnLanguageTo;
     @BindView(R.id.swap_button) ImageButton swapButton;
     @BindView(R.id.dictionary) TextView tvDictionary;
+    @BindView(R.id.main_layout) ConstraintLayout mainLayout;
     @BindView(R.id.translation_layout) ConstraintLayout translationLayout;
     @BindView(R.id.dictionary_layout) ConstraintLayout dictionaryLayout;
     @BindView(R.id.error_layout) ConstraintLayout errorLayout;
@@ -214,7 +216,6 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
         return Observable.create(emitter -> wordToTranslate
                 .addTextChangedListener(new TextWatcher() {
                     @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
                     }
 
                     @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -234,6 +235,28 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
     }
 
     private void initEditorActionListener() {
+        mainLayout.setOnTouchListener((v, event) -> {
+            if(wordToTranslate.hasFocus()){
+                hideKeyboard();
+                presenter.onInputDone();
+                wordToTranslate.clearFocus();
+                return true;
+            }else {
+                return false;
+            }
+        });
+        tvDictionary.setOnTouchListener((v, event) -> {
+            if(wordToTranslate.hasFocus()){
+                hideKeyboard();
+                presenter.onInputDone();
+                wordToTranslate.clearFocus();
+                return true;
+            }else {
+                return false;
+            }
+
+        });
+
         wordToTranslate.setKeyImeChangeListener((keyCode, event) -> {
             if (keyCode == KEYCODE_BACK) {
                 presenter.onInputDone();
@@ -248,7 +271,6 @@ public class TranslatorFragment extends Fragment implements TranslatorView, Tran
             }
             return false;
         });
-
     }
 
     @Override public void switchOnFavButton() {

@@ -9,6 +9,7 @@
     android:focusable="true"
     android:focusableInTouchMode="true"
     tools:context=".presentation.activity.MainActivity"
+    tools:background="@color/green_transparent"
     >
 
     <android.support.v7.widget.Toolbar
@@ -83,6 +84,7 @@
         android:imeOptions="actionDone|flagNoExtractUi|flagNoFullscreen"
         android:inputType="text"
         android:textSize="@dimen/text_regular_size"
+        android:hint="@string/translator_hint"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -197,6 +199,7 @@
         <ScrollView
             android:layout_width="0dp"
             android:layout_height="0dp"
+            android:fillViewport="true"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -212,7 +215,9 @@
                 android:layout_marginRight="8dp"
                 android:layout_marginStart="8dp"
                 tools:text="text [tэkst]"
-                android:layout_marginTop="8dp"/>
+                android:layout_marginTop="8dp"
+                tools:background="@color/green_transparent"
+                />
         </ScrollView>
 
         <TextView
@@ -229,7 +234,8 @@
             android:visibility="invisible"
             tools:background="@color/colorPrimary"
             tools:visibility="visible"
-            />
+            android:layout_marginRight="0dp"
+            app:layout_constraintRight_toRightOf="parent"/>
 
         </android.support.constraint.ConstraintLayout>
 
@@ -238,13 +244,14 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_below="@+id/word_to_translate"
-        android:visibility="gone"
+        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/word_to_translate"
-        tools:visibility="invisible"
-        >
+        tools:visibility="gone"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintVertical_bias="0.0">
 
         <TextView
             android:id="@+id/textView"

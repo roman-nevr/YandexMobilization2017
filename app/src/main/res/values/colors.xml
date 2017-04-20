@@ -9,6 +9,7 @@
     <color name="colorText">#00529e</color>
     <color name="red_transparent">#a7ff0000</color>
     <color name="blue_transparent">#a70011ff</color>
+    <color name="green_transparent">#710dff00</color>
     <color name="light_grey">#9b9b9b</color>
     <color name="dark_grey">#6e6e6e</color>
 </resources>

@@ -6,11 +6,13 @@
     <string name="title_language_selector_source">Выберите исходный язык</string>
     <string name="title_language_selector_target">Выберите язык перевода</string>
 
+    <string name="translator_hint">Вводите текст</string>
+
     <string name="connection_error">Пожалуйста, проверьте \n подключение к Интернету \n после этого нажмите повторить</string>
     <string name="repeat_action">Повторить</string>
     <string name="connection_error_title">Ошибка соединения</string>
 
     <string name="translate_api_ua_text"><u>Переведено сервисом «Яндекс.Переводчик»</u></string>
-    <string name="dictionary_api_ua_text"><u>Реализовано с помощью сервиса «API «Яндекс.Словарь»</u></string>
+    <string name="dictionary_api_ua_text"><u>Реализовано с помощью сервиса\n«API «Яндекс.Словарь»</u></string>
 
 </resources>
