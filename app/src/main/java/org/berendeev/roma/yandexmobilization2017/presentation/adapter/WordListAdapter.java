@@ -80,6 +80,8 @@ public class WordListAdapter extends RecyclerView.Adapter<WordListAdapter.WordHo
             });
 
             itemView.setOnClickListener(v -> presenter.onItemClick(getAdapterPosition()));
+
+            itemView.setOnLongClickListener(v -> presenter.onItemLongClick(getAdapterPosition()));
         }
 
         public void switchOnFavButton() {

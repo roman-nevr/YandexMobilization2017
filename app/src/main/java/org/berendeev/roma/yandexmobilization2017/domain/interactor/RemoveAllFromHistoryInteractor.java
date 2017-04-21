@@ -9,16 +9,16 @@ import javax.inject.Inject;
 
 import io.reactivex.Observable;
 
-public class RemoveAllFromHistoryInteractor extends Interactor<List<Word>, Void> {
+public class RemoveAllFromHistoryInteractor extends Interactor<Void, Void> {
 
     @Inject HistoryAndFavouritesRepository repository;
 
     @Inject
     public RemoveAllFromHistoryInteractor() {}
 
-    @Override public Observable<List<Word>> buildObservable(Void param) {
+    @Override public Observable<Void> buildObservable(Void param) {
         return repository.removeAllFromHistory()
-                .andThen(repository.getHistory());
+                .toObservable();
     }
 
 }

@@ -23,7 +23,7 @@
         app:layout_constraintTop_toTopOf="parent"
         >
 
-        <RelativeLayout
+        <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:orientation="horizontal"
@@ -35,22 +35,28 @@
                 android:layout_alignParentTop="true"
                 android:layout_toLeftOf="@+id/swap_button"
                 android:layout_toStartOf="@+id/swap_button"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:paddingLeft="8dp"
-                android:paddingRight="8dp"
-                android:textAllCaps="false"
-                android:textSize="18sp"
-                tools:text="Russian Fed"/>
+                style="@style/LanguageLabelsStyle"
+                tools:text="Russian Federation La"
+                app:layout_constraintRight_toLeftOf="@+id/swap_button"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintTop_toTopOf="parent"
+                />
 
             <ImageButton
                 android:id="@+id/swap_button"
                 android:layout_width="?attr/actionBarSize"
-                android:layout_height="match_parent"
+                android:layout_height="0dp"
                 android:layout_alignParentTop="true"
                 android:layout_centerHorizontal="true"
                 android:layout_gravity="center"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                app:srcCompat="@drawable/ic_arrows"/>
+                app:srcCompat="@drawable/ic_arrows"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                />
 
             <Button
                 android:id="@+id/language_to"
@@ -59,14 +65,15 @@
                 android:layout_alignParentTop="true"
                 android:layout_toEndOf="@+id/swap_button"
                 android:layout_toRightOf="@+id/swap_button"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:minWidth="0dp"
-                android:paddingLeft="16dp"
-                android:paddingRight="16dp"
-                android:textAllCaps="false"
-                android:textSize="18sp"
-                tools:text="Engl"/>
-        </RelativeLayout>
+                style="@style/LanguageLabelsStyle"
+                tools:text="English Langua"
+                android:ellipsize="end"
+                app:layout_constraintLeft_toRightOf="@+id/swap_button"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintTop_toTopOf="parent"
+                />
+        </android.support.constraint.ConstraintLayout>
 
     </android.support.v7.widget.Toolbar>
 
@@ -96,14 +103,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        android:layout_marginLeft="8dp"
         android:visibility="invisible"
         android:background="?attr/selectableItemBackgroundBorderless"
         app:layout_constraintBottom_toBottomOf="@+id/word_to_translate"
         app:layout_constraintRight_toRightOf="parent"
         app:srcCompat="@drawable/ic_clear_black"
         tools:visibility="visible"
-        android:layout_marginRight="8dp"/>
+        android:layout_marginRight="8dp"
+        android:layout_marginEnd="8dp"/>
 
     <android.support.constraint.ConstraintLayout
         android:id="@+id/translation_layout"
@@ -149,10 +156,10 @@
             android:textColor="@color/textColorPrimary"
             android:gravity="center_horizontal"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/translation"
+            app:layout_constraintTop_toBottomOf="@+id/translation"
             android:layout_marginLeft="8dp"
             android:visibility="invisible"
-            />
+            android:layout_marginStart="8dp"/>
 
         <ImageButton
             android:id="@+id/fav_button"
@@ -191,7 +198,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/translation_layout"
+        app:layout_constraintTop_toBottomOf="@+id/translation_layout"
         tools:visibility="visible"
         tools:background="@color/blue_transparent"
         >
@@ -234,7 +241,6 @@
             android:visibility="invisible"
             tools:background="@color/colorPrimary"
             tools:visibility="visible"
-            android:layout_marginRight="0dp"
             app:layout_constraintRight_toRightOf="parent"/>
 
         </android.support.constraint.ConstraintLayout>

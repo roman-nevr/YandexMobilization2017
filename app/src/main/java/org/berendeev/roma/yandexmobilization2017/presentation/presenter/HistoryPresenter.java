@@ -1,5 +1,6 @@
 package org.berendeev.roma.yandexmobilization2017.presentation.presenter;
 
+import org.berendeev.roma.yandexmobilization2017.BuildConfig;
 import org.berendeev.roma.yandexmobilization2017.R;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.Word;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.GetFavouritesInteractor;
@@ -10,10 +11,8 @@ import org.berendeev.roma.yandexmobilization2017.domain.interactor.OnHistoryChan
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.RemoveAllFromFavouritesInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.RemoveAllFromHistoryInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.RemoveFromFavouritesInteractor;
+import org.berendeev.roma.yandexmobilization2017.domain.interactor.RemoveFromHistoryInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.SaveInFavouriteInteractor;
-import org.berendeev.roma.yandexmobilization2017.domain.interactor.SaveLastWordInteractor;
-import org.berendeev.roma.yandexmobilization2017.domain.interactor.SetDirectionFromInteractor;
-import org.berendeev.roma.yandexmobilization2017.domain.interactor.SetDirectionToInteractor;
 import org.berendeev.roma.yandexmobilization2017.domain.interactor.SetWordInTranslatorInteractor;
 import org.berendeev.roma.yandexmobilization2017.presentation.view.WordListView;
 
@@ -32,14 +31,16 @@ public class HistoryPresenter {
     @Inject RemoveAllFromHistoryInteractor removeAllFromHistoryInteractor;
     @Inject SaveInFavouriteInteractor saveInFavouriteInteractor;
     @Inject RemoveFromFavouritesInteractor removeFromFavouritesInteractor;
+    @Inject RemoveFromHistoryInteractor removeFromHistoryInteractor;
     @Inject OnHistoryChangedInteractor onHistoryChangedInteractor;
     @Inject OnFavouritesChangedInteractor onFavouritesChangedInteractor;
     @Inject SetWordInTranslatorInteractor setWordInTranslatorInteractor;
 
     private int type;
     private Interactor<List<Word>, Void> getInteractor;
-    private Interactor<List<Word>, Void> deleteAllInteractor;
-    private Interactor<Integer, Void> changesInteractor;
+    private Interactor<Void, Void> deleteAllInteractor;
+    private Interactor<Void, Word> deleteInteractor;
+//    private Interactor<Integer, Void> changesInteractor;
     private WordListView view;
     private WordListView.Router router;
     private CompositeDisposable disposable;
@@ -54,12 +55,12 @@ public class HistoryPresenter {
     public void start() {
         loadWordList();
         setTitle();
-        subscribeOnChanges();
+//        subscribeOnChanges();
     }
 
-    private void subscribeOnChanges() {
-        disposable.add(changesInteractor.execute(new OnChangeObserver(), null));
-    }
+//    private void subscribeOnChanges() {
+//        disposable.add(changesInteractor.execute(new OnChangeObserver(), null));
+//    }
 
     public void stop() {
         disposable.clear();
@@ -74,24 +75,43 @@ public class HistoryPresenter {
         this.type = type;
         if (type == R.id.favourites_type) {
             getInteractor = getFavouritesInteractor;
+            deleteInteractor = removeFromFavouritesInteractor;
             deleteAllInteractor = removeAllFromFavouritesInteractor;
             titleId = R.string.title_favourite;
-            changesInteractor = onFavouritesChangedInteractor;
+//            changesInteractor = onFavouritesChangedInteractor;
         }
         if (type == R.id.history_type) {
             getInteractor = getHistoryInteractor;
+            deleteInteractor = removeFromHistoryInteractor;
             deleteAllInteractor = removeAllFromHistoryInteractor;
-            changesInteractor = onHistoryChangedInteractor;
+//            changesInteractor = onHistoryChangedInteractor;
             titleId = R.string.title_history;
         }
     }
 
-    public void deleteAll() {
-        deleteAllInteractor.execute(new WordsObserver(), null);
+    public void onDeleteConfirm(int number) {
+        Word word;
+        try {
+            word = words.get(number);
+            deleteInteractor.execute(new OnChangeObserver(), word);
+        }catch (IndexOutOfBoundsException e){
+            if(BuildConfig.DEBUG){
+                throw new IllegalArgumentException("wrong number in list");
+            }
+        }
+    }
+
+    public void onDeleteAllClick() {
+        view.showDeleteAllDialog(type);
+    }
+
+    public void onDeleteAllConfirm(){
+        deleteAllInteractor.execute(new OnChangeObserver(), null);
+
     }
 
     public void onFavButtonClick(int index) {
-        disposable.clear();
+//        disposable.clear();
         Word word = words.get(index);
         if (word.isFavourite()) {
             word = word.toBuilder()
@@ -119,14 +139,14 @@ public class HistoryPresenter {
         this.router = router;
     }
 
-    public void onShow() {
-        loadWordList();
-        subscribeOnChanges();
-    }
-
-    public void onHide() {
-        disposable.clear();
-    }
+//    public void onShow() {
+//        loadWordList();
+//        subscribeOnChanges();
+//    }
+//
+//    public void onHide() {
+//        disposable.clear();
+//    }
 
     private void loadWordList() {
         getInteractor.execute(new WordsObserver(), null);
@@ -134,6 +154,11 @@ public class HistoryPresenter {
 
     private void setTitle() {
         view.setTitleById(titleId);
+    }
+
+    public boolean onItemLongClick(int adapterPosition) {
+        view.showDeleteDialog(adapterPosition);
+        return true;
     }
 
     private class WordsObserver extends DisposableObserver<List<Word>> {
@@ -149,16 +174,16 @@ public class HistoryPresenter {
         }
     }
 
-    private class OnChangeObserver extends DisposableObserver<Integer> {
+    private class OnChangeObserver extends DisposableObserver<Void> {
 
-        @Override public void onNext(Integer integer) {
-            loadWordList();
+        @Override public void onNext(Void param) {
         }
 
         @Override public void onError(Throwable e) {
         }
 
         @Override public void onComplete() {
+            loadWordList();
         }
     }
 

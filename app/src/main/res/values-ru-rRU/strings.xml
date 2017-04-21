@@ -7,6 +7,13 @@
     <string name="title_language_selector_target">Выберите язык перевода</string>
 
     <string name="translator_hint">Вводите текст</string>
+    <string name="delete_label">Удалить</string>
+
+    <string name="delete_all_text">Удалить </string>
+    <string name="delete_all_favourites">все избранное?</string>
+    <string name="delete_all_history">всю историю?</string>
+    <string name="delete_button_label">Удалить</string>
+    <string name="cancel_button_label">Отменить</string>
 
     <string name="connection_error">Пожалуйста, проверьте \n подключение к Интернету \n после этого нажмите повторить</string>
     <string name="repeat_action">Повторить</string>

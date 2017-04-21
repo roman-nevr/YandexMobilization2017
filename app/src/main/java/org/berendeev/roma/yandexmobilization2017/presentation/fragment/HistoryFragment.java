@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.DividerItemDecoration;
@@ -22,6 +23,8 @@ import org.berendeev.roma.yandexmobilization2017.R;
 import org.berendeev.roma.yandexmobilization2017.domain.entity.Word;
 import org.berendeev.roma.yandexmobilization2017.presentation.App;
 import org.berendeev.roma.yandexmobilization2017.presentation.adapter.WordListAdapter;
+import org.berendeev.roma.yandexmobilization2017.presentation.dialog.DeleteAllDialog;
+import org.berendeev.roma.yandexmobilization2017.presentation.dialog.DeleteDialog;
 import org.berendeev.roma.yandexmobilization2017.presentation.presenter.HistoryPresenter;
 import org.berendeev.roma.yandexmobilization2017.presentation.view.WordListView;
 
@@ -33,9 +36,12 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 
-public class HistoryFragment extends Fragment implements WordListView {
+public class HistoryFragment extends Fragment implements WordListView, DeleteDialog.DeleteDialogListener,
+        DeleteAllDialog.DeleteAllDialogListener{
 
     public static final String TYPE = "type";
+    public static final String DELETE = "delete";
+    private static final String DELETE_ALL = "delete_all";
     @Inject HistoryPresenter presenter;
 
     @BindView(R.id.toolbar) Toolbar toolbar;
@@ -79,13 +85,13 @@ public class HistoryFragment extends Fragment implements WordListView {
         presenter.stop();
     }
 
-    @Override public void onHiddenChanged(boolean hidden) {
-        if (!hidden) {
-            presenter.onShow();
-        } else {
-            presenter.onHide();
-        }
-    }
+//    @Override public void onHiddenChanged(boolean hidden) {
+//        if (!hidden) {
+//            presenter.onShow();
+//        } else {
+//            presenter.onHide();
+//        }
+//    }
 
     private void initDi() {
         App.getApplication().getMainComponent().plusHistoryComponent().inject(this);
@@ -98,7 +104,7 @@ public class HistoryFragment extends Fragment implements WordListView {
                 layoutManager.getOrientation());
         recyclerView.addItemDecoration(dividerItemDecoration);
         recyclerView.setLayoutManager(layoutManager);
-        deleteButton.setOnClickListener(v -> presenter.deleteAll());
+        deleteButton.setOnClickListener(v -> presenter.onDeleteAllClick());
         colorFavourite = ContextCompat.getColor(getContext(), R.color.colorPrimary);
         colorNotFavourite = ContextCompat.getColor(getContext(), R.color.light_grey);
         ((SimpleItemAnimator) recyclerView.getItemAnimator()).setSupportsChangeAnimations(false);
@@ -135,6 +141,16 @@ public class HistoryFragment extends Fragment implements WordListView {
         ((WordListAdapter.WordHolder) recyclerView.getChildViewHolder(recyclerView.getChildAt(index))).switchOnFavButton();
     }
 
+    @Override public void showDeleteDialog(int adapterPosition) {
+        DialogFragment dialog = DeleteDialog.getInstance(adapterPosition);
+        dialog.show(getChildFragmentManager(), DELETE);
+    }
+
+    @Override public void showDeleteAllDialog(int type) {
+        DialogFragment dialog = DeleteAllDialog.getInstance(type);
+        dialog.show(getChildFragmentManager(), DELETE_ALL);
+    }
+
     public static Fragment getHistoryFragment() {
         return getInstance(R.id.history_type);
     }
@@ -151,4 +167,11 @@ public class HistoryFragment extends Fragment implements WordListView {
         return fragment;
     }
 
+    @Override public void onDialogComplete(int number) {
+        presenter.onDeleteConfirm(number);
+    }
+
+    @Override public void onDeleteAllConfirm() {
+        presenter.onDeleteAllConfirm();
+    }
 }

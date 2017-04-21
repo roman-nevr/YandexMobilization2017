@@ -7,6 +7,13 @@
     <string name="title_language_selector_target">Select target language</string>
 
     <string name="translator_hint">Type text here</string>
+    <string name="delete_label">Delete</string>
+
+    <string name="delete_all_text">Delete all </string>
+    <string name="delete_all_favourites"> from favourites?</string>
+    <string name="delete_all_history">history?</string>
+    <string name="delete_button_label">Delete</string>
+    <string name="cancel_button_label">Cancel</string>
 
     <string name="connection_error">Please check your internet \n connection and try again</string>
     <string name="repeat_action">Try again</string>

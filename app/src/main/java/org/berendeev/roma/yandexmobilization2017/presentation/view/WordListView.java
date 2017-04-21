@@ -15,6 +15,10 @@ public interface WordListView {
 
     void switchOnFavButtonAt(int index);
 
+    void showDeleteDialog(int adapterPosition);
+
+    void showDeleteAllDialog(int type);
+
     interface Router{
         void moveShowWordInTranslator();
     }
